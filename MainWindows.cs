@@ -291,9 +291,7 @@ namespace AllSky_2020
                     }
 
                     GC.Collect();
-                    Thread.Sleep(500);
-                    //Task.Delay(2000);
-                    //Thread.Sleep(CameraTimeWait);
+                    Thread.Sleep(200);
                     goto STARTPROCESS;
                 }
                 else
@@ -550,13 +548,18 @@ namespace AllSky_2020
 
         private void FocusSet_Click(object sender, EventArgs e)
         {
-
+                //IsAutoExposureTime.Checked = false;
+                if (AppSetting.Data.ExposureTime <= 200)
+                {
+                    AppSetting.Data.ExposureTime = 1000;
+                }
                 int CameraWidth = Int16.Parse(ROITextWidth.Text);
                 int CameraHeight = Int16.Parse(ROITextHeight.Text);
+
                 StringBuilder msgBuilder = new StringBuilder("Performance: ");
                 
                 //Load the image from file and resize it for display
-                Image<Bgr, Byte> img = ProcessFrame.Resize(500, 500, Emgu.CV.CvEnum.Inter.Linear, true);
+                Image<Bgr, Byte> img = ROIFrame.Resize(400, 400, Emgu.CV.CvEnum.Inter.Linear, true);
 
                 //Convert the image to grayscale and filter out the noise
                 UMat uimage = new UMat();
@@ -572,8 +575,10 @@ namespace AllSky_2020
                 #region circle detection
                 Stopwatch watch = Stopwatch.StartNew();
                 double cannyThreshold = 300;
+                //double circleAccumulatorThreshold = 120;
                 double circleAccumulatorThreshold = 120;
-                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
 
                 watch.Stop();
                 msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
@@ -594,7 +599,7 @@ namespace AllSky_2020
                    10); //gap between lines
 
                 watch.Stop();
-                msgBuilder.Append(String.Format("Canny & Hough lines - {0} ms; ", watch.ElapsedMilliseconds));
+                //msgBuilder.Append(String.Format("Canny & Hough lines - {0} ms; ", watch.ElapsedMilliseconds));
                 #endregion
 
                 #region Find triangles and rectangles
@@ -650,7 +655,7 @@ namespace AllSky_2020
                 }
 
                 watch.Stop();
-                msgBuilder.Append(String.Format("Triangles & Rectangles - {0} ms; ", watch.ElapsedMilliseconds));
+                //msgBuilder.Append(String.Format("Triangles & Rectangles - {0} ms; ", watch.ElapsedMilliseconds));
                 #endregion
 
                 HoughCircles.Image = img;
@@ -665,6 +670,7 @@ namespace AllSky_2020
                 HoughCircles.Image = circleImage;
                 #endregion
             }
+            //IsAutoExposureTime.Checked = true;
         }
 
         private void CameraList_SelectedIndexChanged(object sender, EventArgs e)
@@ -814,7 +820,7 @@ namespace AllSky_2020
 
                     // if (ROIRec.Width < 1 && ROIRec.Height < 1)
                     // {
-                    ROIImage.Image = ProcessFrame; //ROIFrameOnGrayImage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                    //ROIImage.Image = ProcessFrame; //ROIFrameOnGrayImage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                     ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
 
                     // }
@@ -1602,18 +1608,6 @@ namespace AllSky_2020
 
 
 
-
-
-
-                            //System.Diagnostics.Debug.WriteLine("DateTime.Now = "+DateTime.Now.ToString("HH tt"));
-
-                            //string ExposureAMPM = DateTime.Now.ToString("tt");
-                            //System.Diagnostics.Debug.WriteLine("RGBALL = " + Colorall);
-
-
-
-
-
                             Task AutoExposureTime = Task.Run(() =>
                             {
 
@@ -1623,15 +1617,15 @@ namespace AllSky_2020
 
 
                                 //  ======================== AutoExposureTime -  ========================
-                                if (CameraStateText.Text != "ASI_EXP_IDLE")
-                                //if (CameraStateText.Text !=  "ASI_EXP_WORKING")
+                                //if (CameraStateText.Text != "ASI_EXP_IDLE")
+                                if (CameraStateText.Text !=  "ASI_EXP_WORKING")
                                 {
 
 
                                     if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 15000)
                                     {
                                         AppSetting.Data.ExposureTime = 8000;
-                                        Task.Delay(8000);
+                                        //Task.Delay(8000);
                                         //GC.Collect();
 
                                         //goto STARTExposure;
@@ -1639,7 +1633,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 8000)
                                     {
                                         AppSetting.Data.ExposureTime = 4000;
-                                        Task.Delay(4000);
+                                        //Task.Delay(4000);
                                         // GC.Collect();
 
                                         //goto STARTExposure;
@@ -1647,7 +1641,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 4000)
                                     {
                                         AppSetting.Data.ExposureTime = 2000;
-                                        Task.Delay(2000);
+                                        //Task.Delay(2000);
                                         //GC.Collect();
 
                                         //goto STARTExposure;
@@ -1655,7 +1649,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2000)
                                     {
                                         AppSetting.Data.ExposureTime = 1000;
-                                        Task.Delay(1000);
+                                        //Task.Delay(1000);
                                         //GC.Collect();
 
                                         //goto STARTExposure;
@@ -1663,7 +1657,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 1000)
                                     {
                                         AppSetting.Data.ExposureTime = 500;
-                                        Task.Delay(1000);
+                                        //Task.Delay(1000);
                                         //GC.Collect();
 
                                         //goto STARTExposure;
@@ -1672,7 +1666,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 500)
                                     {
                                         AppSetting.Data.ExposureTime = 250;
-                                        Task.Delay(1000);
+                                        //Task.Delay(1000);
                                         //GC.Collect();
 
                                         //goto STARTExposure;
@@ -1680,7 +1674,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 250)
                                     {
                                         AppSetting.Data.ExposureTime = 125;
-                                        Task.Delay(1000);
+                                        //Task.Delay(1000);
                                         //GC.Collect();
 
                                         //goto STARTExposure;
@@ -1688,7 +1682,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 125)
                                     {
                                         AppSetting.Data.ExposureTime = 66;
-                                        Task.Delay(1000);
+                                        //Task.Delay(1000);
                                         // GC.Collect();
 
                                         //goto STARTExposure;
@@ -1696,7 +1690,7 @@ namespace AllSky_2020
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 66)
                                     {
                                         AppSetting.Data.ExposureTime = 33;
-                                        Task.Delay(1000);
+                                        //Task.Delay(1000);
                                     }
                                     else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 33)
                                     {
@@ -1716,12 +1710,11 @@ namespace AllSky_2020
 
                                     //========================================================================================
 
-                                    if (CameraStateText.Text != "ASI_EXP_WORKING")
-                                    {
+                                    
                                         if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 9600;
-                                            Task.Delay(9600);
+                                            //Task.Delay(9600);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1729,7 +1722,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 4800;
-                                            Task.Delay(4800);
+                                            //Task.Delay(4800);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1737,7 +1730,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 2400;
-                                            Thread.Sleep(2400);
+                                            //Thread.Sleep(2400);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1745,7 +1738,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 1200;
-                                            Task.Delay(1200);
+                                            //Task.Delay(1200);
                                             //GC.Collect();
 
                                             // goto STARTExposure;
@@ -1753,7 +1746,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 600;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1761,7 +1754,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 500 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 300;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1769,7 +1762,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 250 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 150;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1777,7 +1770,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 125 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 80;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1785,17 +1778,17 @@ namespace AllSky_2020
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 66 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 40;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                         }
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 33 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime = 20;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                         }
                                         else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1 && Colorall < 255)
                                         {
                                             AppSetting.Data.ExposureTime -= 0.1;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                         }
 
 
@@ -1804,7 +1797,7 @@ namespace AllSky_2020
                                         if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 10000;
-                                            Task.Delay(10000);
+                                            //Task.Delay(10000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1812,7 +1805,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 5000;
-                                            Task.Delay(5000);
+                                            //Task.Delay(5000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1820,7 +1813,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 2500;
-                                            Task.Delay(2500);
+                                            //Task.Delay(2500);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1828,7 +1821,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 1250;
-                                            Task.Delay(1250);
+                                            //Task.Delay(1250);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1836,7 +1829,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 625;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1844,7 +1837,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 500 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 312;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1852,7 +1845,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 250 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 160;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1860,7 +1853,7 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 125 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 83;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                         }
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 66 && Colorall < 200)
                                         {
@@ -1870,15 +1863,15 @@ namespace AllSky_2020
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 33 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime = 25;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                         }
                                         else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1 && Colorall < 200)
                                         {
                                             AppSetting.Data.ExposureTime -= 0.1;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                         }
 
-                                    }
+                                    
 
                                     //========================================================================================
                                     if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 150)
@@ -1939,7 +1932,7 @@ namespace AllSky_2020
                                         if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 15000 && Colorall > 50)
                                         {
                                             AppSetting.Data.ExposureTime += 40;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -1947,7 +1940,7 @@ namespace AllSky_2020
                                         else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 8000 && Colorall > 50 && AppSetting.Data.ExposureTime < 15000)
                                         {
                                             AppSetting.Data.ExposureTime += 30;
-                                            Task.Delay(1000);
+                                            //Task.Delay(1000);
                                             //GC.Collect();
 
                                             //goto STARTExposure;
@@ -2012,12 +2005,11 @@ namespace AllSky_2020
 
                                         //========================================================================================
 
-                                        if (CameraStateText.Text != "ASI_EXP_WORKING")
-                                        {
+                                        
                                             if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 30000)
                                             {
-                                                AppSetting.Data.ExposureTime += 500;
-                                                Task.Delay(30000);
+                                                AppSetting.Data.ExposureTime += 1000;
+                                                //Task.Delay(30000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2025,14 +2017,14 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 15000 && AppSetting.Data.ExposureTime < 30000)
                                             {
                                                 AppSetting.Data.ExposureTime = 30000;
-                                                Task.Delay(15000);
+                                                //Task.Delay(15000);
                                                 //GC.Collect();
                                                 //goto STARTExposure;
                                             }
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 8000 && AppSetting.Data.ExposureTime < 15000)
                                             {
                                                 AppSetting.Data.ExposureTime = 15000;
-                                                Task.Delay(8000);
+                                                //Task.Delay(8000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2040,7 +2032,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 4000 && AppSetting.Data.ExposureTime < 8000)
                                             {
                                                 AppSetting.Data.ExposureTime = 8000;
-                                                Task.Delay(4000);
+                                                //Task.Delay(4000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2048,7 +2040,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 2000 && AppSetting.Data.ExposureTime < 4000)
                                             {
                                                 AppSetting.Data.ExposureTime = 4000;
-                                                Task.Delay(2000);
+                                                //Task.Delay(2000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2056,7 +2048,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 2000)
                                             {
                                                 AppSetting.Data.ExposureTime = 2000;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2064,7 +2056,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000)
                                             {
                                                 AppSetting.Data.ExposureTime = 1000;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2072,7 +2064,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500)
                                             {
                                                 AppSetting.Data.ExposureTime = 500;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2081,7 +2073,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250)
                                             {
                                                 AppSetting.Data.ExposureTime = 250;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2089,7 +2081,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125)
                                             {
                                                 AppSetting.Data.ExposureTime = 125;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2097,7 +2089,7 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 66)
                                             {
                                                 AppSetting.Data.ExposureTime = 66;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
@@ -2105,18 +2097,18 @@ namespace AllSky_2020
                                             else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 33)
                                             {
                                                 AppSetting.Data.ExposureTime = 33;
-                                                Task.Delay(1000);
+                                                //Task.Delay(1000);
                                                 //GC.Collect();
 
                                                 //goto STARTExposure;
                                             }
 
-                                            else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime >= 5)
+                                            else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime >= 10)
                                             {
-                                                AppSetting.Data.ExposureTime += 0.1;
+                                                AppSetting.Data.ExposureTime += 1;
 
                                             }
-                                            else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 5 && AppSetting.Data.ExposureTime > 0.3)
+                                            else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 10 && AppSetting.Data.ExposureTime > 0.3)
                                             {
                                                 AppSetting.Data.ExposureTime += 0.1;
 
@@ -2133,7 +2125,7 @@ namespace AllSky_2020
                                                     AppSetting.Data.ExposureTime = 1;
                                                 }
 
-                                            }
+                                            
 
 
 
@@ -2147,17 +2139,16 @@ namespace AllSky_2020
                                         }
                                     }
                                 }
+                                //AppSetting.Save();
                                 Thread.Sleep(2000);
 
                                 GC.Collect();
 
 
-                                //AppSetting.Save();
+                                
 
 
                             });
-
-
 
 
 
