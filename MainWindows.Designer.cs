@@ -71,6 +71,7 @@
             this.Savebutton = new System.Windows.Forms.Button();
             this.SavePath = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.FocusSet = new System.Windows.Forms.Button();
             this.ShowFocusPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxAverage = new System.Windows.Forms.CheckBox();
             this.ResetZoom = new System.Windows.Forms.Button();
@@ -111,6 +112,7 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
+            this.HoughCircles = new Emgu.CV.UI.ImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -129,12 +131,14 @@
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Histogram)).BeginInit();
+            this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ExpouseTimeText)).BeginInit();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -532,6 +536,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.HoughCircles);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -571,6 +576,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.FocusSet);
             this.groupBox3.Controls.Add(this.ShowFocusPoint);
             this.groupBox3.Controls.Add(this.checkBoxAverage);
             this.groupBox3.Controls.Add(this.ResetZoom);
@@ -589,6 +595,16 @@
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Camera State";
+            // 
+            // FocusSet
+            // 
+            this.FocusSet.Location = new System.Drawing.Point(361, 282);
+            this.FocusSet.Name = "FocusSet";
+            this.FocusSet.Size = new System.Drawing.Size(75, 23);
+            this.FocusSet.TabIndex = 12;
+            this.FocusSet.Text = "Set Focus";
+            this.FocusSet.UseVisualStyleBackColor = true;
+            this.FocusSet.Click += new System.EventHandler(this.FocusSet_Click);
             // 
             // ShowFocusPoint
             // 
@@ -979,6 +995,14 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
+            // HoughCircles
+            // 
+            this.HoughCircles.Location = new System.Drawing.Point(6, 6);
+            this.HoughCircles.Name = "HoughCircles";
+            this.HoughCircles.Size = new System.Drawing.Size(401, 322);
+            this.HoughCircles.TabIndex = 2;
+            this.HoughCircles.TabStop = false;
+            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1010,6 +1034,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Histogram)).EndInit();
+            this.tabPage2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1021,6 +1046,7 @@
             this.groupBox4.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1106,6 +1132,8 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart Histogram;
         private System.Windows.Forms.CheckBox Histogramcheck;
         private System.Windows.Forms.CheckBox ShowFocusPoint;
+        private System.Windows.Forms.Button FocusSet;
+        private Emgu.CV.UI.ImageBox HoughCircles;
     }
 }
 

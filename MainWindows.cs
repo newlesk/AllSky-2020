@@ -20,7 +20,7 @@ using static ZWOptical.ASISDK.ASICameraDll2;
 using System.IO;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
-
+using Emgu.CV.Util;
 
 namespace AllSky_2020
 {
@@ -291,7 +291,7 @@ namespace AllSky_2020
                     }
 
                     GC.Collect();
-                    Thread.Sleep(200);
+                    Thread.Sleep(500);
                     //Task.Delay(2000);
                     //Thread.Sleep(CameraTimeWait);
                     goto STARTPROCESS;
@@ -548,6 +548,125 @@ namespace AllSky_2020
 
         }
 
+        private void FocusSet_Click(object sender, EventArgs e)
+        {
+
+                int CameraWidth = Int16.Parse(ROITextWidth.Text);
+                int CameraHeight = Int16.Parse(ROITextHeight.Text);
+                StringBuilder msgBuilder = new StringBuilder("Performance: ");
+                
+                //Load the image from file and resize it for display
+                Image<Bgr, Byte> img = ProcessFrame.Resize(500, 500, Emgu.CV.CvEnum.Inter.Linear, true);
+
+                //Convert the image to grayscale and filter out the noise
+                UMat uimage = new UMat();
+                CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
+
+                //use image pyr to remove noise
+                UMat pyrDown = new UMat();
+                CvInvoke.PyrDown(uimage, pyrDown);
+                CvInvoke.PyrUp(pyrDown, uimage);
+
+                //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
+
+                #region circle detection
+                Stopwatch watch = Stopwatch.StartNew();
+                double cannyThreshold = 300;
+                double circleAccumulatorThreshold = 120;
+                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
+
+                watch.Stop();
+                msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
+                #endregion
+
+                #region Canny and edge detection
+                watch.Reset(); watch.Start();
+                double cannyThresholdLinking = 120.0;
+                UMat cannyEdges = new UMat();
+                CvInvoke.Canny(uimage, cannyEdges, cannyThreshold, cannyThresholdLinking);
+
+                LineSegment2D[] lines = CvInvoke.HoughLinesP(
+                   cannyEdges,
+                   1, //Distance resolution in pixel-related units
+                   Math.PI / 45.0, //Angle resolution measured in radians.
+                   20, //threshold
+                   30, //min Line width
+                   10); //gap between lines
+
+                watch.Stop();
+                msgBuilder.Append(String.Format("Canny & Hough lines - {0} ms; ", watch.ElapsedMilliseconds));
+                #endregion
+
+                #region Find triangles and rectangles
+                watch.Reset(); watch.Start();
+                List<Triangle2DF> triangleList = new List<Triangle2DF>();
+                List<RotatedRect> boxList = new List<RotatedRect>(); //a box is a rotated rectangle
+
+                using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+                {
+                    CvInvoke.FindContours(cannyEdges, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+                    int count = contours.Size;
+                    for (int i = 0; i < count; i++)
+                    {
+                        using (VectorOfPoint contour = contours[i])
+                        using (VectorOfPoint approxContour = new VectorOfPoint())
+                        {
+                            CvInvoke.ApproxPolyDP(contour, approxContour, CvInvoke.ArcLength(contour, true) * 0.05, true);
+                            if (CvInvoke.ContourArea(approxContour, false) > 250) //only consider contours with area greater than 250
+                            {
+                                if (approxContour.Size == 3) //The contour has 3 vertices, it is a triangle
+                                {
+                                    Point[] pts = approxContour.ToArray();
+                                    triangleList.Add(new Triangle2DF(
+                                       pts[0],
+                                       pts[1],
+                                       pts[2]
+                                       ));
+                                }
+                                else if (approxContour.Size == 4) //The contour has 4 vertices.
+                                {
+                                    #region determine if all the angles in the contour are within [80, 100] degree
+                                    bool isRectangle = true;
+                                    Point[] pts = approxContour.ToArray();
+                                    LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+
+                                    for (int j = 0; j < edges.Length; j++)
+                                    {
+                                        double angle = Math.Abs(
+                                           edges[(j + 1) % edges.Length].GetExteriorAngleDegree(edges[j]));
+                                        if (angle < 80 || angle > 100)
+                                        {
+                                            isRectangle = false;
+                                            break;
+                                        }
+                                    }
+                                    #endregion
+
+                                    if (isRectangle) boxList.Add(CvInvoke.MinAreaRect(approxContour));
+                                }
+                            }
+                        }
+                    
+                }
+
+                watch.Stop();
+                msgBuilder.Append(String.Format("Triangles & Rectangles - {0} ms; ", watch.ElapsedMilliseconds));
+                #endregion
+
+                HoughCircles.Image = img;
+                this.Text = msgBuilder.ToString();
+
+
+
+                #region draw circles
+                Image<Bgr, Byte> circleImage = img;
+                foreach (CircleF circle in circles)
+                    circleImage.Draw(circle, new Bgr(Color.Brown), 2);
+                HoughCircles.Image = circleImage;
+                #endregion
+            }
+        }
+
         private void CameraList_SelectedIndexChanged(object sender, EventArgs e)
         {
 
@@ -673,6 +792,24 @@ namespace AllSky_2020
 
                     //CvInvoke.Circle(ProcessFrame, SunXY, 20, new Bgr(Color.LightGreen).MCvScalar, 2);
 
+
+
+
+
+                    int CameraWidth = Int16.Parse(ROITextWidth.Text);
+                    int CameraHeight = Int16.Parse(ROITextHeight.Text);
+
+                    
+
+
+
+
+
+
+
+
+
+
                     MainImageControl.Image = ProcessFrame;
 
                     // if (ROIRec.Width < 1 && ROIRec.Height < 1)
@@ -682,7 +819,7 @@ namespace AllSky_2020
 
                     // }
 
-
+                    //============
 
 
 
@@ -693,44 +830,24 @@ namespace AllSky_2020
 
                     Image<Bgr, Byte> ImageFrame = ProcessFrame;
 
-                    //=================================================================================================
-
-
-
-
-                    /* Image<Gray, Byte> gray = ImageFrame.Convert<Gray, Byte>().PyrDown().PyrUp();
-
-                     Gray cannyThreshold = new Gray(180);
-                     Gray cannyThresholdLinking = new Gray(120);
-                     Gray circleAccumulatorThreshold = new Gray(120);
-
-                     CircleF[] circles = gray.HoughCircles(
-                         cannyThreshold,
-                         circleAccumulatorThreshold,
-                         5.0, //Resolution of the accumulator used to detect centers of the circles
-                         10.0, //min distance 
-                         5, //min radius
-                         0 //max radius
-                         )[0]; //Get the circles from the first channel
-
-                     Image<Gray, Byte> cannyEdges = gray.Canny(cannyThreshold, cannyThresholdLinking);
-                     LineSegment2D[] lines = cannyEdges.HoughLinesBinary(
-                        1, //Distance resolution in pixel-related units
-                        Math.PI / 45.0, //Angle resolution measured in radians.
-                        20, //threshold
-                        30, //min Line width
-                        10 //gap between lines
-                         )[0]; //Get the lines from the first channel
-
-                     Image<Bgr, Byte> circleImage = ImageFrame.CopyBlank();
-                     foreach (CircleF circle in circles)
-                         circleImage.Draw(circle, new Bgr(Color.Brown), 2);
-                           ImageFrame = circleImage;*/
-
-
-
 
                     //=================================================================================================
+
+
+
+
+                    /*UMat uimage = new UMat();
+                    CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);*/
+
+
+
+
+                    //================================================================================================
+
+
+
+
+
 
 
                     TimeNow = DateTime.Now.ToString("yyyy_MM_dd__HH_mm_ss");
@@ -811,8 +928,8 @@ namespace AllSky_2020
                             {
 
                                 checkBoxAverage.Checked = false;
-                                int CameraWidth = Int16.Parse(ROITextWidth.Text);
-                                int CameraHeight = Int16.Parse(ROITextHeight.Text);
+                                /*int CameraWidth = Int16.Parse(ROITextWidth.Text);
+                                int CameraHeight = Int16.Parse(ROITextHeight.Text);*/
                                 CentroidX = (int)(CameraWidth / 2);
                                 CentroidY = (int)(CameraHeight / 2);
                                 //CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
@@ -847,8 +964,8 @@ namespace AllSky_2020
                             }
                             else
                             {
-                                double CameraWidth = AppSetting.Data.ImageWidth;
-                                double CameraHeight = AppSetting.Data.ImageHeight;
+                                /*double CameraWidth = AppSetting.Data.ImageWidth;
+                                double CameraHeight = AppSetting.Data.ImageHeight;*/
                                 checkBoxCenter.Checked = false;
                                 checkBoxAverage.Checked = true;
                                 //=======================================Center======================================== 
@@ -1500,14 +1617,14 @@ namespace AllSky_2020
                             Task AutoExposureTime = Task.Run(() =>
                             {
 
-
+                                //Thread.Sleep(2000);
 
 
 
 
                                 //  ======================== AutoExposureTime -  ========================
-                                //if (CameraStateText.Text != "ASI_EXP_IDLE")
-                                if(CameraStateText.Text !=  "ASI_EXP_WORKING")
+                                if (CameraStateText.Text != "ASI_EXP_IDLE")
+                                //if (CameraStateText.Text !=  "ASI_EXP_WORKING")
                                 {
 
 
@@ -2030,7 +2147,7 @@ namespace AllSky_2020
                                         }
                                     }
                                 }
-                                Thread.Sleep(1000);
+                                Thread.Sleep(2000);
 
                                 GC.Collect();
 
@@ -2260,6 +2377,7 @@ namespace AllSky_2020
                 }
 
             }
+            GC.Collect();
         }
 
         private void ExpouseTimeText_ValueChanged(object sender, EventArgs e)
