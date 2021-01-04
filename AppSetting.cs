@@ -28,7 +28,7 @@ namespace AllSky_2020
             public double OriginY { get; set; } = 0.0;
             public double OriginWidth { get; set; } = 0.0;
             public double OriginHeight { get; set; } = 0.0;
-
+            public double TEMPERATURE { get; set; } = 0.0;
             public double ExposureTime { get; set; } = 100;
             public double ZoomScale { get; set; } = 1;
             public double MIN_ISO { get; set; } = 0.0;        //100

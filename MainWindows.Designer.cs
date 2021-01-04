@@ -42,6 +42,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.Histogram = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.FocusPoint = new System.Windows.Forms.ComboBox();
             this.Histogramcheck = new System.Windows.Forms.CheckBox();
             this.CameraList = new System.Windows.Forms.ComboBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -67,6 +68,7 @@
             this.AreaTextY = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.HoughCircles = new Emgu.CV.UI.ImageBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.Savebutton = new System.Windows.Forms.Button();
             this.SavePath = new System.Windows.Forms.TextBox();
@@ -112,7 +114,8 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.HoughCircles = new Emgu.CV.UI.ImageBox();
+            this.FocusPointLable = new System.Windows.Forms.Label();
+            this.SpeedMode = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -132,13 +135,13 @@
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Histogram)).BeginInit();
             this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ExpouseTimeText)).BeginInit();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -259,6 +262,8 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.FocusPointLable);
+            this.splitContainer2.Panel2.Controls.Add(this.FocusPoint);
             this.splitContainer2.Panel2.Controls.Add(this.Histogramcheck);
             this.splitContainer2.Panel2.Controls.Add(this.CameraList);
             this.splitContainer2.Panel2.Controls.Add(this.label22);
@@ -304,6 +309,18 @@
             this.Histogram.TabIndex = 0;
             this.Histogram.Text = "chart1";
             this.Histogram.Click += new System.EventHandler(this.Histogram_Click);
+            // 
+            // FocusPoint
+            // 
+            this.FocusPoint.FormattingEnabled = true;
+            this.FocusPoint.Items.AddRange(new object[] {
+            "21 Focus Points",
+            "15 Focus Points",
+            "9 Focus Points"});
+            this.FocusPoint.Location = new System.Drawing.Point(240, 267);
+            this.FocusPoint.Name = "FocusPoint";
+            this.FocusPoint.Size = new System.Drawing.Size(121, 21);
+            this.FocusPoint.TabIndex = 8;
             // 
             // Histogramcheck
             // 
@@ -545,6 +562,14 @@
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // HoughCircles
+            // 
+            this.HoughCircles.Location = new System.Drawing.Point(6, 6);
+            this.HoughCircles.Name = "HoughCircles";
+            this.HoughCircles.Size = new System.Drawing.Size(401, 322);
+            this.HoughCircles.TabIndex = 2;
+            this.HoughCircles.TabStop = false;
+            // 
             // tabPage3
             // 
             this.tabPage3.Controls.Add(this.Savebutton);
@@ -576,6 +601,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.SpeedMode);
             this.groupBox3.Controls.Add(this.FocusSet);
             this.groupBox3.Controls.Add(this.ShowFocusPoint);
             this.groupBox3.Controls.Add(this.checkBoxAverage);
@@ -995,13 +1021,24 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
-            // HoughCircles
+            // FocusPointLable
             // 
-            this.HoughCircles.Location = new System.Drawing.Point(6, 6);
-            this.HoughCircles.Name = "HoughCircles";
-            this.HoughCircles.Size = new System.Drawing.Size(401, 322);
-            this.HoughCircles.TabIndex = 2;
-            this.HoughCircles.TabStop = false;
+            this.FocusPointLable.AutoSize = true;
+            this.FocusPointLable.Location = new System.Drawing.Point(174, 271);
+            this.FocusPointLable.Name = "FocusPointLable";
+            this.FocusPointLable.Size = new System.Drawing.Size(60, 13);
+            this.FocusPointLable.TabIndex = 9;
+            this.FocusPointLable.Text = "FocusPoint";
+            // 
+            // SpeedMode
+            // 
+            this.SpeedMode.AutoSize = true;
+            this.SpeedMode.Location = new System.Drawing.Point(238, 308);
+            this.SpeedMode.Name = "SpeedMode";
+            this.SpeedMode.Size = new System.Drawing.Size(84, 17);
+            this.SpeedMode.TabIndex = 13;
+            this.SpeedMode.Text = "SpeedMode";
+            this.SpeedMode.UseVisualStyleBackColor = true;
             // 
             // MainWindows
             // 
@@ -1035,6 +1072,7 @@
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Histogram)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1046,7 +1084,6 @@
             this.groupBox4.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1134,6 +1171,9 @@
         private System.Windows.Forms.CheckBox ShowFocusPoint;
         private System.Windows.Forms.Button FocusSet;
         private Emgu.CV.UI.ImageBox HoughCircles;
+        private System.Windows.Forms.ComboBox FocusPoint;
+        private System.Windows.Forms.Label FocusPointLable;
+        private System.Windows.Forms.CheckBox SpeedMode;
     }
 }
 
