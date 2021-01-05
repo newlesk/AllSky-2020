@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.MainImageControl = new Emgu.CV.UI.ImageBox();
@@ -69,6 +69,14 @@
             this.AreaTextY = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label26 = new System.Windows.Forms.Label();
+            this.HoughCircles_Profile = new System.Windows.Forms.ComboBox();
+            this.SaveProfile_HoughCircles = new System.Windows.Forms.Button();
+            this.Save_HoughCircles = new System.Windows.Forms.Button();
+            this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
             this.HoughCircles = new Emgu.CV.UI.ImageBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.Savebutton = new System.Windows.Forms.Button();
@@ -116,14 +124,7 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
-            this.label24 = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
-            this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
-            this.Save_HoughCircles = new System.Windows.Forms.Button();
-            this.SaveProfile_HoughCircles = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.label26 = new System.Windows.Forms.Label();
+            this.Clear_Profile = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -302,17 +303,17 @@
             // 
             // Histogram
             // 
-            chartArea3.Name = "ChartArea1";
-            this.Histogram.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.Histogram.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.Histogram.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.Histogram.Legends.Add(legend1);
             this.Histogram.Location = new System.Drawing.Point(13, 13);
             this.Histogram.Name = "Histogram";
             this.Histogram.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Excel;
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Histogram";
-            this.Histogram.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Histogram";
+            this.Histogram.Series.Add(series1);
             this.Histogram.Size = new System.Drawing.Size(358, 300);
             this.Histogram.TabIndex = 0;
             this.Histogram.Text = "chart1";
@@ -570,8 +571,9 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.Clear_Profile);
             this.tabPage2.Controls.Add(this.label26);
-            this.tabPage2.Controls.Add(this.comboBox1);
+            this.tabPage2.Controls.Add(this.HoughCircles_Profile);
             this.tabPage2.Controls.Add(this.SaveProfile_HoughCircles);
             this.tabPage2.Controls.Add(this.Save_HoughCircles);
             this.tabPage2.Controls.Add(this.circleAccumulatorThreshold_Box);
@@ -587,11 +589,81 @@
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(435, 117);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(36, 13);
+            this.label26.TabIndex = 10;
+            this.label26.Text = "Profile";
+            // 
+            // HoughCircles_Profile
+            // 
+            this.HoughCircles_Profile.FormattingEnabled = true;
+            this.HoughCircles_Profile.Location = new System.Drawing.Point(435, 136);
+            this.HoughCircles_Profile.Name = "HoughCircles_Profile";
+            this.HoughCircles_Profile.Size = new System.Drawing.Size(121, 21);
+            this.HoughCircles_Profile.TabIndex = 9;
+            this.HoughCircles_Profile.SelectedIndexChanged += new System.EventHandler(this.HoughCircles_Profile_SelectedIndexChanged);
+            // 
+            // SaveProfile_HoughCircles
+            // 
+            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(664, 44);
+            this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
+            this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
+            this.SaveProfile_HoughCircles.TabIndex = 8;
+            this.SaveProfile_HoughCircles.Text = "SaveProfile";
+            this.SaveProfile_HoughCircles.UseVisualStyleBackColor = true;
+            this.SaveProfile_HoughCircles.Click += new System.EventHandler(this.SaveProfile_HoughCircles_Click);
+            // 
+            // Save_HoughCircles
+            // 
+            this.Save_HoughCircles.Location = new System.Drawing.Point(583, 44);
+            this.Save_HoughCircles.Name = "Save_HoughCircles";
+            this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
+            this.Save_HoughCircles.TabIndex = 7;
+            this.Save_HoughCircles.Text = "Save";
+            this.Save_HoughCircles.UseVisualStyleBackColor = true;
+            this.Save_HoughCircles.Click += new System.EventHandler(this.Save_HoughCircles_Click);
+            // 
+            // circleAccumulatorThreshold_Box
+            // 
+            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(435, 86);
+            this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
+            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.circleAccumulatorThreshold_Box.TabIndex = 6;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(432, 70);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(138, 13);
+            this.label25.TabIndex = 5;
+            this.label25.Text = "circleAccumulatorThreshold";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(432, 31);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(83, 13);
+            this.label24.TabIndex = 4;
+            this.label24.Text = "cannyThreshold";
+            // 
+            // cannyThreshold_Box
+            // 
+            this.cannyThreshold_Box.Location = new System.Drawing.Point(435, 47);
+            this.cannyThreshold_Box.Name = "cannyThreshold_Box";
+            this.cannyThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.cannyThreshold_Box.TabIndex = 3;
+            // 
             // HoughCircles
             // 
             this.HoughCircles.Location = new System.Drawing.Point(6, 6);
             this.HoughCircles.Name = "HoughCircles";
-            this.HoughCircles.Size = new System.Drawing.Size(354, 241);
+            this.HoughCircles.Size = new System.Drawing.Size(352, 275);
             this.HoughCircles.TabIndex = 2;
             this.HoughCircles.TabStop = false;
             // 
@@ -1056,73 +1128,15 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
-            // cannyThreshold_Box
+            // Clear_Profile
             // 
-            this.cannyThreshold_Box.Location = new System.Drawing.Point(435, 47);
-            this.cannyThreshold_Box.Name = "cannyThreshold_Box";
-            this.cannyThreshold_Box.Size = new System.Drawing.Size(115, 20);
-            this.cannyThreshold_Box.TabIndex = 3;
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(432, 31);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(83, 13);
-            this.label24.TabIndex = 4;
-            this.label24.Text = "cannyThreshold";
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(432, 70);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(138, 13);
-            this.label25.TabIndex = 5;
-            this.label25.Text = "circleAccumulatorThreshold";
-            // 
-            // circleAccumulatorThreshold_Box
-            // 
-            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(435, 86);
-            this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
-            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(115, 20);
-            this.circleAccumulatorThreshold_Box.TabIndex = 6;
-            // 
-            // Save_HoughCircles
-            // 
-            this.Save_HoughCircles.Location = new System.Drawing.Point(583, 44);
-            this.Save_HoughCircles.Name = "Save_HoughCircles";
-            this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
-            this.Save_HoughCircles.TabIndex = 7;
-            this.Save_HoughCircles.Text = "Save";
-            this.Save_HoughCircles.UseVisualStyleBackColor = true;
-            this.Save_HoughCircles.Click += new System.EventHandler(this.Save_HoughCircles_Click);
-            // 
-            // SaveProfile_HoughCircles
-            // 
-            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(664, 44);
-            this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
-            this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
-            this.SaveProfile_HoughCircles.TabIndex = 8;
-            this.SaveProfile_HoughCircles.Text = "SaveProfile";
-            this.SaveProfile_HoughCircles.UseVisualStyleBackColor = true;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(435, 136);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 9;
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(435, 117);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(36, 13);
-            this.label26.TabIndex = 10;
-            this.label26.Text = "Profile";
+            this.Clear_Profile.Location = new System.Drawing.Point(583, 136);
+            this.Clear_Profile.Name = "Clear_Profile";
+            this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
+            this.Clear_Profile.TabIndex = 11;
+            this.Clear_Profile.Text = "ClearAllProfile";
+            this.Clear_Profile.UseVisualStyleBackColor = true;
+            this.Clear_Profile.Click += new System.EventHandler(this.Clear_Profile_Click);
             // 
             // MainWindows
             // 
@@ -1266,7 +1280,8 @@
         private System.Windows.Forms.Button Save_HoughCircles;
         private System.Windows.Forms.Button SaveProfile_HoughCircles;
         private System.Windows.Forms.Label label26;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox HoughCircles_Profile;
+        private System.Windows.Forms.Button Clear_Profile;
     }
 }
 

@@ -60,8 +60,9 @@ namespace AllSky_2020
         private bool Recover;
         double cannyThreshold;
         double circleAccumulatorThreshold;
-
-
+        int[] cannyThreshold_Profile = new int[5];
+        int[] circleAccumulatorThreshold_Profile = new int[5];
+        
 
 
 
@@ -124,14 +125,9 @@ namespace AllSky_2020
                 else
                     Application.Exit();
             }
-            if (IsAutoExposureTime.CheckState == 0)
-            {
-                IsAutoExposureTime.Checked = true;
-                FocusPoint.Text = "21 Focus Points";
-                SpeedMode.Checked = true;
-                //AutoExposureOnTime.Checked = true;
-            }
-
+            
+            
+            
         }
 
 
@@ -188,6 +184,23 @@ namespace AllSky_2020
             MIN_SHUTTERText.Text = string.Format("{0:0}", AppSetting.Data.MIN_SHUTTER);
             MAX_SHUTTERText.Text = string.Format("{0:0}", AppSetting.Data.MAX_SHUTTER);
             MIN_APERTUREText.Text = string.Format("{0:0}", AppSetting.Data.MIN_APERTURE);
+            if (IsAutoExposureTime.CheckState == 0)
+            {
+                IsAutoExposureTime.Checked = true;
+                FocusPoint.Text = "21 Focus Points";
+                SpeedMode.Checked = true;
+            }
+            HoughCircles_Profile.Text = "Select Your Profile";
+            
+
+
+            int lineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
+            for (int i = 0; i < (lineCount / 2); i++)
+            {
+
+                HoughCircles_Profile.Items.Add("Profile " + i);
+
+            }
         }
 
         private void CalculateZoomScale()
@@ -604,7 +617,7 @@ namespace AllSky_2020
 
             cannyThreshold = double.Parse(cannyThreshold_Box.Text);
             circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
-            cannyThreshold_Box.Text = cannyThreshold.ToString();
+            
             //double circleAccumulatorThreshold = 120;
            
             circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
@@ -634,6 +647,108 @@ namespace AllSky_2020
             
         }
 
+        private void SaveProfile_HoughCircles_Click(object sender, EventArgs e)
+        {
+            File.AppendAllText(@"./HoughCircles_Profile.txt", cannyThreshold_Box.Text + "\n" + circleAccumulatorThreshold_Box.Text + "\n");
+            int lineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
+            HoughCircles_Profile.Items.Clear();
+            for (int i = 0; i < (lineCount / 2); i++)
+            {
+
+                HoughCircles_Profile.Items.Add("Profile " + i);
+
+            }
+            
+        }
+
+        private void HoughCircles_Profile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int lineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
+            string[] lines = File.ReadAllLines(@"./HoughCircles_Profile.txt", Encoding.UTF8);
+
+            
+            for (int i = 0; i < lineCount; i++)
+            {
+                if(HoughCircles_Profile.Text == "Profile 0")
+                {
+                    
+                    cannyThreshold_Box.Text = lines[0];
+                    
+                   
+                    circleAccumulatorThreshold_Box.Text = lines[1];
+
+                }
+                
+                else if (HoughCircles_Profile.Text == "Profile " + i && HoughCircles_Profile.Text != "Profile 0")
+                {
+                    cannyThreshold_Box.Text = lines[i*2];
+
+
+                    circleAccumulatorThreshold_Box.Text = lines[i* 2 +1];
+                }
+
+
+            }
+
+            int CameraWidth = Int16.Parse(ROITextWidth.Text);
+            int CameraHeight = Int16.Parse(ROITextHeight.Text);
+
+            StringBuilder msgBuilder = new StringBuilder("Performance: ");
+
+            //Load the image from file and resize it for display
+            Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
+
+            //Convert the image to grayscale and filter out the noise
+            UMat uimage = new UMat();
+            CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
+
+            //use image pyr to remove noise
+            UMat pyrDown = new UMat();
+            CvInvoke.PyrDown(uimage, pyrDown);
+            CvInvoke.PyrUp(pyrDown, uimage);
+
+            //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
+
+            #region circle detection
+            Stopwatch watch = Stopwatch.StartNew();
+
+            cannyThreshold = double.Parse(cannyThreshold_Box.Text);
+            circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
+
+            //double circleAccumulatorThreshold = 120;
+
+            circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
+            //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
+            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
+            System.Diagnostics.Debug.WriteLine(circles);
+            watch.Stop();
+            msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
+            #endregion
+
+            #region draw circles
+            Image<Bgr, Byte> circleImage = img;
+            foreach (CircleF circle in circles)
+            {
+                circleImage.Draw(circle, new Bgr(Color.Red), 2);
+                HoughCirclesX = (int)circle.Center.X;
+                HoughCirclesY = (int)circle.Center.Y;
+
+
+
+
+            }
+
+            HoughCircles.Image = circleImage;
+            #endregion
+            //IsAutoExposureTime.Checked = true;
+        }
+
+        private void Clear_Profile_Click(object sender, EventArgs e)
+        {
+            File.WriteAllText(@"./HoughCircles_Profile.txt", String.Empty);
+            HoughCircles_Profile.Items.Clear();
+        }
+
         private void FocusSet_Click(object sender, EventArgs e)
         {
                 int CameraWidth = Int16.Parse(ROITextWidth.Text);
@@ -658,10 +773,10 @@ namespace AllSky_2020
                 #region circle detection
                 Stopwatch watch = Stopwatch.StartNew();
                 
-                cannyThreshold = CameraWidth / 40;
+                cannyThreshold = 80;
                 cannyThreshold_Box.Text = cannyThreshold.ToString();
-                //double circleAccumulatorThreshold = 120;
-                circleAccumulatorThreshold = 60;
+                double circleAccumulatorThreshold = 120;
+                //circleAccumulatorThreshold = 60;
                 circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
                 //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
                 CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
@@ -709,47 +824,20 @@ namespace AllSky_2020
                 RestratModeCamera = 1;
                 SystemMessage = "No camera connected";
                 MainImageControl.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "TAllSyk.jpg");
-                //ROIImage.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "Nocameraconnected.jpg");
-                //MessageBox.Show("No camera connected. Please check the cable.", "Message",  MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-                //Tthen = DateTime.Now;
-
-                //GC.Collect(0);
-                //Thread.Sleep(200);
-                //GC.Collect();
-
+                ROIImage.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "Nocameraconnected.jpg");
+                
             }
             else if (RestratModeCamera == 1 && ConnectedCameras > 0)
             {
 
-                //SystemMessage = "Wait for connect again";
-                //ROIImage.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "Waitforconnectagain.jpg");
-
-
-
-                //Console.WriteLine("Going to sleep..");
-
-                //Stopwatch stopwatch = Stopwatch.StartNew();
-                //while (stopwatch.ElapsedMilliseconds < 2000);
-
-                //Console.WriteLine("Woke up after 2 sec!");
-                //
-                //Task ControlRestratCameraConnected = Task.Run(() =>{
-                //Thread.Sleep(2000);
-                //GC.Collect();
-                //Thread.Sleep(5000);
+                
                 if (ConnectedCameras > 0)
                 {
-                    //MainWindows_Load(sender,e);
+                   
                     RestratModeCamera = 0;
-                    //InitializeSystem();
-
-                    //IsExpSuccess = false;
-
                     Application.Restart();
 
-
                 }
-                //});
 
 
             }
@@ -764,14 +852,8 @@ namespace AllSky_2020
                 else
                     CameraStateText.Text = GetExpError.ToString();
 
-                //ExposuringText.Text = string.Format("{0:0.00}", AppSetting.Data.ExposureTime / 1000 - ExposureCounter.Elapsed.TotalSeconds);
                 ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
-
-
                 SavePath.Text = AppSetting.Data.SaveFileDialog;
-
-
-                //System.Diagnostics.Debug.WriteLine(ExposureCounter.Elapsed.TotalSeconds);
                 MessageStatusText.Text = SystemMessage;
                 GetDataFailedText.Text = GetImageState.ToString();
                 CalculateZoomScale();
@@ -788,20 +870,14 @@ namespace AllSky_2020
                     ROIFrame.ROI = ROIRec;
                     ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
 
-
-
-                    //if (IsAutoExposureTime.CheckState != 0) //AutoExposureTime 
-
-                    //{
-
-
-
                 }
 
 
 
                 if (ProcessFrame != null && ConnectedCameras > 0)
                 {
+                    
+                    
 
 
                     if (IsDefineROI)
@@ -832,64 +908,17 @@ namespace AllSky_2020
 
 
 
-
-
-
-
-
-
-
-
-
-
-
                     MainImageControl.Image = ProcessFrame;
 
-                    // if (ROIRec.Width < 1 && ROIRec.Height < 1)
-                    // {
-                    //ROIImage.Image = ProcessFrame; //ROIFrameOnGrayImage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
                     ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
 
-                    // }
-
-                    //============
-
-
-
-                    //AppSetting.Data.SaveFileDialog = folderName;
-                    //string pathString = System.IO.Path.Combine(folderName, "AllSky");
-                    //System.IO.Directory.CreateDirectory(pathString);
-                    //string fileName = System.IO.Path.GetRandomFileName();
-
                     Image<Bgr, Byte> ImageFrame = ProcessFrame;
-
-
-                    //=================================================================================================
-
-
-
-
-                    /*UMat uimage = new UMat();
-                    CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);*/
-
-
-
-
-                    //================================================================================================
-
-
-
-
-
-
 
                     TimeNow = DateTime.Now.ToString("yyyy_MM_dd__HH_mm_ss");
                     TimeFolder = DateTime.Now.ToString("yyyy-MM-dd");
                     TimeNowChack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
                     string TimesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
-
-
-
                     int thickness = 5;
                     int borderHeight = Int32.Parse(AppSetting.Data.ImageHeight.ToString());
 
@@ -918,45 +947,9 @@ namespace AllSky_2020
 
                     Bitmap BmpInput = ImageFrame.ToBitmap();
 
-                    /*RectangleF rectf = new RectangleF(70, 90, 90, 50);
-
-                    Graphics g = Graphics.FromImage(BmpInput);
-
-                    g.SmoothingMode = SmoothingMode.AntiAlias;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.DrawString("yourText", new Font("Tahoma",8), Brushes.Black, rectf);
-
-                    g.Flush();
-                    */
-
-
-
-
-
-                    //ConnectedCameras = ASICameraDll2.ASIGetNumOfConnectedCameras();
-                    //if (ConnectedCameras == 0)
-                    //{
-                    //UITimer_Tick.Refresh();
-                    //System.Threading.Thread.Sleep(1000);
-                    //Application.Restart();
-
-                    //}
-
-
-
-
-
-
-
                     if (IsAutoExposureTime.CheckState != 0) //AutoExposureTime 
                     {
 
-                        //AppSetting.Save();
-                        //ExpouseTimeText.Value = (decimal)AppSetting.Data.ExposureTime;
-
-
-                        // TimeExposure = Int16.Parse(DateTime.Now.ToString("HH"));
                         if (ROIRec.Width < 1 && ROIRec.Height < 1)
                         {
 
@@ -967,12 +960,10 @@ namespace AllSky_2020
                             {
 
                                 checkBoxAverage.Checked = false;
-                                /*int CameraWidth = Int16.Parse(ROITextWidth.Text);
-                                int CameraHeight = Int16.Parse(ROITextHeight.Text);*/
+                              
                                 CentroidX = (int)(CameraWidth / 2);
                                 CentroidY = (int)(CameraHeight / 2);
-                                //CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
+                                
                                 for (double i = CentroidX - 10; i < CentroidX; i++)
                                 {
 
@@ -1003,13 +994,7 @@ namespace AllSky_2020
                             }
                             else
                             {
-                                //if(CameraStateText.Text == "ASI_EXP_FAILED" || CameraStateText.Text == "ASI_ERROR_CAMERA_CLOSED")
-                                //{
-                                //    Application.Restart();
-                                //}
-                                /*double CameraWidth = AppSetting.Data.ImageWidth;
-                                double CameraHeight = AppSetting.Data.ImageHeight;*/
-
+  
                                 if (FocusPoint.Text == "21 Focus Points")
                                 {
                                     checkBoxCenter.Checked = false;
@@ -2404,18 +2389,6 @@ namespace AllSky_2020
                                 }
 
 
-
-
-
-                                /*for (int i = 0; i < 21;i++)
-                                {
-                                    ColorEx[i] = 0;
-                                }*/
-
-
-
-
-
                             }
 
 
@@ -2427,19 +2400,10 @@ namespace AllSky_2020
                             ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
 
 
-                            //if (CameraStateText.Text == "ASI_EXP_IDLE")
-                            //    GC.Collect();
-
-
-                            //Thread.Sleep(2000);
-
-                            //CheckEX:
-
-
-                            //Thread.Sleep(2000);
+                           
                             //  ======================== AutoExposureTime -  ========================
                             if (CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
-                            //if (CameraStateText.Text !=  "ASI_EXP_WORKING")
+                            
                             {
 
 
@@ -2447,107 +2411,74 @@ namespace AllSky_2020
                                 {
                                     AppSetting.Data.ExposureTime = 8000;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(8000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                  
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 8000 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 4000;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(4000);
-                                    // GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 4000 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 2000;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(2000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+              
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2000 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 1000;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                   
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 1000 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 500;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
 
-                                    //goto STARTExposure;
                                 }
 
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 500 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 250;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+  
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 250 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 125;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+     
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 125 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 66;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    // GC.Collect();
 
-                                    //goto STARTExposure;
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 66 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 33;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                    
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 33 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 0;
                                     Recover = false;
-                                    //goto CheckEX;
+                                   
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 3 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 0;
                                     Recover = false;
-                                    //goto CheckEX;
+                                   
                                 }
                                 else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 0.01;
                                     Recover = false;
-                                    //goto CheckEX;
+                                  
                                 }
 
 
@@ -2560,101 +2491,67 @@ namespace AllSky_2020
                                 {
                                     AppSetting.Data.ExposureTime = 9600;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(9600);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 4800;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(4800);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                   
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 2400;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Thread.Sleep(2400);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                  
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 1200;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1200);
-                                    //GC.Collect();
-
-                                    // goto STARTExposure;
+                                   
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 600;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                  
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 500 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 300;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                   
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 250 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 150;
                                     Recover = false;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 125 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 80;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                  
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 66 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 40;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                    
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 33 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 20;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                   
                                 }
                                 else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1 && Colorall < 255 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 0.1;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                    
                                 }
 
 
@@ -2664,99 +2561,67 @@ namespace AllSky_2020
                                 {
                                     AppSetting.Data.ExposureTime = 10000;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(10000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                  
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 5000;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(5000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 2500;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(2500);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 1250;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1250);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 625;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 500 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 312;
                                     Recover = false;
-                                    // goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 250 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 160;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
-                                    //GC.Collect();
-
-                                    //goto STARTExposure;
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 125 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 83;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 66 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 41;
                                     Recover = false;
-                                    ///goto CheckEX;
-                                    //Thread.Sleep(1000);
+                                    
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 33 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime = 25;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                   
                                 }
                                 else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1 && Colorall < 200 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 0.1;
                                     Recover = false;
-                                    //goto CheckEX;
-                                    //Task.Delay(1000);
+                                    
                                 }
 
 
@@ -2766,73 +2631,72 @@ namespace AllSky_2020
                                 {
                                     AppSetting.Data.ExposureTime -= 5;
                                     Recover = false;
-                                    //goto CheckEX;
+                                   
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 2;
                                     Recover = false;
-                                    //goto CheckEX;
+                                 
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 500 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 250 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 125 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 66 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 33 && Colorall < 150 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 1;
                                     Recover = false;
-                                    // goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime < 33 && Colorall < 150 && AppSetting.Data.ExposureTime > 1 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 0.1;
                                     Recover = false;
-                                    //goto CheckEX;
+
                                 }
                                 else if (Colorall >= 135 && AppSetting.Data.ExposureTime <= 1 && Colorall < 150 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
                                 {
                                     AppSetting.Data.ExposureTime -= 0.01;
                                     Recover = false;
-                                    //goto CheckEX;
                                 }
 
 
@@ -2851,102 +2715,73 @@ namespace AllSky_2020
 
                                         }
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 15000 && Colorall > 50 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 40;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 8000 && Colorall > 50 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 30;
                                         Recover = false;
-                                        // goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 4000 && Colorall > 50 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 25;
                                         Recover = false;
-                                        //goto CheckEX;
 
-                                        //GC.Collect();
-
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 2000 && Colorall > 50 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 20;
                                         Recover = false;
-                                        //goto CheckEX;
 
-                                        //GC.Collect();
-
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 1000 && Colorall > 50 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 15;
                                         Recover = false;
-                                        //goto CheckEX;
 
-                                        //GC.Collect();
-
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Colorall > 50 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 10;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Colorall > 50 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 4;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Colorall > 50 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 3;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Colorall >= 50 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 2;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime > 33 && AppSetting.Data.ExposureTime < 66 && Colorall >= 50 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 1;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (Colorall <= 80 && AppSetting.Data.ExposureTime <= 33 && Colorall >= 50 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 1;
                                         Recover = false;
-                                        //goto CheckEX;
+
 
                                     }
 
@@ -2960,11 +2795,7 @@ namespace AllSky_2020
                                     {
                                         AppSetting.Data.ExposureTime += 10000;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(30000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 15000 && AppSetting.Data.ExposureTime < 30000 && Recover != false)
                                     {
@@ -2976,125 +2807,77 @@ namespace AllSky_2020
 
                                         }
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(15000);
-                                        //GC.Collect();
-                                        //goto STARTExposure;
+
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 8000 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 15000;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(8000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 4000 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 8000;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(4000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 2000 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 4000;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(2000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 2000;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 1000;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
-
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 500;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
-
-                                        //goto STARTExposure;
 
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 250;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 125;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 66 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 66;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
-
-                                        //goto STARTExposure;
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 33 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime = 33;
                                         Recover = false;
-                                        //goto CheckEX;
-                                        //Task.Delay(1000);
-                                        //GC.Collect();
 
-                                        //goto STARTExposure;
                                     }
 
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime >= 10 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 1;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 10 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
                                     {
                                         AppSetting.Data.ExposureTime += 0.1;
                                         Recover = false;
-                                        //goto CheckEX;
 
                                     }
                                     else if (AppSetting.Data.ExposureTime < 1 && Recover != false)
@@ -3111,28 +2894,11 @@ namespace AllSky_2020
 
                                         }
                                         Recover = false;
-                                        //goto CheckEX;
-
-
-
-
-
-
-
-
-
-
-
 
                                     }
-                                }
+                                    }
                                 Recover = false;
                             }
-                            //AppSetting.Save();
-                            //Thread.Sleep(4000);
-
-                            //GC.Collect();
-
 
 
 
@@ -3154,12 +2920,7 @@ namespace AllSky_2020
                         else
                             AppSetting.Data.ExposureTime = (double)ExpouseTimeText.Value;
 
-                        //int ColorAll1 = (color1 + color2 + color3 + color4 + color5) /500;
-                        //int ColorAll2 = (color6 + color7 + color8 + color9 + color10) / 500;
-                        //int ColorAll3 = (color11 + color12 + color13 + color14 + color15) / 500;
-                        //int ColorAll4 = (color16 + color17 + color18) / 300;
-                        //int ColorAll5 = (color19 + color20 + color21) / 300;
-
+    
                         for (int i = 0; i < 21; i++)
                         {
                             ColorEx[i] = ColorEx[i] / 100;
@@ -3344,16 +3105,6 @@ namespace AllSky_2020
                             Histogram.Series[0].Points.Clear();
 
 
-                        //color1 = 0; color2 = 0; color3 = 0; color4 = 0;
-                        //color5 = 0; color6 = 0; color7 = 0; color8 = 0;
-                        //color9 = 0; color10 = 0; color11 = 0; color12 = 0;
-                        //color13 = 0; color14 = 0; color15 = 0; color16 = 0;
-                        //color17 = 0; color18 = 0; color19 = 0; color20 = 0;
-                        //color21 = 0;
-
-
-
-
                         if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && Colorall < 180 && ConnectedCameras > 0)
                         {
                             TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
@@ -3384,9 +3135,6 @@ namespace AllSky_2020
                 }
 
             }
-
-            //GC.WaitForPendingFinalizers();
-            //GC.Collect();
 
         }
 
