@@ -58,6 +58,9 @@ namespace AllSky_2020
         private bool IsExpSuccess;
         private int[] ColorEx = new int[30];
         private bool Recover;
+        double cannyThreshold;
+        double circleAccumulatorThreshold;
+
 
 
 
@@ -125,6 +128,7 @@ namespace AllSky_2020
             {
                 IsAutoExposureTime.Checked = true;
                 FocusPoint.Text = "21 Focus Points";
+                SpeedMode.Checked = true;
                 //AutoExposureOnTime.Checked = true;
             }
 
@@ -297,9 +301,9 @@ namespace AllSky_2020
                         ASICameraDll2.ASICloseCamera(CameraId);
                         CameraConnection();
                     }
-
+                    GC.WaitForPendingFinalizers();
                     GC.Collect();
-                if (Colorall <= 135 && AppSetting.Data.ExposureTime == 0.4 && SpeedMode.CheckState == 0)
+                    if (Colorall <= 135 && AppSetting.Data.ExposureTime < 1 && SpeedMode.CheckState == 0)
                     {
                         await Task.Delay(50000);
                     }
@@ -574,14 +578,8 @@ namespace AllSky_2020
 
         }
 
-        private void FocusSet_Click(object sender, EventArgs e)
+        private void Save_HoughCircles_Click(object sender, EventArgs e)
         {
-            IsAutoExposureTime.Checked = false;
-            if (AppSetting.Data.ExposureTime <= 1)
-            {
-                AppSetting.Data.ExposureTime = 3;
-            }
-
             int CameraWidth = Int16.Parse(ROITextWidth.Text);
             int CameraHeight = Int16.Parse(ROITextHeight.Text);
 
@@ -603,9 +601,13 @@ namespace AllSky_2020
 
             #region circle detection
             Stopwatch watch = Stopwatch.StartNew();
-            double cannyThreshold = 50;
+
+            cannyThreshold = double.Parse(cannyThreshold_Box.Text);
+            circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
+            cannyThreshold_Box.Text = cannyThreshold.ToString();
             //double circleAccumulatorThreshold = 120;
-            double circleAccumulatorThreshold = 120;
+           
+            circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
             //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
             CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
             System.Diagnostics.Debug.WriteLine(circles);
@@ -629,6 +631,62 @@ namespace AllSky_2020
             HoughCircles.Image = circleImage;
             #endregion
             //IsAutoExposureTime.Checked = true;
+            
+        }
+
+        private void FocusSet_Click(object sender, EventArgs e)
+        {
+                int CameraWidth = Int16.Parse(ROITextWidth.Text);
+                int CameraHeight = Int16.Parse(ROITextHeight.Text);
+
+                StringBuilder msgBuilder = new StringBuilder("Performance: ");
+
+                //Load the image from file and resize it for display
+                Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
+
+                //Convert the image to grayscale and filter out the noise
+                UMat uimage = new UMat();
+                CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
+
+                //use image pyr to remove noise
+                UMat pyrDown = new UMat();
+                CvInvoke.PyrDown(uimage, pyrDown);
+                CvInvoke.PyrUp(pyrDown, uimage);
+
+                //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
+
+                #region circle detection
+                Stopwatch watch = Stopwatch.StartNew();
+                
+                cannyThreshold = CameraWidth / 40;
+                cannyThreshold_Box.Text = cannyThreshold.ToString();
+                //double circleAccumulatorThreshold = 120;
+                circleAccumulatorThreshold = 60;
+                circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
+                //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                System.Diagnostics.Debug.WriteLine(circles);
+                watch.Stop();
+                msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
+                #endregion
+
+                #region draw circles
+                Image<Bgr, Byte> circleImage = img;
+                foreach (CircleF circle in circles)
+                {
+                    circleImage.Draw(circle, new Bgr(Color.Red), 2);
+                    HoughCirclesX = (int)circle.Center.X;
+                    HoughCirclesY = (int)circle.Center.Y;
+
+
+
+
+                }
+
+                HoughCircles.Image = circleImage;
+                #endregion
+                //IsAutoExposureTime.Checked = true;
+            
         }
 
 
@@ -643,9 +701,9 @@ namespace AllSky_2020
 
         private void UITimer_Tick(object sender, EventArgs e)
         {
+            //GC.Collect(2, GCCollectionMode.Forced);
 
-
-            if (ASICameraDll2.ASIGetNumOfConnectedCameras() == 0)
+            if (ConnectedCameras == 0)
             {
 
                 RestratModeCamera = 1;
@@ -655,12 +713,12 @@ namespace AllSky_2020
                 //MessageBox.Show("No camera connected. Please check the cable.", "Message",  MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 //Tthen = DateTime.Now;
 
-                GC.Collect();
+                //GC.Collect(0);
                 //Thread.Sleep(200);
                 //GC.Collect();
 
             }
-            else if (RestratModeCamera == 1 && ASICameraDll2.ASIGetNumOfConnectedCameras() > 0)
+            else if (RestratModeCamera == 1 && ConnectedCameras > 0)
             {
 
                 //SystemMessage = "Wait for connect again";
@@ -679,7 +737,7 @@ namespace AllSky_2020
                 //Thread.Sleep(2000);
                 //GC.Collect();
                 //Thread.Sleep(5000);
-                if (ASICameraDll2.ASIGetNumOfConnectedCameras() > 0)
+                if (ConnectedCameras > 0)
                 {
                     //MainWindows_Load(sender,e);
                     RestratModeCamera = 0;
@@ -742,7 +800,7 @@ namespace AllSky_2020
 
 
 
-                if (ProcessFrame != null && ASICameraDll2.ASIGetNumOfConnectedCameras() > 0)
+                if (ProcessFrame != null && ConnectedCameras > 0)
                 {
 
 
@@ -849,8 +907,14 @@ namespace AllSky_2020
                     var borderExposureTime = new Rectangle(borderWidth, borderHeight, 300, 100);
                     ImageFrame.Draw(borderExposureTime, new Bgr(Color.Black), -1);
                     ImageFrame.Draw(borderExposureTime, new Bgr(Color.White), 2);
-                    CvInvoke.PutText(ImageFrame, (int)ExposureTimeShow + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-
+                    if (ExposureTimeShow < 1000)
+                    {
+                        CvInvoke.PutText(ImageFrame, AppSetting.Data.ExposureTime + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                    }
+                    else if (ExposureTimeShow >= 1000)
+                    {
+                        CvInvoke.PutText(ImageFrame, AppSetting.Data.ExposureTime / 1000 + " s", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                    }
 
                     Bitmap BmpInput = ImageFrame.ToBitmap();
 
@@ -946,7 +1010,7 @@ namespace AllSky_2020
                                 /*double CameraWidth = AppSetting.Data.ImageWidth;
                                 double CameraHeight = AppSetting.Data.ImageHeight;*/
 
-                                if(FocusPoint.Text == "21 Focus Points")
+                                if (FocusPoint.Text == "21 Focus Points")
                                 {
                                     checkBoxCenter.Checked = false;
                                     checkBoxAverage.Checked = true;
@@ -1565,7 +1629,8 @@ namespace AllSky_2020
                                     }
                                     Colorall = (Colorall / 2100);
 
-                                }else if(FocusPoint.Text == "15 Focus Points")
+                                }
+                                else if (FocusPoint.Text == "15 Focus Points")
                                 {
                                     checkBoxCenter.Checked = false;
                                     checkBoxAverage.Checked = true;
@@ -1644,7 +1709,7 @@ namespace AllSky_2020
                                     //CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_DOWN.ToString()), Int32.Parse(CentroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
 
 
-                                   
+
 
                                     if (ShowFocusPoint.CheckState != 0)
                                     {
@@ -1714,7 +1779,7 @@ namespace AllSky_2020
                                         CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_DOWN.ToString()), Int32.Parse(CentroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
 
 
-                                        
+
 
                                     }
 
@@ -2011,7 +2076,7 @@ namespace AllSky_2020
 
                                     }
 
-                                    
+
                                     Colorall = (Colorall / 1500);
                                 }
                                 else if (FocusPoint.Text == "9 Focus Points")
@@ -2023,13 +2088,13 @@ namespace AllSky_2020
                                     CentroidY = (int)(CameraHeight / 2);
                                     //CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
 
-                                    
+
                                     //left 
                                     double CentroidXleftmore = (int)(CameraWidth / 3.2);
                                     double CentroidYleftmore = (int)(CameraHeight / 2);
 
 
-                                   
+
                                     //right
                                     double CentroidXrightmore = (int)(CameraWidth / 1.5);
                                     double CentroidYrightmore = (int)(CameraHeight / 2);
@@ -2041,12 +2106,12 @@ namespace AllSky_2020
                                     double CentroidY_UP = (int)(CameraHeight / 3);
                                     //CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_UP.ToString()), Int32.Parse(CentroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
 
-                                    
+
                                     //left 
                                     double CentroidXleftmore_UP = (int)(CameraWidth / 3.2);
                                     double CentroidYleftmore_UP = (int)(CameraHeight / 3);
 
-                                    
+
                                     //right
                                     double CentroidXrightmore_UP = (int)(CameraWidth / 1.5);
                                     double CentroidYrightmore_UP = (int)(CameraHeight / 3);
@@ -2057,12 +2122,12 @@ namespace AllSky_2020
                                     double CentroidY_DOWN = (int)(CameraHeight / 1.5);
                                     //CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_DOWN.ToString()), Int32.Parse(CentroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
 
-                                   
+
                                     //left 
                                     double CentroidXleftmore_DOWN = (int)(CameraWidth / 3.2);
                                     double CentroidYleftmore_DOWN = (int)(CameraHeight / 1.5);
 
-                                    
+
                                     //right
                                     double CentroidXrightmore_DOWN = (int)(CameraWidth / 1.5);
                                     double CentroidYrightmore_DOWN = (int)(CameraHeight / 1.5);
@@ -2112,7 +2177,7 @@ namespace AllSky_2020
 
                                         //right
 
-                                       // CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_UP.ToString()), Int32.Parse(CentroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                                        // CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_UP.ToString()), Int32.Parse(CentroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
 
                                         //right
 
@@ -2183,11 +2248,11 @@ namespace AllSky_2020
 
                                     }
 
-                                    
 
 
 
-                                    
+
+
 
                                     for (double i = CentroidXrightmore - 10; i < CentroidXrightmore; i++)
                                     {
@@ -2228,7 +2293,7 @@ namespace AllSky_2020
 
                                     }
 
-                                    
+
 
                                     for (double i = CentroidXleftmore_UP - 10; i < CentroidXleftmore_UP; i++)
                                     {
@@ -2251,7 +2316,7 @@ namespace AllSky_2020
 
 
 
-                                    
+
 
                                     for (double i = CentroidXrightmore_UP - 10; i < CentroidXrightmore_UP; i++)
                                     {
@@ -2291,7 +2356,7 @@ namespace AllSky_2020
 
                                     }
 
-                                    
+
 
                                     for (double i = CentroidXleftmore_DOWN - 10; i < CentroidXleftmore_DOWN; i++)
                                     {
@@ -2313,7 +2378,7 @@ namespace AllSky_2020
                                     }
 
 
-                                    
+
 
                                     for (double i = CentroidXrightmore_DOWN - 10; i < CentroidXrightmore_DOWN; i++)
                                     {
@@ -2335,7 +2400,7 @@ namespace AllSky_2020
                                     }
 
 
-                                    Colorall = (Colorall / 1500);
+                                    Colorall = (Colorall / 900);
                                 }
 
 
@@ -3033,10 +3098,12 @@ namespace AllSky_2020
 
                                     }
                                     else if (AppSetting.Data.ExposureTime < 1 && Recover != false)
+
                                     {
-                                        AppSetting.Data.ExposureTime = 0.4;
-
-
+                                        if (Colorall <= 30 && Colorall > 20)
+                                        {
+                                            AppSetting.Data.ExposureTime = 0.4;
+                                        }
                                         if (Colorall <= 20)
                                         {
                                             AppSetting.Data.ExposureTime = 0.5;
@@ -3176,7 +3243,8 @@ namespace AllSky_2020
 
 
                                 Histogram.Series["Histogram"].Color = Color.Red;
-                            }else if(FocusPoint.Text == "15 Focus Points")
+                            }
+                            else if (FocusPoint.Text == "15 Focus Points")
                             {
 
                                 uint[] items = new uint[] {
@@ -3226,7 +3294,7 @@ namespace AllSky_2020
                             {
                                 uint[] items = new uint[] {
 
-                                (uint)ColorEx[0],  (uint)ColorEx[2],  
+                                (uint)ColorEx[0],  (uint)ColorEx[2],
                                 (uint)ColorEx[4],  (uint)ColorEx[5],  (uint)ColorEx[7],
                                 (uint)ColorEx[9],  (uint)ColorEx[10], (uint)ColorEx[11],
                                 (uint)ColorEx[13]};
@@ -3286,7 +3354,7 @@ namespace AllSky_2020
 
 
 
-                        if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && Colorall < 180 && ASICameraDll2.ASIGetNumOfConnectedCameras() > 0)
+                        if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && Colorall < 180 && ConnectedCameras > 0)
                         {
                             TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
 
@@ -3316,7 +3384,10 @@ namespace AllSky_2020
                 }
 
             }
+
+            //GC.WaitForPendingFinalizers();
             //GC.Collect();
+
         }
 
         private void ExpouseTimeText_ValueChanged(object sender, EventArgs e)

@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.MainImageControl = new Emgu.CV.UI.ImageBox();
@@ -42,6 +42,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.Histogram = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.FocusPointLable = new System.Windows.Forms.Label();
             this.FocusPoint = new System.Windows.Forms.ComboBox();
             this.Histogramcheck = new System.Windows.Forms.CheckBox();
             this.CameraList = new System.Windows.Forms.ComboBox();
@@ -73,6 +74,7 @@
             this.Savebutton = new System.Windows.Forms.Button();
             this.SavePath = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.SpeedMode = new System.Windows.Forms.CheckBox();
             this.FocusSet = new System.Windows.Forms.Button();
             this.ShowFocusPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxAverage = new System.Windows.Forms.CheckBox();
@@ -114,8 +116,14 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.FocusPointLable = new System.Windows.Forms.Label();
-            this.SpeedMode = new System.Windows.Forms.CheckBox();
+            this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
+            this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
+            this.Save_HoughCircles = new System.Windows.Forms.Button();
+            this.SaveProfile_HoughCircles = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.label26 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -294,21 +302,30 @@
             // 
             // Histogram
             // 
-            chartArea1.Name = "ChartArea1";
-            this.Histogram.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.Histogram.Legends.Add(legend1);
+            chartArea3.Name = "ChartArea1";
+            this.Histogram.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.Histogram.Legends.Add(legend3);
             this.Histogram.Location = new System.Drawing.Point(13, 13);
             this.Histogram.Name = "Histogram";
             this.Histogram.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Excel;
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Histogram";
-            this.Histogram.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Histogram";
+            this.Histogram.Series.Add(series3);
             this.Histogram.Size = new System.Drawing.Size(358, 300);
             this.Histogram.TabIndex = 0;
             this.Histogram.Text = "chart1";
             this.Histogram.Click += new System.EventHandler(this.Histogram_Click);
+            // 
+            // FocusPointLable
+            // 
+            this.FocusPointLable.AutoSize = true;
+            this.FocusPointLable.Location = new System.Drawing.Point(174, 271);
+            this.FocusPointLable.Name = "FocusPointLable";
+            this.FocusPointLable.Size = new System.Drawing.Size(60, 13);
+            this.FocusPointLable.TabIndex = 9;
+            this.FocusPointLable.Text = "FocusPoint";
             // 
             // FocusPoint
             // 
@@ -553,6 +570,14 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label26);
+            this.tabPage2.Controls.Add(this.comboBox1);
+            this.tabPage2.Controls.Add(this.SaveProfile_HoughCircles);
+            this.tabPage2.Controls.Add(this.Save_HoughCircles);
+            this.tabPage2.Controls.Add(this.circleAccumulatorThreshold_Box);
+            this.tabPage2.Controls.Add(this.label25);
+            this.tabPage2.Controls.Add(this.label24);
+            this.tabPage2.Controls.Add(this.cannyThreshold_Box);
             this.tabPage2.Controls.Add(this.HoughCircles);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -566,7 +591,7 @@
             // 
             this.HoughCircles.Location = new System.Drawing.Point(6, 6);
             this.HoughCircles.Name = "HoughCircles";
-            this.HoughCircles.Size = new System.Drawing.Size(401, 322);
+            this.HoughCircles.Size = new System.Drawing.Size(354, 241);
             this.HoughCircles.TabIndex = 2;
             this.HoughCircles.TabStop = false;
             // 
@@ -621,6 +646,16 @@
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Camera State";
+            // 
+            // SpeedMode
+            // 
+            this.SpeedMode.AutoSize = true;
+            this.SpeedMode.Location = new System.Drawing.Point(238, 308);
+            this.SpeedMode.Name = "SpeedMode";
+            this.SpeedMode.Size = new System.Drawing.Size(84, 17);
+            this.SpeedMode.TabIndex = 13;
+            this.SpeedMode.Text = "SpeedMode";
+            this.SpeedMode.UseVisualStyleBackColor = true;
             // 
             // FocusSet
             // 
@@ -1021,24 +1056,73 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
-            // FocusPointLable
+            // cannyThreshold_Box
             // 
-            this.FocusPointLable.AutoSize = true;
-            this.FocusPointLable.Location = new System.Drawing.Point(174, 271);
-            this.FocusPointLable.Name = "FocusPointLable";
-            this.FocusPointLable.Size = new System.Drawing.Size(60, 13);
-            this.FocusPointLable.TabIndex = 9;
-            this.FocusPointLable.Text = "FocusPoint";
+            this.cannyThreshold_Box.Location = new System.Drawing.Point(435, 47);
+            this.cannyThreshold_Box.Name = "cannyThreshold_Box";
+            this.cannyThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.cannyThreshold_Box.TabIndex = 3;
             // 
-            // SpeedMode
+            // label24
             // 
-            this.SpeedMode.AutoSize = true;
-            this.SpeedMode.Location = new System.Drawing.Point(238, 308);
-            this.SpeedMode.Name = "SpeedMode";
-            this.SpeedMode.Size = new System.Drawing.Size(84, 17);
-            this.SpeedMode.TabIndex = 13;
-            this.SpeedMode.Text = "SpeedMode";
-            this.SpeedMode.UseVisualStyleBackColor = true;
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(432, 31);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(83, 13);
+            this.label24.TabIndex = 4;
+            this.label24.Text = "cannyThreshold";
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(432, 70);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(138, 13);
+            this.label25.TabIndex = 5;
+            this.label25.Text = "circleAccumulatorThreshold";
+            // 
+            // circleAccumulatorThreshold_Box
+            // 
+            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(435, 86);
+            this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
+            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.circleAccumulatorThreshold_Box.TabIndex = 6;
+            // 
+            // Save_HoughCircles
+            // 
+            this.Save_HoughCircles.Location = new System.Drawing.Point(583, 44);
+            this.Save_HoughCircles.Name = "Save_HoughCircles";
+            this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
+            this.Save_HoughCircles.TabIndex = 7;
+            this.Save_HoughCircles.Text = "Save";
+            this.Save_HoughCircles.UseVisualStyleBackColor = true;
+            this.Save_HoughCircles.Click += new System.EventHandler(this.Save_HoughCircles_Click);
+            // 
+            // SaveProfile_HoughCircles
+            // 
+            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(664, 44);
+            this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
+            this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
+            this.SaveProfile_HoughCircles.TabIndex = 8;
+            this.SaveProfile_HoughCircles.Text = "SaveProfile";
+            this.SaveProfile_HoughCircles.UseVisualStyleBackColor = true;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(435, 136);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 21);
+            this.comboBox1.TabIndex = 9;
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(435, 117);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(36, 13);
+            this.label26.TabIndex = 10;
+            this.label26.Text = "Profile";
             // 
             // MainWindows
             // 
@@ -1072,6 +1156,7 @@
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Histogram)).EndInit();
             this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
@@ -1174,6 +1259,14 @@
         private System.Windows.Forms.ComboBox FocusPoint;
         private System.Windows.Forms.Label FocusPointLable;
         private System.Windows.Forms.CheckBox SpeedMode;
+        private System.Windows.Forms.TextBox cannyThreshold_Box;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TextBox circleAccumulatorThreshold_Box;
+        private System.Windows.Forms.Button Save_HoughCircles;
+        private System.Windows.Forms.Button SaveProfile_HoughCircles;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 
