@@ -69,6 +69,7 @@
             this.AreaTextY = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.Clear_Profile = new System.Windows.Forms.Button();
             this.label26 = new System.Windows.Forms.Label();
             this.HoughCircles_Profile = new System.Windows.Forms.ComboBox();
             this.SaveProfile_HoughCircles = new System.Windows.Forms.Button();
@@ -83,7 +84,6 @@
             this.SavePath = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.SpeedMode = new System.Windows.Forms.CheckBox();
-            this.FocusSet = new System.Windows.Forms.Button();
             this.ShowFocusPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxAverage = new System.Windows.Forms.CheckBox();
             this.ResetZoom = new System.Windows.Forms.Button();
@@ -124,7 +124,6 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.Clear_Profile = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -589,6 +588,16 @@
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // Clear_Profile
+            // 
+            this.Clear_Profile.Location = new System.Drawing.Point(583, 136);
+            this.Clear_Profile.Name = "Clear_Profile";
+            this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
+            this.Clear_Profile.TabIndex = 11;
+            this.Clear_Profile.Text = "ClearAllProfile";
+            this.Clear_Profile.UseVisualStyleBackColor = true;
+            this.Clear_Profile.Click += new System.EventHandler(this.Clear_Profile_Click);
+            // 
             // label26
             // 
             this.label26.AutoSize = true;
@@ -699,7 +708,6 @@
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.SpeedMode);
-            this.groupBox3.Controls.Add(this.FocusSet);
             this.groupBox3.Controls.Add(this.ShowFocusPoint);
             this.groupBox3.Controls.Add(this.checkBoxAverage);
             this.groupBox3.Controls.Add(this.ResetZoom);
@@ -728,16 +736,6 @@
             this.SpeedMode.TabIndex = 13;
             this.SpeedMode.Text = "SpeedMode";
             this.SpeedMode.UseVisualStyleBackColor = true;
-            // 
-            // FocusSet
-            // 
-            this.FocusSet.Location = new System.Drawing.Point(361, 282);
-            this.FocusSet.Name = "FocusSet";
-            this.FocusSet.Size = new System.Drawing.Size(75, 23);
-            this.FocusSet.TabIndex = 12;
-            this.FocusSet.Text = "Set Focus";
-            this.FocusSet.UseVisualStyleBackColor = true;
-            this.FocusSet.Click += new System.EventHandler(this.FocusSet_Click);
             // 
             // ShowFocusPoint
             // 
@@ -1128,16 +1126,6 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
-            // Clear_Profile
-            // 
-            this.Clear_Profile.Location = new System.Drawing.Point(583, 136);
-            this.Clear_Profile.Name = "Clear_Profile";
-            this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
-            this.Clear_Profile.TabIndex = 11;
-            this.Clear_Profile.Text = "ClearAllProfile";
-            this.Clear_Profile.UseVisualStyleBackColor = true;
-            this.Clear_Profile.Click += new System.EventHandler(this.Clear_Profile_Click);
-            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1268,7 +1256,6 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart Histogram;
         private System.Windows.Forms.CheckBox Histogramcheck;
         private System.Windows.Forms.CheckBox ShowFocusPoint;
-        private System.Windows.Forms.Button FocusSet;
         private Emgu.CV.UI.ImageBox HoughCircles;
         private System.Windows.Forms.ComboBox FocusPoint;
         private System.Windows.Forms.Label FocusPointLable;

@@ -60,9 +60,7 @@ namespace AllSky_2020
         private bool Recover;
         double cannyThreshold;
         double circleAccumulatorThreshold;
-        int[] cannyThreshold_Profile = new int[5];
-        int[] circleAccumulatorThreshold_Profile = new int[5];
-        
+        double golden_ratio = ((Math.Sqrt(5) - 1) / 2);
 
 
 
@@ -307,6 +305,7 @@ namespace AllSky_2020
                             RootFrame = new Image<Bgr, byte>((int)AppSetting.Data.ImageWidth, (int)AppSetting.Data.ImageHeight, (int)AppSetting.Data.ImageWidth * 3, imageBuf);
                             ProcessFrame = RootFrame.Copy();
                             ROIFrame = RootFrame.Copy();
+                            Recover = true;
                         }
                     }
                     else
@@ -330,7 +329,7 @@ namespace AllSky_2020
                     }
                     else
                         await Task.Delay(200);
-                    Recover = true;
+                    
                     goto STARTPROCESS;
                 }
                 else
@@ -365,7 +364,6 @@ namespace AllSky_2020
         {
 
             InitializeSystem();
-            //GC.Collect();
 
         }
 
@@ -449,10 +447,7 @@ namespace AllSky_2020
 
         private void MainImageControl_Click(object sender, EventArgs e)
         {
-            IsAutoExposureTime.CheckState = 0;
-            ROIRecExposure = 1;
-
-
+           
         }
 
         private void IsAutoExposureTime_CheckedChanged(object sender, EventArgs e)
@@ -636,9 +631,6 @@ namespace AllSky_2020
                 HoughCirclesX = (int)circle.Center.X;
                 HoughCirclesY = (int)circle.Center.Y;
 
-
-
-
             }
 
             HoughCircles.Image = circleImage;
@@ -714,11 +706,7 @@ namespace AllSky_2020
 
             cannyThreshold = double.Parse(cannyThreshold_Box.Text);
             circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
-
-            //double circleAccumulatorThreshold = 120;
-
             circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
-            //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
             CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
             System.Diagnostics.Debug.WriteLine(circles);
             watch.Stop();
@@ -740,7 +728,7 @@ namespace AllSky_2020
 
             HoughCircles.Image = circleImage;
             #endregion
-            //IsAutoExposureTime.Checked = true;
+
         }
 
         private void Clear_Profile_Click(object sender, EventArgs e)
@@ -748,63 +736,6 @@ namespace AllSky_2020
             File.WriteAllText(@"./HoughCircles_Profile.txt", String.Empty);
             HoughCircles_Profile.Items.Clear();
         }
-
-        private void FocusSet_Click(object sender, EventArgs e)
-        {
-                int CameraWidth = Int16.Parse(ROITextWidth.Text);
-                int CameraHeight = Int16.Parse(ROITextHeight.Text);
-
-                StringBuilder msgBuilder = new StringBuilder("Performance: ");
-
-                //Load the image from file and resize it for display
-                Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
-
-                //Convert the image to grayscale and filter out the noise
-                UMat uimage = new UMat();
-                CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
-
-                //use image pyr to remove noise
-                UMat pyrDown = new UMat();
-                CvInvoke.PyrDown(uimage, pyrDown);
-                CvInvoke.PyrUp(pyrDown, uimage);
-
-                //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
-
-                #region circle detection
-                Stopwatch watch = Stopwatch.StartNew();
-                
-                cannyThreshold = 80;
-                cannyThreshold_Box.Text = cannyThreshold.ToString();
-                double circleAccumulatorThreshold = 120;
-                //circleAccumulatorThreshold = 60;
-                circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
-                //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
-                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
-                System.Diagnostics.Debug.WriteLine(circles);
-                watch.Stop();
-                msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
-                #endregion
-
-                #region draw circles
-                Image<Bgr, Byte> circleImage = img;
-                foreach (CircleF circle in circles)
-                {
-                    circleImage.Draw(circle, new Bgr(Color.Red), 2);
-                    HoughCirclesX = (int)circle.Center.X;
-                    HoughCirclesY = (int)circle.Center.Y;
-
-
-
-
-                }
-
-                HoughCircles.Image = circleImage;
-                #endregion
-                //IsAutoExposureTime.Checked = true;
-            
-        }
-
-
 
         private void CameraList_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -950,12 +881,6 @@ namespace AllSky_2020
                     if (IsAutoExposureTime.CheckState != 0) //AutoExposureTime 
                     {
 
-                        if (ROIRec.Width < 1 && ROIRec.Height < 1)
-                        {
-
-                            ROIRecExposure = 0;
-
-
                             if (checkBoxCenter.CheckState != 0) //checkBoxFocus
                             {
 
@@ -991,6 +916,9 @@ namespace AllSky_2020
                                 {
                                     CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
                                 }
+
+
+
                             }
                             else
                             {
@@ -2392,513 +2320,541 @@ namespace AllSky_2020
                             }
 
 
-
-
-
-
-
-                            ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
-
-
-                           
-                            //  ======================== AutoExposureTime -  ========================
-                            if (CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                             
-                            {
+
+                            
 
 
-                                if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 15000 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 8000;
-                                    Recover = false;
+                        ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
+
+                        int max_light = 150;
+                        int min_light = 80;
+                        if (Colorall > max_light && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
+                        {
+                            double bestValue = ((AppSetting.Data.ExposureTime * (1 - golden_ratio)));
+                            Console.WriteLine("bestValue" + bestValue);
+                            AppSetting.Data.ExposureTime = Math.Round(bestValue,2);
+                            Recover = false;
+                        }
+                        else if(Colorall < min_light && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
+                        {
+                            double bestValue = ((AppSetting.Data.ExposureTime / (1 - golden_ratio)));
+                            Console.WriteLine("bestValue" + bestValue);
+                            AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
+                            Recover = false;
+                            //AppSetting.Data.ExposureTime +
+                        }
+                        
+
+                        
+
+
+
+                        //  ======================== AutoExposureTime -  ========================
+                        //if (CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
+                            
+                        //    {
+                                
+
+                                
+                        //        if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 15000 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 8000;
+                        //            Recover = false;
                                   
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 8000 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 4000;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 8000 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 4000;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 4000 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 2000;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 4000 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 2000;
+                        //            Recover = false;
               
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2000 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 1000;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2000 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 1000;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 1000 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 500;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 1000 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 500;
+                        //            Recover = false;
 
-                                }
+                        //        }
 
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 500 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 250;
-                                    Recover = false;
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 500 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 250;
+                        //            Recover = false;
   
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 250 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 125;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 250 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 125;
+                        //            Recover = false;
      
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 125 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 66;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 125 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 66;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 66 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 33;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 66 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 33;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 33 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 0;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 33 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 0;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 3 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 0;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 3 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 0;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 0.01;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 255 && AppSetting.Data.ExposureTime >= 2 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 0;
+                        //            Recover = false;
                                   
-                                }
+                        //        }
 
 
 
 
-                                //========================================================================================
+                        //        //========================================================================================
 
 
-                                if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 9600;
-                                    Recover = false;
+                        //        if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 9600;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 4800;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 4800;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 2400;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 2400;
+                        //            Recover = false;
                                   
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 1200;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 1200;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 600;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 600;
+                        //            Recover = false;
                                   
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 500 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 300;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 500 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 300;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 250 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 150;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 250 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 150;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 125 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 80;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 125 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 80;
+                        //            Recover = false;
                                   
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 66 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 40;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 66 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 40;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 33 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 20;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 33 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 20;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1 && Colorall < 255 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 0.1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 200 && AppSetting.Data.ExposureTime >= 1 && Colorall < 255 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 0;
+                        //            Recover = false;
                                     
-                                }
+                        //        }
 
 
 
-                                //========================================================================================
-                                if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 10000;
-                                    Recover = false;
+                        //        //========================================================================================
+                        //        if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 10000;
+                        //            Recover = false;
                                   
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 5000;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 5000;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 2500;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 2500;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 1250;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 1250;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 625;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 625;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 500 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 312;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 500 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 312;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 250 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 160;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 250 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 160;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 125 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 83;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 125 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 83;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 66 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 41;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 66 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 41;
+                        //            Recover = false;
                                     
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 33 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime = 25;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 33 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 25;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1 && Colorall < 200 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 0.1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 150 && AppSetting.Data.ExposureTime >= 1 && Colorall < 200 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime = 0.4;
+                        //            Recover = false;
                                     
-                                }
+                        //        }
 
 
 
-                                //========================================================================================
-                                if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 5;
-                                    Recover = false;
+                        //        //========================================================================================
+                        //        if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 15000 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 5;
+                        //            Recover = false;
                                    
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 2;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 8000 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 2;
+                        //            Recover = false;
                                  
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 4000 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 2000 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 1000 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 500 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 500 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 250 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 250 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 125 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 125 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 66 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 66 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 33 && Colorall < 150 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime >= 33 && Colorall < 150 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime < 33 && Colorall < 150 && AppSetting.Data.ExposureTime > 1 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 0.1;
-                                    Recover = false;
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime < 33 && Colorall < 150 && AppSetting.Data.ExposureTime > 1 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 0.1;
+                        //            Recover = false;
 
-                                }
-                                else if (Colorall >= 135 && AppSetting.Data.ExposureTime <= 1 && Colorall < 150 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
-                                {
-                                    AppSetting.Data.ExposureTime -= 0.01;
-                                    Recover = false;
-                                }
-
-
-
-                                // ======================== AutoExposureTime +  ======================== 
-
-                                if (AppSetting.Data.ExposureTime < 120000)
-                                {
-                                    if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 30000 && Colorall > 50 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 10000;
-                                        if (Colorall <= 20)
-                                        {
-                                            AppSetting.Data.ExposureTime = 120000;
-
-
-                                        }
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 15000 && Colorall > 50 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 40;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 8000 && Colorall > 50 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 30;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 4000 && Colorall > 50 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 25;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 2000 && Colorall > 50 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 20;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 1000 && Colorall > 50 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 15;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Colorall > 50 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 10;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Colorall > 50 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 4;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Colorall > 50 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 3;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Colorall >= 50 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 2;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime > 33 && AppSetting.Data.ExposureTime < 66 && Colorall >= 50 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 1;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 80 && AppSetting.Data.ExposureTime <= 33 && Colorall >= 50 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 1;
-                                        Recover = false;
-
-
-                                    }
+                        //        }
+                        //        else if (Colorall >= 135 && AppSetting.Data.ExposureTime <= 1 && Colorall < 150 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
+                        //        {
+                        //            AppSetting.Data.ExposureTime -= 0.01;
+                        //            Recover = false;
+                        //        }
 
 
 
+                        //        // ======================== AutoExposureTime +  ======================== 
 
-                                    //========================================================================================
-
-
-                                    if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 30000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 10000;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 15000 && AppSetting.Data.ExposureTime < 30000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 30000;
-                                        if (Colorall <= 20)
-                                        {
-                                            AppSetting.Data.ExposureTime = 120000;
+                        //        if (AppSetting.Data.ExposureTime < 120000)
+                        //        {
+                        //            if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 30000 && Colorall > 50 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 10000;
+                        //                if (Colorall <= 20)
+                        //                {
+                        //                    AppSetting.Data.ExposureTime = 120000;
 
 
-                                        }
-                                        Recover = false;
+                        //                }
+                        //                Recover = false;
 
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 8000 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 15000;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 4000 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 8000;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 2000 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 4000;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 2000;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 1000;
-                                        Recover = false;
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 500;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 250;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 125;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 66 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 66;
-                                        Recover = false;
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 33 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime = 33;
-                                        Recover = false;
-
-                                    }
-
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime >= 10 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 1;
-                                        Recover = false;
-
-                                    }
-                                    else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 10 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
-                                    {
-                                        AppSetting.Data.ExposureTime += 0.1;
-                                        Recover = false;
-
-                                    }
-                                    else if (AppSetting.Data.ExposureTime < 1 && Recover != false)
-
-                                    {
-                                        if (Colorall <= 30 && Colorall > 20)
-                                        {
-                                            AppSetting.Data.ExposureTime = 0.4;
-                                        }
-                                        if (Colorall <= 20)
-                                        {
-                                            AppSetting.Data.ExposureTime = 0.5;
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 15000 && Colorall > 50 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 40;
+                        //                if (Colorall <= 20)
+                        //                {
+                        //                    AppSetting.Data.ExposureTime = 120000;
 
 
-                                        }
-                                        Recover = false;
+                        //                }
+                        //                Recover = false;
 
-                                    }
-                                    }
-                                Recover = false;
-                            }
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 8000 && Colorall > 50 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 30;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 4000 && Colorall > 50 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 25;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 2000 && Colorall > 50 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 20;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 1000 && Colorall > 50 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 15;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Colorall > 50 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 10;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Colorall > 50 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 4;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Colorall > 50 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 3;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Colorall >= 50 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 2;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime > 33 && AppSetting.Data.ExposureTime < 66 && Colorall >= 50 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 1;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 80 && AppSetting.Data.ExposureTime <= 33 && Colorall >= 50 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 1;
+                        //                Recover = false;
+
+
+                        //            }
+
+
+
+
+                        //            //========================================================================================
+
+
+                        //            if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 30000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 10000;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 15000 && AppSetting.Data.ExposureTime < 30000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 30000;
+                        //                if (Colorall <= 20)
+                        //                {
+                        //                    AppSetting.Data.ExposureTime = 120000;
+
+
+                        //                }
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 8000 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 15000;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 4000 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 8000;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 2000 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 4000;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 2000;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 1000;
+                        //                Recover = false;
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 500;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 250;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 125;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 66 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 66;
+                        //                Recover = false;
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 33 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime = 33;
+                        //                Recover = false;
+
+                        //            }
+
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime >= 10 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 1;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (Colorall <= 50 && AppSetting.Data.ExposureTime <= 10 && AppSetting.Data.ExposureTime > 0.4 && Recover != false)
+                        //            {
+                        //                AppSetting.Data.ExposureTime += 0.1;
+                        //                Recover = false;
+
+                        //            }
+                        //            else if (AppSetting.Data.ExposureTime < 1 && Recover != false)
+
+                        //            {
+                        //                if (Colorall <= 30 && Colorall > 20)
+                        //                {
+                        //                    AppSetting.Data.ExposureTime = 0.4;
+                        //                }
+                        //                if (Colorall <= 20)
+                        //                {
+                        //                    AppSetting.Data.ExposureTime = 0.5;
+
+
+                        //                }
+                        //                Recover = false;
+
+                        //            }
+                        //            }
+                        //        Recover = false;
+                        //    }
 
 
 
@@ -2908,17 +2864,14 @@ namespace AllSky_2020
 
 
                             //AppSetting.Save();
-                            if (AppSetting.Data.ExposureTime % 1 == 0)
-                            {
-                                //AppSetting.Save();
+                            
                                 ExpouseTimeText.Value = (decimal)AppSetting.Data.ExposureTime;
 
-                            }
 
-                        }
+                        
 
-                        else
-                            AppSetting.Data.ExposureTime = (double)ExpouseTimeText.Value;
+                        
+                            
 
     
                         for (int i = 0; i < 21; i++)
@@ -3135,6 +3088,7 @@ namespace AllSky_2020
                 }
 
             }
+            GC.Collect();
 
         }
 
