@@ -29,9 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.MainImageControl = new Emgu.CV.UI.ImageBox();
@@ -41,7 +38,6 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.Histogram = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.FocusPointLable = new System.Windows.Forms.Label();
             this.FocusPoint = new System.Windows.Forms.ComboBox();
             this.Histogramcheck = new System.Windows.Forms.CheckBox();
@@ -124,6 +120,7 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
+            this.Histo = new Emgu.CV.UI.HistogramBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -141,7 +138,6 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Histogram)).BeginInit();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).BeginInit();
             this.tabPage3.SuspendLayout();
@@ -266,7 +262,7 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.Histogram);
+            this.splitContainer2.Panel1.Controls.Add(this.Histo);
             // 
             // splitContainer2.Panel2
             // 
@@ -299,24 +295,6 @@
             this.splitContainer2.Size = new System.Drawing.Size(828, 326);
             this.splitContainer2.SplitterDistance = 374;
             this.splitContainer2.TabIndex = 0;
-            // 
-            // Histogram
-            // 
-            chartArea1.Name = "ChartArea1";
-            this.Histogram.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.Histogram.Legends.Add(legend1);
-            this.Histogram.Location = new System.Drawing.Point(13, 13);
-            this.Histogram.Name = "Histogram";
-            this.Histogram.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Excel;
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Histogram";
-            this.Histogram.Series.Add(series1);
-            this.Histogram.Size = new System.Drawing.Size(358, 300);
-            this.Histogram.TabIndex = 0;
-            this.Histogram.Text = "chart1";
-            this.Histogram.Click += new System.EventHandler(this.Histogram_Click);
             // 
             // FocusPointLable
             // 
@@ -1126,6 +1104,13 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
+            // Histo
+            // 
+            this.Histo.Location = new System.Drawing.Point(3, 3);
+            this.Histo.Name = "Histo";
+            this.Histo.Size = new System.Drawing.Size(368, 320);
+            this.Histo.TabIndex = 0;
+            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1156,7 +1141,6 @@
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.Histogram)).EndInit();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
@@ -1253,7 +1237,6 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.CheckBox checkBoxAverage;
         private System.Windows.Forms.CheckBox checkBoxCenter;
-        private System.Windows.Forms.DataVisualization.Charting.Chart Histogram;
         private System.Windows.Forms.CheckBox Histogramcheck;
         private System.Windows.Forms.CheckBox ShowFocusPoint;
         private Emgu.CV.UI.ImageBox HoughCircles;
@@ -1269,6 +1252,7 @@
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.ComboBox HoughCircles_Profile;
         private System.Windows.Forms.Button Clear_Profile;
+        private Emgu.CV.UI.HistogramBox Histo;
     }
 }
 
