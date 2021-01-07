@@ -60,7 +60,8 @@ namespace AllSky_2020
         double cannyThreshold;
         double circleAccumulatorThreshold;
         double golden_ratio = (1+(Math.Sqrt(5)) / 2);
-
+        int HoughCirclesradius = 0;
+        bool houghCircles_status;
 
 
 
@@ -586,55 +587,60 @@ namespace AllSky_2020
 
         private void Save_HoughCircles_Click(object sender, EventArgs e)
         {
-            int CameraWidth = Int16.Parse(ROITextWidth.Text);
-            int CameraHeight = Int16.Parse(ROITextHeight.Text);
-
-            StringBuilder msgBuilder = new StringBuilder("Performance: ");
-
-            //Load the image from file and resize it for display
-            Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
-
-            //Convert the image to grayscale and filter out the noise
-            UMat uimage = new UMat();
-            CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
-
-            //use image pyr to remove noise
-            UMat pyrDown = new UMat();
-            CvInvoke.PyrDown(uimage, pyrDown);
-            CvInvoke.PyrUp(pyrDown, uimage);
-
-            //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
-
-            #region circle detection
-            Stopwatch watch = Stopwatch.StartNew();
-
-            cannyThreshold = double.Parse(cannyThreshold_Box.Text);
-            circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
+            houghCircles_status = true;
             
-            //double circleAccumulatorThreshold = 120;
-           
-            circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
-            //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
-            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
-            System.Diagnostics.Debug.WriteLine(circles);
-            watch.Stop();
-            msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
-            #endregion
 
-            #region draw circles
-            circleImage = img;
-            foreach (CircleF circle in circles)
-            {
-                circleImage.Draw(circle, new Bgr(Color.Red), 2);
-                HoughCirclesX = (int)circle.Center.X;
-                HoughCirclesY = (int)circle.Center.Y;
 
-            }
+                int CameraWidth = Int16.Parse(ROITextWidth.Text);
+                int CameraHeight = Int16.Parse(ROITextHeight.Text);
 
-            HoughCircles.Image = circleImage;
+                StringBuilder msgBuilder = new StringBuilder("Performance: ");
+
+                //Load the image from file and resize it for display
+                Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
+
+                //Convert the image to grayscale and filter out the noise
+                UMat uimage = new UMat();
+                CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
+
+                //use image pyr to remove noise
+                UMat pyrDown = new UMat();
+                CvInvoke.PyrDown(uimage, pyrDown);
+                CvInvoke.PyrUp(pyrDown, uimage);
+
+                //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
+
+                #region circle detection
+                Stopwatch watch = Stopwatch.StartNew();
+
+                cannyThreshold = double.Parse(cannyThreshold_Box.Text);
+                circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
+
+                //double circleAccumulatorThreshold = 120;
+
+                circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
+                //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                System.Diagnostics.Debug.WriteLine(circles);
+                watch.Stop();
+                msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
+                #endregion
+
+                #region draw circles
+                circleImage = img;
+                foreach (CircleF circle in circles)
+                {
+                    circleImage.Draw(circle, new Bgr(Color.Red), 2);
+                    HoughCirclesX = (int)circle.Center.X;
+                    HoughCirclesY = (int)circle.Center.Y;
+                    HoughCirclesradius = (int)circle.Radius;
+
+                }
+
+                HoughCircles.Image = circleImage;
             #endregion
             //IsAutoExposureTime.Checked = true;
-            
+            houghCircles_status = false;
         }
 
         private void SaveProfile_HoughCircles_Click(object sender, EventArgs e)
@@ -653,6 +659,7 @@ namespace AllSky_2020
 
         private void HoughCircles_Profile_SelectedIndexChanged(object sender, EventArgs e)
         {
+            houghCircles_status = true;
             int lineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
             string[] lines = File.ReadAllLines(@"./HoughCircles_Profile.txt", Encoding.UTF8);
 
@@ -679,54 +686,55 @@ namespace AllSky_2020
 
 
             }
+            
+                int CameraWidth = Int16.Parse(ROITextWidth.Text);
+                int CameraHeight = Int16.Parse(ROITextHeight.Text);
 
-            int CameraWidth = Int16.Parse(ROITextWidth.Text);
-            int CameraHeight = Int16.Parse(ROITextHeight.Text);
+                StringBuilder msgBuilder = new StringBuilder("Performance: ");
 
-            StringBuilder msgBuilder = new StringBuilder("Performance: ");
+                //Load the image from file and resize it for display
+                Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
 
-            //Load the image from file and resize it for display
-            Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
+                //Convert the image to grayscale and filter out the noise
+                UMat uimage = new UMat();
+                CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
 
-            //Convert the image to grayscale and filter out the noise
-            UMat uimage = new UMat();
-            CvInvoke.CvtColor(img, uimage, ColorConversion.Bgr2Gray);
+                //use image pyr to remove noise
+                UMat pyrDown = new UMat();
+                CvInvoke.PyrDown(uimage, pyrDown);
+                CvInvoke.PyrUp(pyrDown, uimage);
 
-            //use image pyr to remove noise
-            UMat pyrDown = new UMat();
-            CvInvoke.PyrDown(uimage, pyrDown);
-            CvInvoke.PyrUp(pyrDown, uimage);
+                //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
 
-            //Image<Gray, Byte> gray = img.Convert<Gray, Byte>().PyrDown().PyrUp();
+                #region circle detection
+                Stopwatch watch = Stopwatch.StartNew();
 
-            #region circle detection
-            Stopwatch watch = Stopwatch.StartNew();
+                cannyThreshold = double.Parse(cannyThreshold_Box.Text);
+                circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
+                circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
+                CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
+                System.Diagnostics.Debug.WriteLine(circles);
+                watch.Stop();
+                msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
+                #endregion
 
-            cannyThreshold = double.Parse(cannyThreshold_Box.Text);
-            circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
-            circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
-            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
-            System.Diagnostics.Debug.WriteLine(circles);
-            watch.Stop();
-            msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
+                #region draw circles
+                circleImage = img;
+                foreach (CircleF circle in circles)
+                {
+                    circleImage.Draw(circle, new Bgr(Color.Red), 2);
+                    HoughCirclesX = (int)circle.Center.X;
+                    HoughCirclesY = (int)circle.Center.Y;
+                    HoughCirclesradius = (int)circle.Radius;
+
+
+
+
+                }
+
+                HoughCircles.Image = circleImage;
             #endregion
-
-            #region draw circles
-            circleImage = img;
-            foreach (CircleF circle in circles)
-            {
-                circleImage.Draw(circle, new Bgr(Color.Red), 2);
-                HoughCirclesX = (int)circle.Center.X;
-                HoughCirclesY = (int)circle.Center.Y;
-
-
-
-
-            }
-
-            HoughCircles.Image = circleImage;
-            #endregion
-
+            houghCircles_status = false;
         }
 
         private void Clear_Profile_Click(object sender, EventArgs e)
@@ -796,8 +804,8 @@ namespace AllSky_2020
                 {
                     System.Diagnostics.Debug.WriteLine("ROIRec.Width == " + ROIRec.Width);
                     System.Diagnostics.Debug.WriteLine("ROIRec.Height == " + ROIRec.Height);
-                    ROIFrame.ROI = ROIRec;
-                    ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
+                    //ROIFrame.ROI = ROIRec;
+                    //ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
 
                 }
 
@@ -840,7 +848,7 @@ namespace AllSky_2020
                     MainImageControl.Image = ProcessFrame;
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-                    ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
+                    //ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
 
                     Image<Bgr, Byte> ImageFrame = ProcessFrame;
 
@@ -921,8 +929,9 @@ namespace AllSky_2020
                         else
                         {
 
-                            if (FocusPoint.Text == "21 Focus Points")
+                            if (FocusPoint.Text == "21 Focus Points" && houghCircles_status == false)
                             {
+
                                 checkBoxCenter.Checked = false;
                                 checkBoxAverage.Checked = true;
                                 //=======================================Center======================================== 
@@ -1136,13 +1145,17 @@ namespace AllSky_2020
                                     for (double j = CentroidY - 10; j < CentroidY; j++)
 
                                     {
+                                        if(houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[0] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
+                                        
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[0] += (pixel.R + pixel.B + pixel.G) / 3;
+                                       
 
 
                                     }
@@ -1155,13 +1168,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleftmore - 10; j < CentroidYleftmore; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[1] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[1] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        
 
 
 
@@ -1175,14 +1190,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleft - 10; j < CentroidYleft; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[2] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[2] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1196,14 +1212,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYright - 10; j < CentroidYright; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[3] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[3] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1215,14 +1232,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYrightmore - 10; j < CentroidYrightmore; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[4] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[4] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1235,14 +1253,15 @@ namespace AllSky_2020
                                     for (double j = CentroidY_UP - 10; j < CentroidY_UP; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[5] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[5] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1254,14 +1273,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleft_UP - 10; j < CentroidYleft_UP; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[6] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[6] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1273,14 +1293,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleftmore_UP - 10; j < CentroidYleftmore_UP; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[7] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[7] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1294,14 +1315,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYright_UP - 10; j < CentroidYright_UP; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[8] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[8] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1313,14 +1335,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYrightmore_UP - 10; j < CentroidYrightmore_UP; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[9] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[9] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1332,14 +1355,15 @@ namespace AllSky_2020
                                     for (double j = CentroidY_DOWN - 10; j < CentroidY_DOWN; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[10] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[10] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1355,10 +1379,11 @@ namespace AllSky_2020
                                         Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[11] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                        if (houghCircles_status == false)
+                                        {
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[11] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1370,14 +1395,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleftmore_DOWN - 10; j < CentroidYleftmore_DOWN; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[12] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[12] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1390,14 +1416,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYright_DOWN - 10; j < CentroidYright_DOWN; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[13] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[13] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1409,14 +1436,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYrightmore_DOWN - 10; j < CentroidYrightmore_DOWN; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[14] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[14] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1429,14 +1457,15 @@ namespace AllSky_2020
                                     for (double j = CentroidY_UP2 - 10; j < CentroidY_UP2; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[15] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[15] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1448,14 +1477,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYright_UP2 - 10; j < CentroidYright_UP2; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[16] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[16] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1467,14 +1497,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleft_UP2 - 10; j < CentroidYleft_UP2; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[17] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[17] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1488,13 +1519,14 @@ namespace AllSky_2020
                                     for (double j = CentroidX_DOWN2 - 10; j < CentroidX_DOWN2; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                                            ColorEx[18] += (pixel.R + pixel.B + pixel.G) / 3;
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                        ColorEx[18] += (pixel.R + pixel.B + pixel.G) / 3;
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
 
                                     }
@@ -1507,14 +1539,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYright_DOWN2 - 10; j < CentroidYright_DOWN2; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[19] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[19] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -1526,14 +1559,15 @@ namespace AllSky_2020
                                     for (double j = CentroidYleft_DOWN2 - 10; j < CentroidYleft_DOWN2; j++)
 
                                     {
+                                        if (houghCircles_status == false)
+                                        {
+                                            Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                                        Color pixel = BmpInput.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
 
-
-                                        Colorall += (pixel.R + pixel.B + pixel.G) / 3;
-                                        ColorEx[20] += (pixel.R + pixel.B + pixel.G) / 3;
-
+                                            Colorall += (pixel.R + pixel.B + pixel.G) / 3;
+                                            ColorEx[20] += (pixel.R + pixel.B + pixel.G) / 3;
+                                        }
 
                                     }
 
@@ -2318,46 +2352,61 @@ namespace AllSky_2020
                         }
 
 
-
-
-
-
-
                         ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
 
                         int max_light;
                         int min_light;
-                        if (AppSetting.Data.ExposureTime >= 1)
+                        int Control_Jump = 0;
+                        if (AppSetting.Data.ExposureTime >= 10)
                         {
-                            max_light = 150;
-                            min_light = 70;
+                            max_light = 125;
+                            min_light = 100;
+                            if (Colorall <= 150 && Colorall > 80)
+                            {
+                                Control_Jump = 1;
+                            }
+                            else if (Colorall <= 150 && Colorall > 100)
+                            {
+                                Control_Jump = 2;
+                            }
+                            else if (Colorall <= 125 && Colorall >= 100)
+                            {
+                                Control_Jump = 3;
+                            }
+                            
 
                         }
                         else
                         {
-                            max_light = 100;
+                            max_light = 80;
                             min_light = 30;
+                            if (Colorall <= 150 && Colorall > 80)
+                            {
+                                Control_Jump = 1;
+                            }
+                            else if (Colorall <= 100 && Colorall > 80)
+                            {
+                                Control_Jump = 2;
+                            }
+                            else if (Colorall <= 80 && Colorall >= 30)
+                            {
+                                Control_Jump = 3;
+                            }
 
                         }
 
-                        int Control_Jump = 0;
-                        if (Colorall <= 80 && Colorall >= 70)
-                        {
-                            Control_Jump = 2;
-                        }
-                        else if (Colorall <= 100 && Colorall >= 80)
-                        {
-                            Control_Jump = 1;
-                        }
-                        else if (Colorall <= 150 && Colorall >= 140)
-                        {
-                            Control_Jump = 2;
-                        }
+                        
+                        
 
+                        double ExposureTimeMax = AppSetting.Data.ExposureTime;
 
+                        double ExposureTimeMin = 0;
+
+                        double ExposureTimeAverage = (ExposureTimeMin + ExposureTimeMax) / 2;
 
                         if (Colorall >= max_light && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                         {
+                            //AppSetting.Data.ExposureTime = ExposureTimeAverage;
                             double bestValue = ((AppSetting.Data.ExposureTime / (golden_ratio + Control_Jump)));
                             Console.WriteLine("bestValue" + bestValue);
                             AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
@@ -2366,6 +2415,7 @@ namespace AllSky_2020
                         }
                         else if (Colorall <= min_light && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false && AppSetting.Data.ExposureTime <= 120000)
                         {
+                            //AppSetting.Data.ExposureTime = ExposureTimeAverage;
                             double bestValue = ((AppSetting.Data.ExposureTime * (golden_ratio - Control_Jump)));
                             Console.WriteLine("bestValue" + bestValue);
                             AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
@@ -2376,12 +2426,18 @@ namespace AllSky_2020
 
                         ExpouseTimeText.Value = (decimal)AppSetting.Data.ExposureTime;
       
-                        if (Histogramcheck.CheckState != 0)
+                        if (Histogramcheck.CheckState != 0&& HoughCirclesradius != 0)
                         {
-                            Image<Bgr, Byte> HistoImage = ProcessFrame;
-                          
+                           
+                            Image<Bgr, Byte> HistoImage = ROIFrame;
+                            HistoImage.ROI = new Rectangle((int)CentroidX - HoughCirclesradius*7, (int)CentroidY - HoughCirclesradius * 7, HoughCirclesradius * 7 * 2, HoughCirclesradius * 7 * 2); ;
+                            
+                            Image<Bgr, Byte> cropped_im = HistoImage.Copy();
+                            ROIImage.Image = cropped_im.Convert<Gray, Byte>();
+
+
                             Histo.ClearHistogram();                        
-                            Histo.GenerateHistograms(HistoImage.Convert<Gray, Byte>(), 256);
+                            Histo.GenerateHistograms(cropped_im.Convert<Gray, Byte>(), 256);
                             Histo.Refresh();
 
                         }else

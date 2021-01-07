@@ -38,6 +38,7 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.Histo = new Emgu.CV.UI.HistogramBox();
             this.FocusPointLable = new System.Windows.Forms.Label();
             this.FocusPoint = new System.Windows.Forms.ComboBox();
             this.Histogramcheck = new System.Windows.Forms.CheckBox();
@@ -120,7 +121,6 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.Histo = new Emgu.CV.UI.HistogramBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -295,6 +295,13 @@
             this.splitContainer2.Size = new System.Drawing.Size(828, 326);
             this.splitContainer2.SplitterDistance = 374;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // Histo
+            // 
+            this.Histo.Location = new System.Drawing.Point(3, 3);
+            this.Histo.Name = "Histo";
+            this.Histo.Size = new System.Drawing.Size(368, 320);
+            this.Histo.TabIndex = 0;
             // 
             // FocusPointLable
             // 
@@ -1103,13 +1110,6 @@
             this.UITimer.Enabled = true;
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
-            // 
-            // Histo
-            // 
-            this.Histo.Location = new System.Drawing.Point(3, 3);
-            this.Histo.Name = "Histo";
-            this.Histo.Size = new System.Drawing.Size(368, 320);
-            this.Histo.TabIndex = 0;
             // 
             // MainWindows
             // 
