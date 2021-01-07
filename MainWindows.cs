@@ -31,7 +31,7 @@ namespace AllSky_2020
         public CAMERASTSTATE _CAMERASTSTATE;
         public string SystemMessage = "Ready.";
 
-        private Image<Bgr, Byte> RootFrame = null, ProcessFrame = null, ROIFrame, circleImage = null;
+        private Image<Bgr, Byte> RootFrame = null, ProcessFrame = null, ROIFrame, circleImage = null , ProcessFrameGray =null;
         private Rectangle ROIRec;
         private IntPtr imageBuf;
 
@@ -304,6 +304,7 @@ namespace AllSky_2020
                         {
                             RootFrame = new Image<Bgr, byte>((int)AppSetting.Data.ImageWidth, (int)AppSetting.Data.ImageHeight, (int)AppSetting.Data.ImageWidth * 3, imageBuf);
                             ProcessFrame = RootFrame.Copy();
+                            ProcessFrameGray = RootFrame.Copy();
                             ROIFrame = RootFrame.Copy();
                             Recover = true;
                         }
@@ -844,13 +845,15 @@ namespace AllSky_2020
                     }
 
 
-
+                    ROIImage.Image = ProcessFrameGray.Convert<Gray, Byte>(); ;
                     MainImageControl.Image = ProcessFrame;
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-                    //ROIImage.Image = ROIFrame.Convert<Gray, Byte>();
+                   
 
                     Image<Bgr, Byte> ImageFrame = ProcessFrame;
+
+                    
 
                     TimeNow = DateTime.Now.ToString("yyyy_MM_dd__HH_mm_ss");
                     TimeFolder = DateTime.Now.ToString("yyyy-MM-dd");
@@ -2425,23 +2428,29 @@ namespace AllSky_2020
 
 
                         ExpouseTimeText.Value = (decimal)AppSetting.Data.ExposureTime;
-      
+                        
                         if (Histogramcheck.CheckState != 0&& HoughCirclesradius != 0)
                         {
-                           
+                            
                             Image<Bgr, Byte> HistoImage = ROIFrame;
                             HistoImage.ROI = new Rectangle((int)CentroidX - HoughCirclesradius*7, (int)CentroidY - HoughCirclesradius * 7, HoughCirclesradius * 7 * 2, HoughCirclesradius * 7 * 2); ;
                             
                             Image<Bgr, Byte> cropped_im = HistoImage.Copy();
-                            ROIImage.Image = cropped_im.Convert<Gray, Byte>();
+                            //ROIImage.Image = cropped_im.Convert<Gray, Byte>();
 
 
                             Histo.ClearHistogram();                        
                             Histo.GenerateHistograms(cropped_im.Convert<Gray, Byte>(), 256);
                             Histo.Refresh();
 
-                        }else
-                            Histo.ClearHistogram();
+                        }
+                        else if(Histogramcheck.Checked == true && HoughCirclesradius == 0 )
+                        {
+                            Histogramcheck.Checked = false;
+                            MessageBox.Show("Please turn on HoughCircles.", "Message", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+                        }
+                            
 
 
                         if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && Colorall < 180 && ConnectedCameras > 0)
