@@ -39,12 +39,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.Histo = new Emgu.CV.UI.HistogramBox();
-            this.FocusPointLable = new System.Windows.Forms.Label();
-            this.FocusPoint = new System.Windows.Forms.ComboBox();
-            this.Histogramcheck = new System.Windows.Forms.CheckBox();
-            this.CameraList = new System.Windows.Forms.ComboBox();
-            this.label22 = new System.Windows.Forms.Label();
-            this.SetCameraId = new System.Windows.Forms.Button();
+            this.panel6 = new System.Windows.Forms.Panel();
             this.OriginDisplay = new System.Windows.Forms.CheckBox();
             this.AreaDisplay = new System.Windows.Forms.CheckBox();
             this.BtnDefineOrigin = new System.Windows.Forms.Button();
@@ -65,21 +60,32 @@
             this.label15 = new System.Windows.Forms.Label();
             this.AreaTextY = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.FocusPointLable = new System.Windows.Forms.Label();
+            this.FocusPoint = new System.Windows.Forms.ComboBox();
+            this.Histogramcheck = new System.Windows.Forms.CheckBox();
+            this.CameraList = new System.Windows.Forms.ComboBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.SetCameraId = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.hdr_On = new System.Windows.Forms.CheckBox();
+            this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
             this.Clear_Profile = new System.Windows.Forms.Button();
+            this.label24 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
+            this.Save_HoughCircles = new System.Windows.Forms.Button();
             this.HoughCircles_Profile = new System.Windows.Forms.ComboBox();
             this.SaveProfile_HoughCircles = new System.Windows.Forms.Button();
-            this.Save_HoughCircles = new System.Windows.Forms.Button();
-            this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
-            this.label24 = new System.Windows.Forms.Label();
-            this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
+            this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
             this.HoughCircles = new Emgu.CV.UI.ImageBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.SaveLog = new System.Windows.Forms.CheckBox();
             this.Savebutton = new System.Windows.Forms.Button();
             this.SavePath = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.panel5 = new System.Windows.Forms.Panel();
             this.SpeedMode = new System.Windows.Forms.CheckBox();
             this.ShowFocusPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxAverage = new System.Windows.Forms.CheckBox();
@@ -87,6 +93,9 @@
             this.checkBoxCenter = new System.Windows.Forms.CheckBox();
             this.ExpouseTimeText = new System.Windows.Forms.NumericUpDown();
             this.label23 = new System.Windows.Forms.Label();
+            this.IsAutoExposureTime = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.ROITextX = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -102,7 +111,6 @@
             this.ROITextHeight = new System.Windows.Forms.TextBox();
             this.ROITextY = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.IsAutoExposureTime = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.BtnSetCameraSetting = new System.Windows.Forms.Button();
             this.MIN_ISOText = new System.Windows.Forms.TextBox();
@@ -115,8 +123,6 @@
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.MAX_ISOText = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
@@ -138,10 +144,14 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.panel6.SuspendLayout();
+            this.panel4.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ExpouseTimeText)).BeginInit();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -266,32 +276,8 @@
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.FocusPointLable);
-            this.splitContainer2.Panel2.Controls.Add(this.FocusPoint);
-            this.splitContainer2.Panel2.Controls.Add(this.Histogramcheck);
-            this.splitContainer2.Panel2.Controls.Add(this.CameraList);
-            this.splitContainer2.Panel2.Controls.Add(this.label22);
-            this.splitContainer2.Panel2.Controls.Add(this.SetCameraId);
-            this.splitContainer2.Panel2.Controls.Add(this.OriginDisplay);
-            this.splitContainer2.Panel2.Controls.Add(this.AreaDisplay);
-            this.splitContainer2.Panel2.Controls.Add(this.BtnDefineOrigin);
-            this.splitContainer2.Panel2.Controls.Add(this.BtnSetROI);
-            this.splitContainer2.Panel2.Controls.Add(this.OriginXText);
-            this.splitContainer2.Panel2.Controls.Add(this.AreaTextX);
-            this.splitContainer2.Panel2.Controls.Add(this.label21);
-            this.splitContainer2.Panel2.Controls.Add(this.label4);
-            this.splitContainer2.Panel2.Controls.Add(this.label20);
-            this.splitContainer2.Panel2.Controls.Add(this.label3);
-            this.splitContainer2.Panel2.Controls.Add(this.OriginWidthText);
-            this.splitContainer2.Panel2.Controls.Add(this.AreaTextWidth);
-            this.splitContainer2.Panel2.Controls.Add(this.OriginHeightText);
-            this.splitContainer2.Panel2.Controls.Add(this.label19);
-            this.splitContainer2.Panel2.Controls.Add(this.AreaTextHeight);
-            this.splitContainer2.Panel2.Controls.Add(this.OriginYText);
-            this.splitContainer2.Panel2.Controls.Add(this.label1);
-            this.splitContainer2.Panel2.Controls.Add(this.label15);
-            this.splitContainer2.Panel2.Controls.Add(this.AreaTextY);
-            this.splitContainer2.Panel2.Controls.Add(this.label2);
+            this.splitContainer2.Panel2.Controls.Add(this.panel6);
+            this.splitContainer2.Panel2.Controls.Add(this.panel4);
             this.splitContainer2.Size = new System.Drawing.Size(828, 326);
             this.splitContainer2.SplitterDistance = 374;
             this.splitContainer2.TabIndex = 0;
@@ -303,72 +289,38 @@
             this.Histo.Size = new System.Drawing.Size(368, 320);
             this.Histo.TabIndex = 0;
             // 
-            // FocusPointLable
+            // panel6
             // 
-            this.FocusPointLable.AutoSize = true;
-            this.FocusPointLable.Location = new System.Drawing.Point(174, 271);
-            this.FocusPointLable.Name = "FocusPointLable";
-            this.FocusPointLable.Size = new System.Drawing.Size(60, 13);
-            this.FocusPointLable.TabIndex = 9;
-            this.FocusPointLable.Text = "FocusPoint";
-            // 
-            // FocusPoint
-            // 
-            this.FocusPoint.FormattingEnabled = true;
-            this.FocusPoint.Items.AddRange(new object[] {
-            "21 Focus Points",
-            "15 Focus Points",
-            "9 Focus Points"});
-            this.FocusPoint.Location = new System.Drawing.Point(240, 267);
-            this.FocusPoint.Name = "FocusPoint";
-            this.FocusPoint.Size = new System.Drawing.Size(121, 21);
-            this.FocusPoint.TabIndex = 8;
-            // 
-            // Histogramcheck
-            // 
-            this.Histogramcheck.AutoSize = true;
-            this.Histogramcheck.Location = new System.Drawing.Point(19, 267);
-            this.Histogramcheck.Name = "Histogramcheck";
-            this.Histogramcheck.Size = new System.Drawing.Size(73, 17);
-            this.Histogramcheck.TabIndex = 7;
-            this.Histogramcheck.Text = "Histogram";
-            this.Histogramcheck.UseVisualStyleBackColor = true;
-            this.Histogramcheck.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // CameraList
-            // 
-            this.CameraList.FormattingEnabled = true;
-            this.CameraList.Location = new System.Drawing.Point(105, 207);
-            this.CameraList.Name = "CameraList";
-            this.CameraList.Size = new System.Drawing.Size(217, 21);
-            this.CameraList.TabIndex = 6;
-            this.CameraList.SelectedIndexChanged += new System.EventHandler(this.CameraList_SelectedIndexChanged);
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(45, 210);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(54, 13);
-            this.label22.TabIndex = 5;
-            this.label22.Text = "CameraID";
-            this.label22.Click += new System.EventHandler(this.label22_Click);
-            // 
-            // SetCameraId
-            // 
-            this.SetCameraId.Location = new System.Drawing.Point(328, 207);
-            this.SetCameraId.Name = "SetCameraId";
-            this.SetCameraId.Size = new System.Drawing.Size(75, 23);
-            this.SetCameraId.TabIndex = 4;
-            this.SetCameraId.Text = "Set";
-            this.SetCameraId.UseVisualStyleBackColor = true;
-            this.SetCameraId.Click += new System.EventHandler(this.SetCameraId_Click);
+            this.panel6.Controls.Add(this.OriginDisplay);
+            this.panel6.Controls.Add(this.AreaDisplay);
+            this.panel6.Controls.Add(this.BtnDefineOrigin);
+            this.panel6.Controls.Add(this.BtnSetROI);
+            this.panel6.Controls.Add(this.OriginXText);
+            this.panel6.Controls.Add(this.AreaTextX);
+            this.panel6.Controls.Add(this.label21);
+            this.panel6.Controls.Add(this.label4);
+            this.panel6.Controls.Add(this.label20);
+            this.panel6.Controls.Add(this.label3);
+            this.panel6.Controls.Add(this.OriginWidthText);
+            this.panel6.Controls.Add(this.AreaTextWidth);
+            this.panel6.Controls.Add(this.OriginHeightText);
+            this.panel6.Controls.Add(this.label19);
+            this.panel6.Controls.Add(this.AreaTextHeight);
+            this.panel6.Controls.Add(this.OriginYText);
+            this.panel6.Controls.Add(this.label1);
+            this.panel6.Controls.Add(this.label15);
+            this.panel6.Controls.Add(this.AreaTextY);
+            this.panel6.Controls.Add(this.label2);
+            this.panel6.Location = new System.Drawing.Point(16, 16);
+            this.panel6.Name = "panel6";
+            this.panel6.Size = new System.Drawing.Size(411, 169);
+            this.panel6.TabIndex = 11;
             // 
             // OriginDisplay
             // 
             this.OriginDisplay.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.OriginDisplay.AutoSize = true;
-            this.OriginDisplay.Location = new System.Drawing.Point(327, 130);
+            this.OriginDisplay.Location = new System.Drawing.Point(308, 114);
             this.OriginDisplay.Name = "OriginDisplay";
             this.OriginDisplay.Size = new System.Drawing.Size(71, 17);
             this.OriginDisplay.TabIndex = 3;
@@ -380,7 +332,7 @@
             // 
             this.AreaDisplay.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.AreaDisplay.AutoSize = true;
-            this.AreaDisplay.Location = new System.Drawing.Point(122, 130);
+            this.AreaDisplay.Location = new System.Drawing.Point(103, 114);
             this.AreaDisplay.Name = "AreaDisplay";
             this.AreaDisplay.Size = new System.Drawing.Size(71, 17);
             this.AreaDisplay.TabIndex = 3;
@@ -390,7 +342,7 @@
             // BtnDefineOrigin
             // 
             this.BtnDefineOrigin.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BtnDefineOrigin.Location = new System.Drawing.Point(315, 156);
+            this.BtnDefineOrigin.Location = new System.Drawing.Point(296, 140);
             this.BtnDefineOrigin.Name = "BtnDefineOrigin";
             this.BtnDefineOrigin.Size = new System.Drawing.Size(100, 23);
             this.BtnDefineOrigin.TabIndex = 2;
@@ -401,7 +353,7 @@
             // BtnSetROI
             // 
             this.BtnSetROI.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.BtnSetROI.Location = new System.Drawing.Point(105, 156);
+            this.BtnSetROI.Location = new System.Drawing.Point(86, 140);
             this.BtnSetROI.Name = "BtnSetROI";
             this.BtnSetROI.Size = new System.Drawing.Size(100, 23);
             this.BtnSetROI.TabIndex = 2;
@@ -412,7 +364,7 @@
             // OriginXText
             // 
             this.OriginXText.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.OriginXText.Location = new System.Drawing.Point(315, 26);
+            this.OriginXText.Location = new System.Drawing.Point(296, 10);
             this.OriginXText.Name = "OriginXText";
             this.OriginXText.Size = new System.Drawing.Size(100, 20);
             this.OriginXText.TabIndex = 1;
@@ -420,7 +372,7 @@
             // AreaTextX
             // 
             this.AreaTextX.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.AreaTextX.Location = new System.Drawing.Point(105, 26);
+            this.AreaTextX.Location = new System.Drawing.Point(86, 10);
             this.AreaTextX.Name = "AreaTextX";
             this.AreaTextX.Size = new System.Drawing.Size(100, 20);
             this.AreaTextX.TabIndex = 1;
@@ -429,7 +381,7 @@
             // 
             this.label21.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(236, 107);
+            this.label21.Location = new System.Drawing.Point(217, 91);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(74, 13);
             this.label21.TabIndex = 0;
@@ -439,7 +391,7 @@
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(33, 107);
+            this.label4.Location = new System.Drawing.Point(14, 91);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(69, 13);
             this.label4.TabIndex = 0;
@@ -449,7 +401,7 @@
             // 
             this.label20.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(237, 81);
+            this.label20.Location = new System.Drawing.Point(218, 65);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(71, 13);
             this.label20.TabIndex = 0;
@@ -459,7 +411,7 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(33, 81);
+            this.label3.Location = new System.Drawing.Point(14, 65);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(66, 13);
             this.label3.TabIndex = 0;
@@ -468,7 +420,7 @@
             // OriginWidthText
             // 
             this.OriginWidthText.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.OriginWidthText.Location = new System.Drawing.Point(315, 78);
+            this.OriginWidthText.Location = new System.Drawing.Point(296, 62);
             this.OriginWidthText.Name = "OriginWidthText";
             this.OriginWidthText.Size = new System.Drawing.Size(100, 20);
             this.OriginWidthText.TabIndex = 1;
@@ -476,7 +428,7 @@
             // AreaTextWidth
             // 
             this.AreaTextWidth.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.AreaTextWidth.Location = new System.Drawing.Point(105, 78);
+            this.AreaTextWidth.Location = new System.Drawing.Point(86, 62);
             this.AreaTextWidth.Name = "AreaTextWidth";
             this.AreaTextWidth.Size = new System.Drawing.Size(100, 20);
             this.AreaTextWidth.TabIndex = 1;
@@ -484,7 +436,7 @@
             // OriginHeightText
             // 
             this.OriginHeightText.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.OriginHeightText.Location = new System.Drawing.Point(315, 104);
+            this.OriginHeightText.Location = new System.Drawing.Point(296, 88);
             this.OriginHeightText.Name = "OriginHeightText";
             this.OriginHeightText.Size = new System.Drawing.Size(100, 20);
             this.OriginHeightText.TabIndex = 1;
@@ -493,7 +445,7 @@
             // 
             this.label19.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(260, 29);
+            this.label19.Location = new System.Drawing.Point(241, 13);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(50, 13);
             this.label19.TabIndex = 0;
@@ -502,7 +454,7 @@
             // AreaTextHeight
             // 
             this.AreaTextHeight.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.AreaTextHeight.Location = new System.Drawing.Point(105, 104);
+            this.AreaTextHeight.Location = new System.Drawing.Point(86, 88);
             this.AreaTextHeight.Name = "AreaTextHeight";
             this.AreaTextHeight.Size = new System.Drawing.Size(100, 20);
             this.AreaTextHeight.TabIndex = 1;
@@ -510,7 +462,7 @@
             // OriginYText
             // 
             this.OriginYText.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.OriginYText.Location = new System.Drawing.Point(315, 52);
+            this.OriginYText.Location = new System.Drawing.Point(296, 36);
             this.OriginYText.Name = "OriginYText";
             this.OriginYText.Size = new System.Drawing.Size(100, 20);
             this.OriginYText.TabIndex = 1;
@@ -519,7 +471,7 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(57, 29);
+            this.label1.Location = new System.Drawing.Point(38, 13);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(45, 13);
             this.label1.TabIndex = 0;
@@ -529,7 +481,7 @@
             // 
             this.label15.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(260, 55);
+            this.label15.Location = new System.Drawing.Point(241, 39);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(50, 13);
             this.label15.TabIndex = 0;
@@ -538,7 +490,7 @@
             // AreaTextY
             // 
             this.AreaTextY.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.AreaTextY.Location = new System.Drawing.Point(105, 52);
+            this.AreaTextY.Location = new System.Drawing.Point(86, 36);
             this.AreaTextY.Name = "AreaTextY";
             this.AreaTextY.Size = new System.Drawing.Size(100, 20);
             this.AreaTextY.TabIndex = 1;
@@ -547,23 +499,91 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(57, 55);
+            this.label2.Location = new System.Drawing.Point(38, 39);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(45, 13);
             this.label2.TabIndex = 0;
             this.label2.Text = "Area Y :";
             // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.FocusPointLable);
+            this.panel4.Controls.Add(this.FocusPoint);
+            this.panel4.Controls.Add(this.Histogramcheck);
+            this.panel4.Controls.Add(this.CameraList);
+            this.panel4.Controls.Add(this.label22);
+            this.panel4.Controls.Add(this.SetCameraId);
+            this.panel4.Location = new System.Drawing.Point(16, 198);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(411, 100);
+            this.panel4.TabIndex = 10;
+            // 
+            // FocusPointLable
+            // 
+            this.FocusPointLable.AutoSize = true;
+            this.FocusPointLable.Location = new System.Drawing.Point(158, 73);
+            this.FocusPointLable.Name = "FocusPointLable";
+            this.FocusPointLable.Size = new System.Drawing.Size(60, 13);
+            this.FocusPointLable.TabIndex = 9;
+            this.FocusPointLable.Text = "FocusPoint";
+            // 
+            // FocusPoint
+            // 
+            this.FocusPoint.FormattingEnabled = true;
+            this.FocusPoint.Items.AddRange(new object[] {
+            "21 Focus Points",
+            "15 Focus Points",
+            "9 Focus Points",
+            "Histogram"});
+            this.FocusPoint.Location = new System.Drawing.Point(224, 69);
+            this.FocusPoint.Name = "FocusPoint";
+            this.FocusPoint.Size = new System.Drawing.Size(121, 21);
+            this.FocusPoint.TabIndex = 8;
+            this.FocusPoint.SelectedIndexChanged += new System.EventHandler(this.FocusPoint_SelectedIndexChanged);
+            // 
+            // Histogramcheck
+            // 
+            this.Histogramcheck.AutoSize = true;
+            this.Histogramcheck.Location = new System.Drawing.Point(3, 69);
+            this.Histogramcheck.Name = "Histogramcheck";
+            this.Histogramcheck.Size = new System.Drawing.Size(73, 17);
+            this.Histogramcheck.TabIndex = 7;
+            this.Histogramcheck.Text = "Histogram";
+            this.Histogramcheck.UseVisualStyleBackColor = true;
+            this.Histogramcheck.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // CameraList
+            // 
+            this.CameraList.FormattingEnabled = true;
+            this.CameraList.Location = new System.Drawing.Point(89, 9);
+            this.CameraList.Name = "CameraList";
+            this.CameraList.Size = new System.Drawing.Size(217, 21);
+            this.CameraList.TabIndex = 6;
+            this.CameraList.SelectedIndexChanged += new System.EventHandler(this.CameraList_SelectedIndexChanged);
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(29, 12);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(54, 13);
+            this.label22.TabIndex = 5;
+            this.label22.Text = "CameraID";
+            this.label22.Click += new System.EventHandler(this.label22_Click);
+            // 
+            // SetCameraId
+            // 
+            this.SetCameraId.Location = new System.Drawing.Point(312, 9);
+            this.SetCameraId.Name = "SetCameraId";
+            this.SetCameraId.Size = new System.Drawing.Size(75, 23);
+            this.SetCameraId.TabIndex = 4;
+            this.SetCameraId.Text = "Set";
+            this.SetCameraId.UseVisualStyleBackColor = true;
+            this.SetCameraId.Click += new System.EventHandler(this.SetCameraId_Click);
+            // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.Clear_Profile);
-            this.tabPage2.Controls.Add(this.label26);
-            this.tabPage2.Controls.Add(this.HoughCircles_Profile);
-            this.tabPage2.Controls.Add(this.SaveProfile_HoughCircles);
-            this.tabPage2.Controls.Add(this.Save_HoughCircles);
-            this.tabPage2.Controls.Add(this.circleAccumulatorThreshold_Box);
-            this.tabPage2.Controls.Add(this.label25);
-            this.tabPage2.Controls.Add(this.label24);
-            this.tabPage2.Controls.Add(this.cannyThreshold_Box);
+            this.tabPage2.Controls.Add(this.panel1);
             this.tabPage2.Controls.Add(this.HoughCircles);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -573,9 +593,43 @@
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.hdr_On);
+            this.panel1.Controls.Add(this.cannyThreshold_Box);
+            this.panel1.Controls.Add(this.Clear_Profile);
+            this.panel1.Controls.Add(this.label24);
+            this.panel1.Controls.Add(this.label26);
+            this.panel1.Controls.Add(this.Save_HoughCircles);
+            this.panel1.Controls.Add(this.HoughCircles_Profile);
+            this.panel1.Controls.Add(this.SaveProfile_HoughCircles);
+            this.panel1.Controls.Add(this.label25);
+            this.panel1.Controls.Add(this.circleAccumulatorThreshold_Box);
+            this.panel1.Location = new System.Drawing.Point(401, 6);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(368, 275);
+            this.panel1.TabIndex = 12;
+            // 
+            // hdr_On
+            // 
+            this.hdr_On.AutoSize = true;
+            this.hdr_On.Location = new System.Drawing.Point(20, 159);
+            this.hdr_On.Name = "hdr_On";
+            this.hdr_On.Size = new System.Drawing.Size(50, 17);
+            this.hdr_On.TabIndex = 12;
+            this.hdr_On.Text = "HDR";
+            this.hdr_On.UseVisualStyleBackColor = true;
+            // 
+            // cannyThreshold_Box
+            // 
+            this.cannyThreshold_Box.Location = new System.Drawing.Point(20, 25);
+            this.cannyThreshold_Box.Name = "cannyThreshold_Box";
+            this.cannyThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.cannyThreshold_Box.TabIndex = 3;
+            // 
             // Clear_Profile
             // 
-            this.Clear_Profile.Location = new System.Drawing.Point(583, 136);
+            this.Clear_Profile.Location = new System.Drawing.Point(247, 56);
             this.Clear_Profile.Name = "Clear_Profile";
             this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
             this.Clear_Profile.TabIndex = 11;
@@ -583,37 +637,27 @@
             this.Clear_Profile.UseVisualStyleBackColor = true;
             this.Clear_Profile.Click += new System.EventHandler(this.Clear_Profile_Click);
             // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(17, 9);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(83, 13);
+            this.label24.TabIndex = 4;
+            this.label24.Text = "cannyThreshold";
+            // 
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(435, 117);
+            this.label26.Location = new System.Drawing.Point(163, 9);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(36, 13);
             this.label26.TabIndex = 10;
             this.label26.Text = "Profile";
             // 
-            // HoughCircles_Profile
-            // 
-            this.HoughCircles_Profile.FormattingEnabled = true;
-            this.HoughCircles_Profile.Location = new System.Drawing.Point(435, 136);
-            this.HoughCircles_Profile.Name = "HoughCircles_Profile";
-            this.HoughCircles_Profile.Size = new System.Drawing.Size(121, 21);
-            this.HoughCircles_Profile.TabIndex = 9;
-            this.HoughCircles_Profile.SelectedIndexChanged += new System.EventHandler(this.HoughCircles_Profile_SelectedIndexChanged);
-            // 
-            // SaveProfile_HoughCircles
-            // 
-            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(664, 44);
-            this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
-            this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
-            this.SaveProfile_HoughCircles.TabIndex = 8;
-            this.SaveProfile_HoughCircles.Text = "SaveProfile";
-            this.SaveProfile_HoughCircles.UseVisualStyleBackColor = true;
-            this.SaveProfile_HoughCircles.Click += new System.EventHandler(this.SaveProfile_HoughCircles_Click);
-            // 
             // Save_HoughCircles
             // 
-            this.Save_HoughCircles.Location = new System.Drawing.Point(583, 44);
+            this.Save_HoughCircles.Location = new System.Drawing.Point(20, 110);
             this.Save_HoughCircles.Name = "Save_HoughCircles";
             this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.Save_HoughCircles.TabIndex = 7;
@@ -621,37 +665,40 @@
             this.Save_HoughCircles.UseVisualStyleBackColor = true;
             this.Save_HoughCircles.Click += new System.EventHandler(this.Save_HoughCircles_Click);
             // 
-            // circleAccumulatorThreshold_Box
+            // HoughCircles_Profile
             // 
-            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(435, 86);
-            this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
-            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(115, 20);
-            this.circleAccumulatorThreshold_Box.TabIndex = 6;
+            this.HoughCircles_Profile.FormattingEnabled = true;
+            this.HoughCircles_Profile.Location = new System.Drawing.Point(166, 24);
+            this.HoughCircles_Profile.Name = "HoughCircles_Profile";
+            this.HoughCircles_Profile.Size = new System.Drawing.Size(121, 21);
+            this.HoughCircles_Profile.TabIndex = 9;
+            this.HoughCircles_Profile.SelectedIndexChanged += new System.EventHandler(this.HoughCircles_Profile_SelectedIndexChanged);
+            // 
+            // SaveProfile_HoughCircles
+            // 
+            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(166, 56);
+            this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
+            this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
+            this.SaveProfile_HoughCircles.TabIndex = 8;
+            this.SaveProfile_HoughCircles.Text = "SaveProfile";
+            this.SaveProfile_HoughCircles.UseVisualStyleBackColor = true;
+            this.SaveProfile_HoughCircles.Click += new System.EventHandler(this.SaveProfile_HoughCircles_Click);
             // 
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(432, 70);
+            this.label25.Location = new System.Drawing.Point(17, 56);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(138, 13);
             this.label25.TabIndex = 5;
             this.label25.Text = "circleAccumulatorThreshold";
             // 
-            // label24
+            // circleAccumulatorThreshold_Box
             // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(432, 31);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(83, 13);
-            this.label24.TabIndex = 4;
-            this.label24.Text = "cannyThreshold";
-            // 
-            // cannyThreshold_Box
-            // 
-            this.cannyThreshold_Box.Location = new System.Drawing.Point(435, 47);
-            this.cannyThreshold_Box.Name = "cannyThreshold_Box";
-            this.cannyThreshold_Box.Size = new System.Drawing.Size(115, 20);
-            this.cannyThreshold_Box.TabIndex = 3;
+            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(20, 76);
+            this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
+            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.circleAccumulatorThreshold_Box.TabIndex = 6;
             // 
             // HoughCircles
             // 
@@ -660,9 +707,11 @@
             this.HoughCircles.Size = new System.Drawing.Size(352, 275);
             this.HoughCircles.TabIndex = 2;
             this.HoughCircles.TabStop = false;
+            this.HoughCircles.Click += new System.EventHandler(this.HoughCircles_Click);
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.SaveLog);
             this.tabPage3.Controls.Add(this.Savebutton);
             this.tabPage3.Controls.Add(this.SavePath);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
@@ -672,6 +721,16 @@
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "tabPage3";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // SaveLog
+            // 
+            this.SaveLog.AutoSize = true;
+            this.SaveLog.Location = new System.Drawing.Point(50, 58);
+            this.SaveLog.Name = "SaveLog";
+            this.SaveLog.Size = new System.Drawing.Size(69, 17);
+            this.SaveLog.TabIndex = 2;
+            this.SaveLog.Text = "SaveLog";
+            this.SaveLog.UseVisualStyleBackColor = true;
             // 
             // Savebutton
             // 
@@ -692,18 +751,9 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.SpeedMode);
-            this.groupBox3.Controls.Add(this.ShowFocusPoint);
-            this.groupBox3.Controls.Add(this.checkBoxAverage);
-            this.groupBox3.Controls.Add(this.ResetZoom);
-            this.groupBox3.Controls.Add(this.checkBoxCenter);
-            this.groupBox3.Controls.Add(this.ExpouseTimeText);
-            this.groupBox3.Controls.Add(this.label23);
+            this.groupBox3.Controls.Add(this.panel5);
             this.groupBox3.Controls.Add(this.groupBox5);
-            this.groupBox3.Controls.Add(this.IsAutoExposureTime);
             this.groupBox3.Controls.Add(this.groupBox4);
-            this.groupBox3.Controls.Add(this.label5);
-            this.groupBox3.Controls.Add(this.label6);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox3.Location = new System.Drawing.Point(848, 0);
             this.groupBox3.Name = "groupBox3";
@@ -712,10 +762,27 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Camera State";
             // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.SpeedMode);
+            this.panel5.Controls.Add(this.ShowFocusPoint);
+            this.panel5.Controls.Add(this.checkBoxAverage);
+            this.panel5.Controls.Add(this.ResetZoom);
+            this.panel5.Controls.Add(this.checkBoxCenter);
+            this.panel5.Controls.Add(this.ExpouseTimeText);
+            this.panel5.Controls.Add(this.label23);
+            this.panel5.Controls.Add(this.IsAutoExposureTime);
+            this.panel5.Controls.Add(this.label5);
+            this.panel5.Controls.Add(this.label6);
+            this.panel5.Location = new System.Drawing.Point(44, 277);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(388, 100);
+            this.panel5.TabIndex = 14;
+            // 
             // SpeedMode
             // 
             this.SpeedMode.AutoSize = true;
-            this.SpeedMode.Location = new System.Drawing.Point(238, 308);
+            this.SpeedMode.Location = new System.Drawing.Point(194, 31);
             this.SpeedMode.Name = "SpeedMode";
             this.SpeedMode.Size = new System.Drawing.Size(84, 17);
             this.SpeedMode.TabIndex = 13;
@@ -725,7 +792,7 @@
             // ShowFocusPoint
             // 
             this.ShowFocusPoint.AutoSize = true;
-            this.ShowFocusPoint.Location = new System.Drawing.Point(301, 349);
+            this.ShowFocusPoint.Location = new System.Drawing.Point(257, 72);
             this.ShowFocusPoint.Name = "ShowFocusPoint";
             this.ShowFocusPoint.Size = new System.Drawing.Size(108, 17);
             this.ShowFocusPoint.TabIndex = 11;
@@ -735,7 +802,7 @@
             // checkBoxAverage
             // 
             this.checkBoxAverage.AutoSize = true;
-            this.checkBoxAverage.Location = new System.Drawing.Point(116, 349);
+            this.checkBoxAverage.Location = new System.Drawing.Point(72, 72);
             this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxAverage.Name = "checkBoxAverage";
             this.checkBoxAverage.Size = new System.Drawing.Size(66, 17);
@@ -747,7 +814,7 @@
             // 
             // ResetZoom
             // 
-            this.ResetZoom.Location = new System.Drawing.Point(267, 282);
+            this.ResetZoom.Location = new System.Drawing.Point(223, 5);
             this.ResetZoom.Name = "ResetZoom";
             this.ResetZoom.Size = new System.Drawing.Size(75, 23);
             this.ResetZoom.TabIndex = 4;
@@ -758,7 +825,7 @@
             // checkBoxCenter
             // 
             this.checkBoxCenter.AutoSize = true;
-            this.checkBoxCenter.Location = new System.Drawing.Point(188, 349);
+            this.checkBoxCenter.Location = new System.Drawing.Point(144, 72);
             this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxCenter.Name = "checkBoxCenter";
             this.checkBoxCenter.Size = new System.Drawing.Size(57, 17);
@@ -776,7 +843,7 @@
             0,
             0,
             65536});
-            this.ExpouseTimeText.Location = new System.Drawing.Point(116, 283);
+            this.ExpouseTimeText.Location = new System.Drawing.Point(72, 6);
             this.ExpouseTimeText.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -790,12 +857,44 @@
             // label23
             // 
             this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(53, 327);
+            this.label23.Location = new System.Drawing.Point(9, 50);
             this.label23.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(83, 13);
             this.label23.TabIndex = 7;
             this.label23.Text = "Exposure Focus";
+            // 
+            // IsAutoExposureTime
+            // 
+            this.IsAutoExposureTime.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.IsAutoExposureTime.AutoSize = true;
+            this.IsAutoExposureTime.Location = new System.Drawing.Point(72, 31);
+            this.IsAutoExposureTime.Name = "IsAutoExposureTime";
+            this.IsAutoExposureTime.Size = new System.Drawing.Size(116, 17);
+            this.IsAutoExposureTime.TabIndex = 2;
+            this.IsAutoExposureTime.Text = "Auto exposure time";
+            this.IsAutoExposureTime.UseVisualStyleBackColor = true;
+            this.IsAutoExposureTime.CheckedChanged += new System.EventHandler(this.IsAutoExposureTime_CheckedChanged);
+            // 
+            // label5
+            // 
+            this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(9, 8);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(57, 13);
+            this.label5.TabIndex = 0;
+            this.label5.Text = "Exp Time :";
+            // 
+            // label6
+            // 
+            this.label6.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(178, 9);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(20, 13);
+            this.label6.TabIndex = 0;
+            this.label6.Text = "ms";
             // 
             // groupBox5
             // 
@@ -932,18 +1031,6 @@
             this.label9.TabIndex = 0;
             this.label9.Text = "ROI Width :";
             // 
-            // IsAutoExposureTime
-            // 
-            this.IsAutoExposureTime.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.IsAutoExposureTime.AutoSize = true;
-            this.IsAutoExposureTime.Location = new System.Drawing.Point(116, 308);
-            this.IsAutoExposureTime.Name = "IsAutoExposureTime";
-            this.IsAutoExposureTime.Size = new System.Drawing.Size(116, 17);
-            this.IsAutoExposureTime.TabIndex = 2;
-            this.IsAutoExposureTime.Text = "Auto exposure time";
-            this.IsAutoExposureTime.UseVisualStyleBackColor = true;
-            this.IsAutoExposureTime.CheckedChanged += new System.EventHandler(this.IsAutoExposureTime_CheckedChanged);
-            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.BtnSetCameraSetting);
@@ -1054,26 +1141,6 @@
             this.MAX_ISOText.Size = new System.Drawing.Size(100, 20);
             this.MAX_ISOText.TabIndex = 1;
             // 
-            // label5
-            // 
-            this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(53, 285);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(57, 13);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Exp Time :";
-            // 
-            // label6
-            // 
-            this.label6.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(222, 286);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(20, 13);
-            this.label6.TabIndex = 0;
-            this.label6.Text = "ms";
-            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.XYPosText);
@@ -1138,16 +1205,21 @@
             this.groupBox1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
-            this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
+            this.panel4.ResumeLayout(false);
+            this.panel4.PerformLayout();
             this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            this.panel5.ResumeLayout(false);
+            this.panel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ExpouseTimeText)).EndInit();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
@@ -1253,6 +1325,12 @@
         private System.Windows.Forms.ComboBox HoughCircles_Profile;
         private System.Windows.Forms.Button Clear_Profile;
         private Emgu.CV.UI.HistogramBox Histo;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel5;
+        private System.Windows.Forms.Panel panel6;
+        private System.Windows.Forms.CheckBox hdr_On;
+        private System.Windows.Forms.CheckBox SaveLog;
     }
 }
 

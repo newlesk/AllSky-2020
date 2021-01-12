@@ -16,8 +16,8 @@ namespace AllSky_2020
         {
             JD = AstroTime.JulianDay(DateTime.UtcNow);
             RaDec SunCoordinate = _Sun.GetRaDec(JD);
-            LatLon StationCoordinate = new LatLon(Angle.FromDegs(AppSetting.Data.LATITUDE), Angle.FromDegs(AppSetting.Data.LONGTITUDE));
-            //LatLon StationCoordinate = new LatLon(Angle.FromDegs(18.852325), Angle.FromDegs(98.957644));
+            //LatLon StationCoordinate = new LatLon(Angle.FromDegs(AppSetting.Data.LATITUDE), Angle.FromDegs(AppSetting.Data.LONGTITUDE));
+            LatLon StationCoordinate = new LatLon(Angle.FromDegs(18.852325), Angle.FromDegs(98.957644));
 
             AltAz SunAltAz = SunCoordinate.ToAltAz(StationCoordinate, JD);
             //System.Diagnostics.Debug.WriteLine("SunAltAz =" + SunAltAz);
