@@ -69,6 +69,16 @@
             this.SetCameraId = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.ClearProfilePixel = new System.Windows.Forms.Button();
+            this.SaveProfilePixel = new System.Windows.Forms.Button();
+            this.label28 = new System.Windows.Forms.Label();
+            this.ProfilePixelValues = new System.Windows.Forms.ComboBox();
+            this.SavePixelValues = new System.Windows.Forms.Button();
+            this.label27 = new System.Windows.Forms.Label();
+            this.pixelValuesmin = new System.Windows.Forms.Label();
+            this.pixelvalues_max = new System.Windows.Forms.TextBox();
+            this.pixelvalues_min = new System.Windows.Forms.TextBox();
+            this.keoGrams = new System.Windows.Forms.CheckBox();
             this.hdr_On = new System.Windows.Forms.CheckBox();
             this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
             this.Clear_Profile = new System.Windows.Forms.Button();
@@ -205,7 +215,6 @@
             this.MainImageControl.Size = new System.Drawing.Size(690, 450);
             this.MainImageControl.TabIndex = 3;
             this.MainImageControl.TabStop = false;
-            this.MainImageControl.Click += new System.EventHandler(this.MainImageControl_Click);
             this.MainImageControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MainImageControl_MouseClick);
             this.MainImageControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainImageControl_MouseMove);
             // 
@@ -220,7 +229,6 @@
             this.ROIImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.ROIImage.TabIndex = 4;
             this.ROIImage.TabStop = false;
-            this.ROIImage.Click += new System.EventHandler(this.ROIImage_Click);
             // 
             // panel3
             // 
@@ -359,7 +367,6 @@
             this.BtnSetROI.TabIndex = 2;
             this.BtnSetROI.Text = "Set";
             this.BtnSetROI.UseVisualStyleBackColor = true;
-            this.BtnSetROI.Click += new System.EventHandler(this.BtnSetROI_Click);
             // 
             // OriginXText
             // 
@@ -539,7 +546,6 @@
             this.FocusPoint.Name = "FocusPoint";
             this.FocusPoint.Size = new System.Drawing.Size(121, 21);
             this.FocusPoint.TabIndex = 8;
-            this.FocusPoint.SelectedIndexChanged += new System.EventHandler(this.FocusPoint_SelectedIndexChanged);
             // 
             // Histogramcheck
             // 
@@ -550,7 +556,6 @@
             this.Histogramcheck.TabIndex = 7;
             this.Histogramcheck.Text = "Histogram";
             this.Histogramcheck.UseVisualStyleBackColor = true;
-            this.Histogramcheck.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // CameraList
             // 
@@ -559,7 +564,6 @@
             this.CameraList.Name = "CameraList";
             this.CameraList.Size = new System.Drawing.Size(217, 21);
             this.CameraList.TabIndex = 6;
-            this.CameraList.SelectedIndexChanged += new System.EventHandler(this.CameraList_SelectedIndexChanged);
             // 
             // label22
             // 
@@ -569,7 +573,6 @@
             this.label22.Size = new System.Drawing.Size(54, 13);
             this.label22.TabIndex = 5;
             this.label22.Text = "CameraID";
-            this.label22.Click += new System.EventHandler(this.label22_Click);
             // 
             // SetCameraId
             // 
@@ -595,6 +598,16 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.ClearProfilePixel);
+            this.panel1.Controls.Add(this.SaveProfilePixel);
+            this.panel1.Controls.Add(this.label28);
+            this.panel1.Controls.Add(this.ProfilePixelValues);
+            this.panel1.Controls.Add(this.SavePixelValues);
+            this.panel1.Controls.Add(this.label27);
+            this.panel1.Controls.Add(this.pixelValuesmin);
+            this.panel1.Controls.Add(this.pixelvalues_max);
+            this.panel1.Controls.Add(this.pixelvalues_min);
+            this.panel1.Controls.Add(this.keoGrams);
             this.panel1.Controls.Add(this.hdr_On);
             this.panel1.Controls.Add(this.cannyThreshold_Box);
             this.panel1.Controls.Add(this.Clear_Profile);
@@ -607,8 +620,100 @@
             this.panel1.Controls.Add(this.circleAccumulatorThreshold_Box);
             this.panel1.Location = new System.Drawing.Point(401, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(368, 275);
+            this.panel1.Size = new System.Drawing.Size(422, 339);
             this.panel1.TabIndex = 12;
+            // 
+            // ClearProfilePixel
+            // 
+            this.ClearProfilePixel.Location = new System.Drawing.Point(289, 287);
+            this.ClearProfilePixel.Name = "ClearProfilePixel";
+            this.ClearProfilePixel.Size = new System.Drawing.Size(75, 23);
+            this.ClearProfilePixel.TabIndex = 22;
+            this.ClearProfilePixel.Text = "ClearAllProfile";
+            this.ClearProfilePixel.UseVisualStyleBackColor = true;
+            this.ClearProfilePixel.Click += new System.EventHandler(this.ClearProfilePixel_Click);
+            // 
+            // SaveProfilePixel
+            // 
+            this.SaveProfilePixel.Location = new System.Drawing.Point(289, 258);
+            this.SaveProfilePixel.Name = "SaveProfilePixel";
+            this.SaveProfilePixel.Size = new System.Drawing.Size(75, 23);
+            this.SaveProfilePixel.TabIndex = 21;
+            this.SaveProfilePixel.Text = "SaveProfile";
+            this.SaveProfilePixel.UseVisualStyleBackColor = true;
+            this.SaveProfilePixel.Click += new System.EventHandler(this.SaveProfilePixel_Click);
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(286, 207);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(36, 13);
+            this.label28.TabIndex = 20;
+            this.label28.Text = "Profile";
+            // 
+            // ProfilePixelValues
+            // 
+            this.ProfilePixelValues.FormattingEnabled = true;
+            this.ProfilePixelValues.Location = new System.Drawing.Point(289, 225);
+            this.ProfilePixelValues.Name = "ProfilePixelValues";
+            this.ProfilePixelValues.Size = new System.Drawing.Size(121, 21);
+            this.ProfilePixelValues.TabIndex = 19;
+            this.ProfilePixelValues.SelectedIndexChanged += new System.EventHandler(this.ProfilePixelValues_SelectedIndexChanged);
+            // 
+            // SavePixelValues
+            // 
+            this.SavePixelValues.Location = new System.Drawing.Point(107, 258);
+            this.SavePixelValues.Name = "SavePixelValues";
+            this.SavePixelValues.Size = new System.Drawing.Size(75, 23);
+            this.SavePixelValues.TabIndex = 18;
+            this.SavePixelValues.Text = "Save";
+            this.SavePixelValues.UseVisualStyleBackColor = true;
+            this.SavePixelValues.Click += new System.EventHandler(this.SavePixelValues_Click);
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.CausesValidation = false;
+            this.label27.Location = new System.Drawing.Point(154, 207);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(87, 13);
+            this.label27.TabIndex = 17;
+            this.label27.Text = "Pixel Values Max";
+            // 
+            // pixelValuesmin
+            // 
+            this.pixelValuesmin.AutoSize = true;
+            this.pixelValuesmin.CausesValidation = false;
+            this.pixelValuesmin.Location = new System.Drawing.Point(20, 207);
+            this.pixelValuesmin.Name = "pixelValuesmin";
+            this.pixelValuesmin.Size = new System.Drawing.Size(84, 13);
+            this.pixelValuesmin.TabIndex = 16;
+            this.pixelValuesmin.Text = "Pixel Values Min";
+            // 
+            // pixelvalues_max
+            // 
+            this.pixelvalues_max.Location = new System.Drawing.Point(157, 226);
+            this.pixelvalues_max.Name = "pixelvalues_max";
+            this.pixelvalues_max.Size = new System.Drawing.Size(100, 20);
+            this.pixelvalues_max.TabIndex = 15;
+            // 
+            // pixelvalues_min
+            // 
+            this.pixelvalues_min.Location = new System.Drawing.Point(20, 226);
+            this.pixelvalues_min.Name = "pixelvalues_min";
+            this.pixelvalues_min.Size = new System.Drawing.Size(100, 20);
+            this.pixelvalues_min.TabIndex = 14;
+            // 
+            // keoGrams
+            // 
+            this.keoGrams.AutoSize = true;
+            this.keoGrams.Location = new System.Drawing.Point(109, 159);
+            this.keoGrams.Name = "keoGrams";
+            this.keoGrams.Size = new System.Drawing.Size(73, 17);
+            this.keoGrams.TabIndex = 13;
+            this.keoGrams.Text = "Keograms";
+            this.keoGrams.UseVisualStyleBackColor = true;
             // 
             // hdr_On
             // 
@@ -624,12 +729,12 @@
             // 
             this.cannyThreshold_Box.Location = new System.Drawing.Point(20, 25);
             this.cannyThreshold_Box.Name = "cannyThreshold_Box";
-            this.cannyThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.cannyThreshold_Box.Size = new System.Drawing.Size(100, 20);
             this.cannyThreshold_Box.TabIndex = 3;
             // 
             // Clear_Profile
             // 
-            this.Clear_Profile.Location = new System.Drawing.Point(247, 56);
+            this.Clear_Profile.Location = new System.Drawing.Point(289, 85);
             this.Clear_Profile.Name = "Clear_Profile";
             this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
             this.Clear_Profile.TabIndex = 11;
@@ -649,7 +754,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(163, 9);
+            this.label26.Location = new System.Drawing.Point(286, 8);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(36, 13);
             this.label26.TabIndex = 10;
@@ -657,7 +762,7 @@
             // 
             // Save_HoughCircles
             // 
-            this.Save_HoughCircles.Location = new System.Drawing.Point(20, 110);
+            this.Save_HoughCircles.Location = new System.Drawing.Point(107, 52);
             this.Save_HoughCircles.Name = "Save_HoughCircles";
             this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.Save_HoughCircles.TabIndex = 7;
@@ -668,7 +773,7 @@
             // HoughCircles_Profile
             // 
             this.HoughCircles_Profile.FormattingEnabled = true;
-            this.HoughCircles_Profile.Location = new System.Drawing.Point(166, 24);
+            this.HoughCircles_Profile.Location = new System.Drawing.Point(289, 24);
             this.HoughCircles_Profile.Name = "HoughCircles_Profile";
             this.HoughCircles_Profile.Size = new System.Drawing.Size(121, 21);
             this.HoughCircles_Profile.TabIndex = 9;
@@ -676,7 +781,7 @@
             // 
             // SaveProfile_HoughCircles
             // 
-            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(166, 56);
+            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(289, 56);
             this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
             this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.SaveProfile_HoughCircles.TabIndex = 8;
@@ -687,7 +792,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(17, 56);
+            this.label25.Location = new System.Drawing.Point(142, 7);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(138, 13);
             this.label25.TabIndex = 5;
@@ -695,9 +800,9 @@
             // 
             // circleAccumulatorThreshold_Box
             // 
-            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(20, 76);
+            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(157, 26);
             this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
-            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(115, 20);
+            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(99, 20);
             this.circleAccumulatorThreshold_Box.TabIndex = 6;
             // 
             // HoughCircles
@@ -707,7 +812,6 @@
             this.HoughCircles.Size = new System.Drawing.Size(352, 275);
             this.HoughCircles.TabIndex = 2;
             this.HoughCircles.TabStop = false;
-            this.HoughCircles.Click += new System.EventHandler(this.HoughCircles_Click);
             // 
             // tabPage3
             // 
@@ -810,7 +914,6 @@
             this.checkBoxAverage.Text = "Average";
             this.checkBoxAverage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.checkBoxAverage.UseVisualStyleBackColor = true;
-            this.checkBoxAverage.CheckedChanged += new System.EventHandler(this.checkBoxAverage_CheckedChanged);
             // 
             // ResetZoom
             // 
@@ -832,7 +935,6 @@
             this.checkBoxCenter.TabIndex = 8;
             this.checkBoxCenter.Text = "Center";
             this.checkBoxCenter.UseVisualStyleBackColor = true;
-            this.checkBoxCenter.CheckedChanged += new System.EventHandler(this.checkBoxCenter_CheckedChanged);
             // 
             // ExpouseTimeText
             // 
@@ -1331,6 +1433,16 @@
         private System.Windows.Forms.Panel panel6;
         private System.Windows.Forms.CheckBox hdr_On;
         private System.Windows.Forms.CheckBox SaveLog;
+        private System.Windows.Forms.CheckBox keoGrams;
+        private System.Windows.Forms.Button ClearProfilePixel;
+        private System.Windows.Forms.Button SaveProfilePixel;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.ComboBox ProfilePixelValues;
+        private System.Windows.Forms.Button SavePixelValues;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label pixelValuesmin;
+        private System.Windows.Forms.TextBox pixelvalues_max;
+        private System.Windows.Forms.TextBox pixelvalues_min;
     }
 }
 

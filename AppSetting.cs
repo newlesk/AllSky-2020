@@ -31,6 +31,8 @@ namespace AllSky_2020
             public double TEMPERATURE { get; set; } = 0.0;
             public double ExposureTime { get; set; } = 100;
             public double ZoomScale { get; set; } = 1;
+            public int max_light { get; set; } = 125;
+            public int min_light { get; set; } = 100;
             public double MIN_ISO { get; set; } = 0.0;        //100
             public double MAX_ISO { get; set; } = 0.0;        //3200
             public double MIN_SHUTTER { get; set; } = 0.0;    //0.25 sec
