@@ -69,6 +69,8 @@
             this.SetCameraId = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label29 = new System.Windows.Forms.Label();
+            this.autoHDR = new System.Windows.Forms.CheckBox();
             this.ClearProfilePixel = new System.Windows.Forms.Button();
             this.SaveProfilePixel = new System.Windows.Forms.Button();
             this.label28 = new System.Windows.Forms.Label();
@@ -137,6 +139,8 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
+            this.label30 = new System.Windows.Forms.Label();
+            this.StopSave = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -184,8 +188,8 @@
             this.splitContainer1.Panel2.Controls.Add(this.panel3);
             this.splitContainer1.Panel2.Controls.Add(this.TabControl);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
-            this.splitContainer1.Size = new System.Drawing.Size(1340, 831);
-            this.splitContainer1.SplitterDistance = 450;
+            this.splitContainer1.Size = new System.Drawing.Size(1340, 815);
+            this.splitContainer1.SplitterDistance = 440;
             this.splitContainer1.TabIndex = 1;
             // 
             // splitContainer3
@@ -201,8 +205,8 @@
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.ROIImage);
-            this.splitContainer3.Size = new System.Drawing.Size(1340, 450);
-            this.splitContainer3.SplitterDistance = 690;
+            this.splitContainer3.Size = new System.Drawing.Size(1340, 440);
+            this.splitContainer3.SplitterDistance = 689;
             this.splitContainer3.TabIndex = 4;
             // 
             // MainImageControl
@@ -212,9 +216,10 @@
             this.MainImageControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainImageControl.Location = new System.Drawing.Point(0, 0);
             this.MainImageControl.Name = "MainImageControl";
-            this.MainImageControl.Size = new System.Drawing.Size(690, 450);
+            this.MainImageControl.Size = new System.Drawing.Size(689, 440);
             this.MainImageControl.TabIndex = 3;
             this.MainImageControl.TabStop = false;
+            this.MainImageControl.Click += new System.EventHandler(this.MainImageControl_Click);
             this.MainImageControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MainImageControl_MouseClick);
             this.MainImageControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainImageControl_MouseMove);
             // 
@@ -225,17 +230,18 @@
             this.ROIImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ROIImage.Location = new System.Drawing.Point(0, 0);
             this.ROIImage.Name = "ROIImage";
-            this.ROIImage.Size = new System.Drawing.Size(646, 450);
+            this.ROIImage.Size = new System.Drawing.Size(647, 440);
             this.ROIImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.ROIImage.TabIndex = 4;
             this.ROIImage.TabStop = false;
+            this.ROIImage.Click += new System.EventHandler(this.ROIImage_Click);
             // 
             // panel3
             // 
             this.panel3.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel3.Location = new System.Drawing.Point(843, 0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(5, 377);
+            this.panel3.Size = new System.Drawing.Size(5, 371);
             this.panel3.TabIndex = 2;
             // 
             // TabControl
@@ -247,7 +253,7 @@
             this.TabControl.Location = new System.Drawing.Point(0, 0);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(848, 377);
+            this.TabControl.Size = new System.Drawing.Size(848, 371);
             this.TabControl.TabIndex = 0;
             // 
             // tabPage1
@@ -255,8 +261,8 @@
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(840, 351);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage1.Size = new System.Drawing.Size(840, 345);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Setting";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -267,7 +273,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(834, 345);
+            this.groupBox1.Size = new System.Drawing.Size(834, 339);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Process Area";
@@ -286,13 +292,14 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.panel6);
             this.splitContainer2.Panel2.Controls.Add(this.panel4);
-            this.splitContainer2.Size = new System.Drawing.Size(828, 326);
-            this.splitContainer2.SplitterDistance = 374;
+            this.splitContainer2.Size = new System.Drawing.Size(828, 320);
+            this.splitContainer2.SplitterDistance = 373;
             this.splitContainer2.TabIndex = 0;
             // 
             // Histo
             // 
             this.Histo.Location = new System.Drawing.Point(3, 3);
+            this.Histo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Histo.Name = "Histo";
             this.Histo.Size = new System.Drawing.Size(368, 320);
             this.Histo.TabIndex = 0;
@@ -590,14 +597,16 @@
             this.tabPage2.Controls.Add(this.HoughCircles);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(840, 351);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage2.Size = new System.Drawing.Size(840, 345);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label29);
+            this.panel1.Controls.Add(this.autoHDR);
             this.panel1.Controls.Add(this.ClearProfilePixel);
             this.panel1.Controls.Add(this.SaveProfilePixel);
             this.panel1.Controls.Add(this.label28);
@@ -620,8 +629,27 @@
             this.panel1.Controls.Add(this.circleAccumulatorThreshold_Box);
             this.panel1.Location = new System.Drawing.Point(401, 6);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(422, 339);
+            this.panel1.Size = new System.Drawing.Size(432, 339);
             this.panel1.TabIndex = 12;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(3, 12);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(73, 13);
+            this.label29.TabIndex = 24;
+            this.label29.Text = "Hough Circles";
+            // 
+            // autoHDR
+            // 
+            this.autoHDR.AutoSize = true;
+            this.autoHDR.Location = new System.Drawing.Point(89, 159);
+            this.autoHDR.Name = "autoHDR";
+            this.autoHDR.Size = new System.Drawing.Size(83, 17);
+            this.autoHDR.TabIndex = 23;
+            this.autoHDR.Text = "AUTO HDR";
+            this.autoHDR.UseVisualStyleBackColor = true;
             // 
             // ClearProfilePixel
             // 
@@ -663,7 +691,7 @@
             // 
             // SavePixelValues
             // 
-            this.SavePixelValues.Location = new System.Drawing.Point(107, 258);
+            this.SavePixelValues.Location = new System.Drawing.Point(97, 260);
             this.SavePixelValues.Name = "SavePixelValues";
             this.SavePixelValues.Size = new System.Drawing.Size(75, 23);
             this.SavePixelValues.TabIndex = 18;
@@ -708,7 +736,7 @@
             // keoGrams
             // 
             this.keoGrams.AutoSize = true;
-            this.keoGrams.Location = new System.Drawing.Point(109, 159);
+            this.keoGrams.Location = new System.Drawing.Point(184, 159);
             this.keoGrams.Name = "keoGrams";
             this.keoGrams.Size = new System.Drawing.Size(73, 17);
             this.keoGrams.TabIndex = 13;
@@ -727,14 +755,14 @@
             // 
             // cannyThreshold_Box
             // 
-            this.cannyThreshold_Box.Location = new System.Drawing.Point(20, 25);
+            this.cannyThreshold_Box.Location = new System.Drawing.Point(20, 53);
             this.cannyThreshold_Box.Name = "cannyThreshold_Box";
             this.cannyThreshold_Box.Size = new System.Drawing.Size(100, 20);
             this.cannyThreshold_Box.TabIndex = 3;
             // 
             // Clear_Profile
             // 
-            this.Clear_Profile.Location = new System.Drawing.Point(289, 85);
+            this.Clear_Profile.Location = new System.Drawing.Point(289, 104);
             this.Clear_Profile.Name = "Clear_Profile";
             this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
             this.Clear_Profile.TabIndex = 11;
@@ -745,7 +773,7 @@
             // label24
             // 
             this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(17, 9);
+            this.label24.Location = new System.Drawing.Point(17, 33);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(83, 13);
             this.label24.TabIndex = 4;
@@ -754,7 +782,7 @@
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(286, 8);
+            this.label26.Location = new System.Drawing.Point(286, 36);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(36, 13);
             this.label26.TabIndex = 10;
@@ -762,7 +790,7 @@
             // 
             // Save_HoughCircles
             // 
-            this.Save_HoughCircles.Location = new System.Drawing.Point(107, 52);
+            this.Save_HoughCircles.Location = new System.Drawing.Point(97, 79);
             this.Save_HoughCircles.Name = "Save_HoughCircles";
             this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.Save_HoughCircles.TabIndex = 7;
@@ -773,7 +801,7 @@
             // HoughCircles_Profile
             // 
             this.HoughCircles_Profile.FormattingEnabled = true;
-            this.HoughCircles_Profile.Location = new System.Drawing.Point(289, 24);
+            this.HoughCircles_Profile.Location = new System.Drawing.Point(289, 52);
             this.HoughCircles_Profile.Name = "HoughCircles_Profile";
             this.HoughCircles_Profile.Size = new System.Drawing.Size(121, 21);
             this.HoughCircles_Profile.TabIndex = 9;
@@ -781,7 +809,7 @@
             // 
             // SaveProfile_HoughCircles
             // 
-            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(289, 56);
+            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(289, 78);
             this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
             this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.SaveProfile_HoughCircles.TabIndex = 8;
@@ -792,7 +820,7 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(142, 7);
+            this.label25.Location = new System.Drawing.Point(119, 30);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(138, 13);
             this.label25.TabIndex = 5;
@@ -800,7 +828,7 @@
             // 
             // circleAccumulatorThreshold_Box
             // 
-            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(157, 26);
+            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(157, 53);
             this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
             this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(99, 20);
             this.circleAccumulatorThreshold_Box.TabIndex = 6;
@@ -809,21 +837,23 @@
             // 
             this.HoughCircles.Location = new System.Drawing.Point(6, 6);
             this.HoughCircles.Name = "HoughCircles";
-            this.HoughCircles.Size = new System.Drawing.Size(352, 275);
+            this.HoughCircles.Size = new System.Drawing.Size(389, 338);
             this.HoughCircles.TabIndex = 2;
             this.HoughCircles.TabStop = false;
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.StopSave);
+            this.tabPage3.Controls.Add(this.label30);
             this.tabPage3.Controls.Add(this.SaveLog);
             this.tabPage3.Controls.Add(this.Savebutton);
             this.tabPage3.Controls.Add(this.SavePath);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(840, 351);
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage3.Size = new System.Drawing.Size(840, 345);
             this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "tabPage3";
+            this.tabPage3.Text = "Save";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // SaveLog
@@ -861,7 +891,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox3.Location = new System.Drawing.Point(848, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(492, 377);
+            this.groupBox3.Size = new System.Drawing.Size(492, 371);
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Camera State";
@@ -878,9 +908,9 @@
             this.panel5.Controls.Add(this.IsAutoExposureTime);
             this.panel5.Controls.Add(this.label5);
             this.panel5.Controls.Add(this.label6);
-            this.panel5.Location = new System.Drawing.Point(44, 277);
+            this.panel5.Location = new System.Drawing.Point(45, 261);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(388, 100);
+            this.panel5.Size = new System.Drawing.Size(395, 100);
             this.panel5.TabIndex = 14;
             // 
             // SpeedMode
@@ -907,7 +937,7 @@
             // 
             this.checkBoxAverage.AutoSize = true;
             this.checkBoxAverage.Location = new System.Drawing.Point(72, 72);
-            this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.checkBoxAverage.Name = "checkBoxAverage";
             this.checkBoxAverage.Size = new System.Drawing.Size(66, 17);
             this.checkBoxAverage.TabIndex = 9;
@@ -929,7 +959,7 @@
             // 
             this.checkBoxCenter.AutoSize = true;
             this.checkBoxCenter.Location = new System.Drawing.Point(144, 72);
-            this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.checkBoxCenter.Name = "checkBoxCenter";
             this.checkBoxCenter.Size = new System.Drawing.Size(57, 17);
             this.checkBoxCenter.TabIndex = 8;
@@ -945,7 +975,7 @@
             0,
             0,
             65536});
-            this.ExpouseTimeText.Location = new System.Drawing.Point(72, 6);
+            this.ExpouseTimeText.Location = new System.Drawing.Point(75, 6);
             this.ExpouseTimeText.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -970,7 +1000,7 @@
             // 
             this.IsAutoExposureTime.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.IsAutoExposureTime.AutoSize = true;
-            this.IsAutoExposureTime.Location = new System.Drawing.Point(72, 31);
+            this.IsAutoExposureTime.Location = new System.Drawing.Point(75, 31);
             this.IsAutoExposureTime.Name = "IsAutoExposureTime";
             this.IsAutoExposureTime.Size = new System.Drawing.Size(116, 17);
             this.IsAutoExposureTime.TabIndex = 2;
@@ -982,7 +1012,7 @@
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 8);
+            this.label5.Location = new System.Drawing.Point(12, 8);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(57, 13);
             this.label5.TabIndex = 0;
@@ -992,7 +1022,7 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(178, 9);
+            this.label6.Location = new System.Drawing.Point(181, 9);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(20, 13);
             this.label6.TabIndex = 0;
@@ -1248,7 +1278,7 @@
             this.panel2.Controls.Add(this.XYPosText);
             this.panel2.Controls.Add(this.MessageStatusText);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(5, 836);
+            this.panel2.Location = new System.Drawing.Point(5, 820);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.panel2.Size = new System.Drawing.Size(1340, 20);
@@ -1280,15 +1310,34 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(47, 16);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(61, 13);
+            this.label30.TabIndex = 3;
+            this.label30.Text = "ImageSave";
+            // 
+            // StopSave
+            // 
+            this.StopSave.AutoSize = true;
+            this.StopSave.Location = new System.Drawing.Point(334, 35);
+            this.StopSave.Name = "StopSave";
+            this.StopSave.Size = new System.Drawing.Size(73, 17);
+            this.StopSave.TabIndex = 4;
+            this.StopSave.Text = "StopSave";
+            this.StopSave.UseVisualStyleBackColor = true;
+            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1350, 861);
+            this.ClientSize = new System.Drawing.Size(1350, 845);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.panel2);
             this.Name = "MainWindows";
-            this.Padding = new System.Windows.Forms.Padding(5);
+            this.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AllSky-2020";
             this.Load += new System.EventHandler(this.MainWindows_Load);
@@ -1443,6 +1492,10 @@
         private System.Windows.Forms.Label pixelValuesmin;
         private System.Windows.Forms.TextBox pixelvalues_max;
         private System.Windows.Forms.TextBox pixelvalues_min;
+        private System.Windows.Forms.CheckBox autoHDR;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.CheckBox StopSave;
+        private System.Windows.Forms.Label label30;
     }
 }
 
