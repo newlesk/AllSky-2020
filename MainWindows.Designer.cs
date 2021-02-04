@@ -93,6 +93,8 @@
             this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
             this.HoughCircles = new Emgu.CV.UI.ImageBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.StopSave = new System.Windows.Forms.CheckBox();
+            this.label30 = new System.Windows.Forms.Label();
             this.SaveLog = new System.Windows.Forms.CheckBox();
             this.Savebutton = new System.Windows.Forms.Button();
             this.SavePath = new System.Windows.Forms.TextBox();
@@ -139,8 +141,6 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.label30 = new System.Windows.Forms.Label();
-            this.StopSave = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -261,7 +261,7 @@
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(840, 345);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Setting";
@@ -299,7 +299,7 @@
             // Histo
             // 
             this.Histo.Location = new System.Drawing.Point(3, 3);
-            this.Histo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Histo.Margin = new System.Windows.Forms.Padding(4);
             this.Histo.Name = "Histo";
             this.Histo.Size = new System.Drawing.Size(368, 320);
             this.Histo.TabIndex = 0;
@@ -597,7 +597,7 @@
             this.tabPage2.Controls.Add(this.HoughCircles);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(840, 345);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Process Image";
@@ -850,11 +850,30 @@
             this.tabPage3.Controls.Add(this.SavePath);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage3.Size = new System.Drawing.Size(840, 345);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Save";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // StopSave
+            // 
+            this.StopSave.AutoSize = true;
+            this.StopSave.Location = new System.Drawing.Point(334, 35);
+            this.StopSave.Name = "StopSave";
+            this.StopSave.Size = new System.Drawing.Size(73, 17);
+            this.StopSave.TabIndex = 4;
+            this.StopSave.Text = "StopSave";
+            this.StopSave.UseVisualStyleBackColor = true;
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(47, 16);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(61, 13);
+            this.label30.TabIndex = 3;
+            this.label30.Text = "ImageSave";
             // 
             // SaveLog
             // 
@@ -937,7 +956,7 @@
             // 
             this.checkBoxAverage.AutoSize = true;
             this.checkBoxAverage.Location = new System.Drawing.Point(72, 72);
-            this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxAverage.Name = "checkBoxAverage";
             this.checkBoxAverage.Size = new System.Drawing.Size(66, 17);
             this.checkBoxAverage.TabIndex = 9;
@@ -959,7 +978,7 @@
             // 
             this.checkBoxCenter.AutoSize = true;
             this.checkBoxCenter.Location = new System.Drawing.Point(144, 72);
-            this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxCenter.Name = "checkBoxCenter";
             this.checkBoxCenter.Size = new System.Drawing.Size(57, 17);
             this.checkBoxCenter.TabIndex = 8;
@@ -1310,25 +1329,6 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
-            // label30
-            // 
-            this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(47, 16);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(61, 13);
-            this.label30.TabIndex = 3;
-            this.label30.Text = "ImageSave";
-            // 
-            // StopSave
-            // 
-            this.StopSave.AutoSize = true;
-            this.StopSave.Location = new System.Drawing.Point(334, 35);
-            this.StopSave.Name = "StopSave";
-            this.StopSave.Size = new System.Drawing.Size(73, 17);
-            this.StopSave.TabIndex = 4;
-            this.StopSave.Text = "StopSave";
-            this.StopSave.UseVisualStyleBackColor = true;
-            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1337,7 +1337,7 @@
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.panel2);
             this.Name = "MainWindows";
-            this.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Padding = new System.Windows.Forms.Padding(5);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AllSky-2020";
             this.Load += new System.EventHandler(this.MainWindows_Load);

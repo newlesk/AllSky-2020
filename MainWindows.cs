@@ -915,6 +915,10 @@ namespace AllSky_2020
                 else if (AppSetting.Data.ExposureTime <= 8000 && AppSetting.Data.ExposureTime > 4000 && recover != false)
                 {
                     AppSetting.Data.ExposureTime = 15000;
+                    if (colorValue <= 50)
+                    {
+                        AppSetting.Data.ExposureTime = 120000;
+                    }
                     recover = false;
                 }
 
@@ -935,6 +939,10 @@ namespace AllSky_2020
                 else if (AppSetting.Data.ExposureTime <= 1000 && AppSetting.Data.ExposureTime > 500 && recover != false)
                 {
                     AppSetting.Data.ExposureTime = 2000;
+                    if(colorValue <= 40)
+                    {
+                        AppSetting.Data.ExposureTime = 8000;
+                    }
                     recover = false;
                 }
 
@@ -1008,7 +1016,798 @@ namespace AllSky_2020
             }
         }
 
-        private void UITimer_Tick(object sender, EventArgs e)
+        public void Focus_Point()
+        {
+            Bitmap bmpImage_Frame = imageFrame.ToBitmap();
+            int cameraWidth;
+            int cameraHeight;
+            int thickness = 5;
+            //When open houghCircles Change focus
+            if (houghCircles_X > 0 && houghCircles_Y > 0)
+            {
+                cameraWidth = (houghCircles_X * 10) * 2;
+                cameraHeight = (houghCircles_Y * 10) * 2;
+            }
+            else
+            {
+                cameraWidth = Int16.Parse(ROITextWidth.Text);
+                cameraHeight = Int16.Parse(ROITextHeight.Text);
+            }
+
+            if (FocusPoint.Text == "21 Focus Points" && houghCircles_Status == false)
+            {
+                checkBoxCenter.Checked = false;
+                checkBoxAverage.Checked = true;
+                //=======================================Center Line======================================== 
+                centroidX = (int)(cameraWidth / 2);
+                centroidY = (int)(cameraHeight / 2);
+                //left 
+                double centroidXleft = (int)(cameraWidth / 2.5);
+                double centroidYleft = (int)(cameraHeight / 2);
+                //left 
+                double centroidXleftmore = (int)(cameraWidth / 3.2);
+                double centroidYleftmore = (int)(cameraHeight / 2);
+                //right
+                double centroidXright = (int)(cameraWidth / 1.7);
+                double centroidYright = (int)(cameraHeight / 2);
+                //right
+                double centroidXrightmore = (int)(cameraWidth / 1.5);
+                double centroidYrightmore = (int)(cameraHeight / 2);
+                //=========================================UP Line======================================
+                double centroidX_UP = (int)(cameraWidth / 2);
+                double centroidY_UP = (int)(cameraHeight / 3);
+                //left 
+                double centroidXleft_UP = (int)(cameraWidth / 2.5);
+                double centroidYleft_UP = (int)(cameraHeight / 3);
+                //left 
+                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
+                double centroidYleftmore_UP = (int)(cameraHeight / 3);
+                //right
+                double centroidXright_UP = (int)(cameraWidth / 1.7);
+                double centroidYright_UP = (int)(cameraHeight / 3);
+                //right
+                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
+                double centroidYrightmore_UP = (int)(cameraHeight / 3);
+                //=======================================DOWN Line========================================
+                double centroidX_DOWN = (int)(cameraWidth / 2);
+                double centroidY_DOWN = (int)(cameraHeight / 1.5);
+                //left 
+                double centroidXleft_DOWN = (int)(cameraWidth / 2.5);
+                double centroidYleft_DOWN = (int)(cameraHeight / 1.5);
+                //left 
+                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
+                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
+                //right
+                double centroidXright_DOWN = (int)(cameraWidth / 1.7);
+                double centroidYright_DOWN = (int)(cameraHeight / 1.5);
+                //right
+                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
+                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
+                //=========================================UP 3 DOT======================================
+                double centroidX_UP2 = (int)(cameraWidth / 2);
+                double centroidY_UP2 = (int)(cameraHeight / 6);
+                //right
+                double centroidXright_UP2 = (int)(cameraWidth / 1.7);
+                double centroidYright_UP2 = (int)(cameraHeight / 6);
+                //left 
+                double centroidXleft_UP2 = (int)(cameraWidth / 2.5);
+                double centroidYleft_UP2 = (int)(cameraHeight / 6);
+                //=======================================DOWN 3 DOT========================================
+                double centroidX_DOWN2 = (int)(cameraWidth / 2);
+                double centroidY_DOWN2 = (int)(cameraHeight / 1.2);
+                //right
+                double centroidXright_DOWN2 = (int)(cameraWidth / 1.7);
+                double centroidYright_DOWN2 = (int)(cameraHeight / 1.2);
+                //left 
+                double centroidXleft_DOWN2 = (int)(cameraWidth / 2.5);
+                double centroidYleft_DOWN2 = (int)(cameraHeight / 1.2);
+
+                if (ShowFocusPoint.CheckState != 0)
+                {
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=========================================UP======================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=======================================DOWN========================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=========================================UP 3 DOT======================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP2.ToString()), Int32.Parse(centroidY_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP2.ToString()), Int32.Parse(centroidYright_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP2.ToString()), Int32.Parse(centroidYleft_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=======================================DOWN 3 DOT========================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN2.ToString()), Int32.Parse(centroidY_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN2.ToString()), Int32.Parse(centroidYleft_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN2.ToString()), Int32.Parse(centroidYright_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                }
+
+                //==================Readlight Center
+                for (double i = centroidX - 10; i < centroidX; i++)
+                {
+                    for (double j = centroidY - 10; j < centroidY; j++)
+                    {
+                        if (centroidX > centroidY)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
+                {
+                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
+                    {
+                        if (centroidXleftmore > centroidYleftmore)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft - 10; i < centroidXleft; i++)
+                {
+                    for (double j = centroidYleft - 10; j < centroidYleft; j++)
+                    {
+                        if (centroidXleft > centroidYleft)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright - 10; i < centroidXright; i++)
+                {
+                    for (double j = centroidYright - 10; j < centroidYright; j++)
+                    {
+                        if (centroidXright > centroidYright)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
+                {
+                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
+                    {
+                        if (centroidXrightmore > centroidYrightmore)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight UP
+                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
+                {
+                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
+                    {
+                        if (centroidX_UP > centroidY_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft_UP - 10; i < centroidXleft_UP; i++)
+                {
+                    for (double j = centroidYleft_UP - 10; j < centroidYleft_UP; j++)
+                    {
+                        if (centroidXleft_UP > centroidYleft_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
+                {
+                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
+                    {
+                        if (centroidXleftmore_UP > centroidYleftmore_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright_UP - 10; i < centroidXright_UP; i++)
+                {
+                    for (double j = centroidYright_UP - 10; j < centroidYright_UP; j++)
+
+                    {
+                        if (centroidXright_UP > centroidYright_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+
+                    }
+
+                }
+                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
+                {
+                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
+                    {
+                        if (centroidXrightmore_UP > centroidYrightmore_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight Down
+                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
+                {
+                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
+                    {
+                        if (centroidX_DOWN > centroidY_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft_DOWN - 10; i < centroidXleft_DOWN; i++)
+                {
+                    for (double j = centroidYleft_DOWN - 10; j < centroidYleft_DOWN; j++)
+                    {
+                        if (centroidXleft_DOWN > centroidYleft_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
+                {
+                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
+                    {
+                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright_DOWN - 10; i < centroidXright_DOWN; i++)
+                {
+                    for (double j = centroidYright_DOWN - 10; j < centroidYright_DOWN; j++)
+                    {
+                        if (centroidXright_DOWN > centroidYright_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
+                {
+                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
+                    {
+                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight UP DOT
+                for (double i = centroidX_UP2 - 10; i < centroidX_UP2; i++)
+                {
+                    for (double j = centroidY_UP2 - 10; j < centroidY_UP2; j++)
+                    {
+                        if (centroidX_UP2 > centroidY_UP2)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright_UP2 - 10; i < centroidXright_UP2; i++)
+                {
+                    for (double j = centroidYright_UP2 - 10; j < centroidYright_UP2; j++)
+                    {
+                        if (centroidXright_UP2 > centroidYright_UP2)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft_UP2 - 10; i < centroidXleft_UP2; i++)
+                {
+                    for (double j = centroidYleft_UP2 - 10; j < centroidYleft_UP2; j++)
+                    {
+                        if (centroidXleft_UP2 > centroidYleft_UP2)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight DOWN DOT
+                for (double i = centroidX_DOWN2 - 10; i < centroidX_DOWN2; i++)
+                {
+                    for (double j = centroidY_DOWN2 - 10; j < centroidY_DOWN2; j++)
+                    {
+                        if (centroidX_DOWN2 > centroidY_DOWN2)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright_DOWN2 - 10; i < centroidXright_DOWN2; i++)
+                {
+                    for (double j = centroidYright_DOWN2 - 10; j < centroidYright_DOWN2; j++)
+                    {
+                        if (centroidXright_DOWN2 > centroidYright_DOWN2)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft_DOWN2 - 10; i < centroidXleft_DOWN2; i++)
+                {
+                    for (double j = centroidYleft_DOWN2 - 10; j < centroidYleft_DOWN2; j++)
+                    {
+                        if (centroidXleft_DOWN2 > centroidYleft_DOWN2)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                colorValue = (colorValue / 2100);
+
+            }
+            else if (FocusPoint.Text == "15 Focus Points")
+            {
+                checkBoxCenter.Checked = false;
+                checkBoxAverage.Checked = true;
+                //=======================================Center======================================== 
+                centroidX = (int)(cameraWidth / 2);
+                centroidY = (int)(cameraHeight / 2);
+                //left 
+                double centroidXleft = (int)(cameraWidth / 2.5);
+                double centroidYleft = (int)(cameraHeight / 2);
+                //left 
+                double centroidXleftmore = (int)(cameraWidth / 3.2);
+                double centroidYleftmore = (int)(cameraHeight / 2);
+                //right
+                double centroidXright = (int)(cameraWidth / 1.7);
+                double centroidYright = (int)(cameraHeight / 2);
+                //right
+                double centroidXrightmore = (int)(cameraWidth / 1.5);
+                double centroidYrightmore = (int)(cameraHeight / 2);
+                //=========================================UP======================================
+                double centroidX_UP = (int)(cameraWidth / 2);
+                double centroidY_UP = (int)(cameraHeight / 3);
+                //left 
+                double centroidXleft_UP = (int)(cameraWidth / 2.5);
+                double centroidYleft_UP = (int)(cameraHeight / 3);
+                //left 
+                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
+                double centroidYleftmore_UP = (int)(cameraHeight / 3);
+                //right
+                double centroidXright_UP = (int)(cameraWidth / 1.7);
+                double centroidYright_UP = (int)(cameraHeight / 3);
+                //right
+                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
+                double centroidYrightmore_UP = (int)(cameraHeight / 3);
+                //=======================================DOWN========================================
+                double centroidX_DOWN = (int)(cameraWidth / 2);
+                double centroidY_DOWN = (int)(cameraHeight / 1.5);
+                //left 
+                double centroidXleft_DOWN = (int)(cameraWidth / 2.5);
+                double centroidYleft_DOWN = (int)(cameraHeight / 1.5);
+                //left 
+                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
+                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
+                //right
+                double centroidXright_DOWN = (int)(cameraWidth / 1.7);
+                double centroidYright_DOWN = (int)(cameraHeight / 1.5);
+                //right
+                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
+                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
+
+                if (ShowFocusPoint.CheckState != 0)
+                {
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=========================================UP======================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=======================================DOWN========================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                }
+                //==================Readlight Center
+                for (double i = centroidX - 10; i < centroidX; i++)
+                {
+                    for (double j = centroidY - 10; j < centroidY; j++)
+                    {
+                        if (centroidX > centroidY)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
+                {
+                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
+                    {
+                        if (centroidXleftmore > centroidYleftmore)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+
+                        }
+                    }
+                }
+                for (double i = centroidXleft - 10; i < centroidXleft; i++)
+                {
+                    for (double j = centroidYleft - 10; j < centroidYleft; j++)
+                    {
+                        if (centroidXleft > centroidYleft)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright - 10; i < centroidXright; i++)
+                {
+                    for (double j = centroidYright - 10; j < centroidYright; j++)
+                    {
+                        if (centroidXright > centroidYright)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
+                {
+                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
+                    {
+                        if (centroidXrightmore > centroidYrightmore)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight UP
+                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
+                {
+                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
+                    {
+                        if (centroidX_UP > centroidY_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft_UP - 10; i < centroidXleft_UP; i++)
+                {
+                    for (double j = centroidYleft_UP - 10; j < centroidYleft_UP; j++)
+                    {
+                        if (centroidXleft_UP > centroidYleft_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
+                {
+                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
+                    {
+                        if (centroidXleftmore_UP > centroidYleftmore_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright_UP - 10; i < centroidXright_UP; i++)
+                {
+                    for (double j = centroidYright_UP - 10; j < centroidYright_UP; j++)
+                    {
+                        if (centroidXright_UP > centroidYright_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
+                {
+                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
+                    {
+                        if (centroidXrightmore_UP > centroidYrightmore_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight Down
+                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
+                {
+                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
+                    {
+                        if (centroidX_DOWN > centroidY_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleft_DOWN - 10; i < centroidXleft_DOWN; i++)
+                {
+                    for (double j = centroidYleft_DOWN - 10; j < centroidYleft_DOWN; j++)
+                    {
+                        if (centroidXleft_DOWN > centroidYleft_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
+                {
+                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
+                    {
+                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXright_DOWN - 10; i < centroidXright_DOWN; i++)
+                {
+                    for (double j = centroidYright_DOWN - 10; j < centroidYright_DOWN; j++)
+                    {
+                        if (centroidXright_DOWN > centroidYright_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
+                {
+                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
+                    {
+                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                colorValue = (colorValue / 1500);
+            }
+            else if (FocusPoint.Text == "9 Focus Points")
+            {
+                checkBoxCenter.Checked = false;
+                checkBoxAverage.Checked = true;
+                //=======================================Center======================================== 
+                centroidX = (int)(cameraWidth / 2);
+                centroidY = (int)(cameraHeight / 2);
+                //left 
+                double centroidXleftmore = (int)(cameraWidth / 3.2);
+                double centroidYleftmore = (int)(cameraHeight / 2);
+                //right
+                double centroidXrightmore = (int)(cameraWidth / 1.5);
+                double centroidYrightmore = (int)(cameraHeight / 2);
+                //=========================================UP======================================
+                double centroidX_UP = (int)(cameraWidth / 2);
+                double centroidY_UP = (int)(cameraHeight / 3);
+                //left 
+                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
+                double centroidYleftmore_UP = (int)(cameraHeight / 3);
+                //right
+                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
+                double centroidYrightmore_UP = (int)(cameraHeight / 3);
+                //=======================================DOWN========================================
+                double centroidX_DOWN = (int)(cameraWidth / 2);
+                double centroidY_DOWN = (int)(cameraHeight / 1.5);
+                //left 
+                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
+                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
+                //right
+                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
+                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
+                if (ShowFocusPoint.CheckState != 0)
+                {
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=========================================UP======================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //=======================================DOWN========================================
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //left 
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    //right
+                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                }
+
+                //==================Readlight Center
+                for (double i = centroidX - 10; i < centroidX; i++)
+                {
+                    for (double j = centroidY - 10; j < centroidY; j++)
+                    {
+                        if (centroidX > centroidY)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
+                {
+                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
+                    {
+                        if (centroidXleftmore > centroidYleftmore)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
+                {
+                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
+                    {
+                        if (centroidXrightmore > centroidYrightmore)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight UP
+                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
+                {
+                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
+                    {
+                        if (centroidX_UP > centroidY_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
+                {
+                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
+                    {
+                        if (centroidXleftmore_UP > centroidYleftmore_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
+                {
+                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
+                    {
+                        if (centroidXrightmore_UP > centroidYrightmore_UP)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                //==================Readlight Down
+                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
+                {
+                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
+                    {
+                        if (centroidX_DOWN > centroidY_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
+                {
+                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
+                    {
+                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
+                {
+                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
+                    {
+                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
+                        {
+                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                        }
+                    }
+                }
+                colorValue = (colorValue / 900);
+            }
+            else if (FocusPoint.Text == "Histogram" && Histogramcheck.Checked == false)
+            {
+                FocusPoint.Text = "21 Focus Points";
+                Histogramcheck.Checked = false;
+                MessageBox.Show("Please turn on Histogram.", "Message", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+            }
+
+        }
+        
+            private void UITimer_Tick(object sender, EventArgs e)
         {
             if (CameraStateText.Text == "ASI_EXP_FAILED")
             {
@@ -1016,14 +1815,12 @@ namespace AllSky_2020
                 if (ConnectedCameras > 0)
                 {
                     ConnectedCameras = ASICameraDll2.ASIGetNumOfConnectedCameras();
-
                 }
                 if (ConnectedCameras > 0)
                 {
                     SystemMessage = "Retring to connect to the camera.";
                     Application.Restart();
                 }
-
                 SystemMessage = "No camera connected";
                 MainImageControl.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "TAllSyk.jpg");
                 ROIImage.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "Nocameraconnected.jpg");
@@ -1033,10 +1830,12 @@ namespace AllSky_2020
             {
                 ASI_EXPOSURE_STATUS ExpStatus = ASI_EXPOSURE_STATUS.ASI_EXP_IDLE;
                 ASI_ERROR_CODE GetExpError = ASICameraDll2.ASIGetExpStatus(CameraId, out ExpStatus);
+
                 if (GetExpError == ASI_ERROR_CODE.ASI_SUCCESS)
                     CameraStateText.Text = ExpStatus.ToString();
                 else
                     CameraStateText.Text = GetExpError.ToString();
+
                 ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
                 SavePath.Text = AppSetting.Data.SaveFileDialog;
                 MessageStatusText.Text = SystemMessage;
@@ -1066,13 +1865,12 @@ namespace AllSky_2020
                         CvInvoke.Rectangle(ProcessFrame, new Rectangle((int)AppSetting.Data.OriginX, (int)AppSetting.Data.OriginY, (int)AppSetting.Data.OriginWidth, (int)AppSetting.Data.OriginHeight), new Bgr(Color.LightGreen).MCvScalar, 2);
 
                     AltAz SunAltAz = SunHanler.GetSunPosition();
-
                     Point SunXY = AzmAltToXY.CalculateXYPoint(SunAltAz.Alt.Degs, SunAltAz.Az.Degs, 20);
-
                     //CvInvoke.Circle(ProcessFrame, SunXY, 20, new Bgr(Color.LightGreen).MCvScalar, 2);
 
                     int cameraWidth;
                     int cameraHeight;
+                    //When open houghCircles Change focus
                     if (houghCircles_X > 0 && houghCircles_Y > 0)
                     {
                         cameraWidth = (houghCircles_X * 10) * 2;
@@ -1084,16 +1882,16 @@ namespace AllSky_2020
                         cameraHeight = Int16.Parse(ROITextHeight.Text);
                     }
 
-                    if (hdrOn == false && hdr_On.Checked == false)
+                    
+
+                    if (autoHDR.Checked == false && hdr_On.Checked == false)
                     {
-                        //ProcessFrame._EqualizeHist();
                         MainImageControl.Image = ProcessFrame;
                     }
 
                     string timesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
                     int thickness = 5;
                     int borderHeight = Int32.Parse(AppSetting.Data.ImageHeight.ToString());
-
                     int borderWidth = Int32.Parse(AppSetting.Data.ImageWidth.ToString());
                     float exposureTime_Show = float.Parse(AppSetting.Data.ExposureTime.ToString());
 
@@ -1124,10 +1922,12 @@ namespace AllSky_2020
                     }
 
                     Bitmap bmpImage_Frame = imageFrame.ToBitmap();
-                    if (IsAutoExposureTime.CheckState != 0) //AutoExposureTime 
-                    {
 
-                        if (checkBoxCenter.CheckState != 0) //checkBoxFocus
+                    if (IsAutoExposureTime.CheckState != 0) //On-Off AutoExposureTime 
+                    {
+                        
+
+                        if (checkBoxCenter.CheckState != 0) //checkBoxCenter
                         {
                             checkBoxAverage.Checked = false;
                             centroidX = (int)(cameraWidth / 2);
@@ -1148,1255 +1948,7 @@ namespace AllSky_2020
                         }
                         else
                         {
-
-                            if (FocusPoint.Text == "21 Focus Points" && houghCircles_Status == false)
-                            {
-                                checkBoxCenter.Checked = false;
-                                checkBoxAverage.Checked = true;
-                                //=======================================Center Line======================================== 
-                                centroidX = (int)(cameraWidth / 2);
-                                centroidY = (int)(cameraHeight / 2);
-                                //left 
-                                double centroidXleft = (int)(cameraWidth / 2.5);
-                                double centroidYleft = (int)(cameraHeight / 2);
-
-                                //left 
-                                double centroidXleftmore = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore = (int)(cameraHeight / 2);
-
-                                //right
-                                double centroidXright = (int)(cameraWidth / 1.7);
-                                double centroidYright = (int)(cameraHeight / 2);
-
-                                //right
-                                double centroidXrightmore = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore = (int)(cameraHeight / 2);
-
-                                //=========================================UP Line======================================
-
-                                double centroidX_UP = (int)(cameraWidth / 2);
-                                double centroidY_UP = (int)(cameraHeight / 3);
-
-                                //left 
-                                double centroidXleft_UP = (int)(cameraWidth / 2.5);
-                                double centroidYleft_UP = (int)(cameraHeight / 3);
-
-                                //left 
-                                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore_UP = (int)(cameraHeight / 3);
-
-                                //right
-                                double centroidXright_UP = (int)(cameraWidth / 1.7);
-                                double centroidYright_UP = (int)(cameraHeight / 3);
-
-                                //right
-                                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore_UP = (int)(cameraHeight / 3);
-
-                                //=======================================DOWN Line========================================
-                                double centroidX_DOWN = (int)(cameraWidth / 2);
-                                double centroidY_DOWN = (int)(cameraHeight / 1.5);
-
-                                //left 
-                                double centroidXleft_DOWN = (int)(cameraWidth / 2.5);
-                                double centroidYleft_DOWN = (int)(cameraHeight / 1.5);
-
-                                //left 
-                                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
-
-                                //right
-                                double centroidXright_DOWN = (int)(cameraWidth / 1.7);
-                                double centroidYright_DOWN = (int)(cameraHeight / 1.5);
-
-                                //right
-                                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
-
-                                //=========================================UP 3 DOT======================================
-
-                                double centroidX_UP2 = (int)(cameraWidth / 2);
-                                double centroidY_UP2 = (int)(cameraHeight / 6);
-
-                                //right
-                                double centroidXright_UP2 = (int)(cameraWidth / 1.7);
-                                double centroidYright_UP2 = (int)(cameraHeight / 6);
-
-                                //left 
-                                double centroidXleft_UP2 = (int)(cameraWidth / 2.5);
-                                double centroidYleft_UP2 = (int)(cameraHeight / 6);
-
-
-
-                                //=======================================DOWN 3 DOT========================================
-                                double centroidX_DOWN2 = (int)(cameraWidth / 2);
-                                double centroidY_DOWN2 = (int)(cameraHeight / 1.2);
-
-                                //right
-                                double centroidXright_DOWN2 = (int)(cameraWidth / 1.7);
-                                double centroidYright_DOWN2 = (int)(cameraHeight / 1.2);
-
-                                //left 
-                                double centroidXleft_DOWN2 = (int)(cameraWidth / 2.5);
-                                double centroidYleft_DOWN2 = (int)(cameraHeight / 1.2);
-
-                                if (ShowFocusPoint.CheckState != 0)
-                                {
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //=========================================UP======================================
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //=======================================DOWN========================================
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //=========================================UP 3 DOT======================================
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP2.ToString()), Int32.Parse(centroidY_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP2.ToString()), Int32.Parse(centroidYright_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP2.ToString()), Int32.Parse(centroidYleft_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //=======================================DOWN 3 DOT========================================
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN2.ToString()), Int32.Parse(centroidY_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN2.ToString()), Int32.Parse(centroidYleft_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN2.ToString()), Int32.Parse(centroidYright_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                }
-
-                                //==================Readlight Center
-                                for (double i = centroidX - 10; i < centroidX; i++)
-                                {
-                                    for (double j = centroidY - 10; j < centroidY; j++)
-
-                                    {
-                                        if (centroidX > centroidY)
-                                        {
-
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-                                    }
-                                }
-
-                                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
-                                {
-                                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
-                                    {
-                                        if (centroidXleftmore > centroidYleftmore)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-                                    }
-                                }
-
-                                for (double i = centroidXleft - 10; i < centroidXleft; i++)
-                                {
-                                    for (double j = centroidYleft - 10; j < centroidYleft; j++)
-                                    {
-                                        if (centroidXleft > centroidYleft)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-                                    }
-                                }
-
-                                for (double i = centroidXright - 10; i < centroidXright; i++)
-                                {
-                                    for (double j = centroidYright - 10; j < centroidYright; j++)
-                                    {
-                                        if (centroidXright > centroidYright)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-                                    }
-                                }
-
-                                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
-                                {
-                                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
-                                    {
-                                        if (centroidXrightmore > centroidYrightmore)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-                                    }
-                                }
-
-                                //==================Readlight UP
-                                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
-                                {
-                                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
-                                    {
-                                        if (centroidX_UP > centroidY_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-                                    }
-                                }
-
-                                for (double i = centroidXleft_UP - 10; i < centroidXleft_UP; i++)
-                                {
-                                    for (double j = centroidYleft_UP - 10; j < centroidYleft_UP; j++)
-                                    {
-                                        if (centroidXleft_UP > centroidYleft_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-                                    }
-                                }
-
-                                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
-                                {
-                                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
-                                    {
-                                        if (centroidXleftmore_UP > centroidYleftmore_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-                                    }
-                                }
-
-
-
-                                for (double i = centroidXright_UP - 10; i < centroidXright_UP; i++)
-                                {
-
-                                    for (double j = centroidYright_UP - 10; j < centroidYright_UP; j++)
-
-                                    {
-                                        if (centroidXright_UP > centroidYright_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
-                                {
-
-                                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
-
-                                    {
-                                        if (centroidXrightmore_UP > centroidYrightmore_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-                                //==================Readlight Down
-                                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
-                                {
-
-                                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
-
-                                    {
-                                        if (centroidX_DOWN > centroidY_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleft_DOWN - 10; i < centroidXleft_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYleft_DOWN - 10; j < centroidYleft_DOWN; j++)
-
-                                    {
-
-
-
-
-                                        if (centroidXleft_DOWN > centroidYleft_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
-
-                                    {
-                                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-
-                                for (double i = centroidXright_DOWN - 10; i < centroidXright_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYright_DOWN - 10; j < centroidYright_DOWN; j++)
-
-                                    {
-                                        if (centroidXright_DOWN > centroidYright_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
-
-                                    {
-                                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                //==================Readlight UP DOT
-                                for (double i = centroidX_UP2 - 10; i < centroidX_UP2; i++)
-                                {
-
-                                    for (double j = centroidY_UP2 - 10; j < centroidY_UP2; j++)
-
-                                    {
-                                        if (centroidX_UP2 > centroidY_UP2)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXright_UP2 - 10; i < centroidXright_UP2; i++)
-                                {
-
-                                    for (double j = centroidYright_UP2 - 10; j < centroidYright_UP2; j++)
-
-                                    {
-                                        if (centroidXright_UP2 > centroidYright_UP2)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleft_UP2 - 10; i < centroidXleft_UP2; i++)
-                                {
-
-                                    for (double j = centroidYleft_UP2 - 10; j < centroidYleft_UP2; j++)
-
-                                    {
-                                        if (centroidXleft_UP2 > centroidYleft_UP2)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                //==================Readlight DOWN DOT
-
-                                for (double i = centroidX_DOWN2 - 10; i < centroidX_DOWN2; i++)
-                                {
-
-                                    for (double j = centroidY_DOWN2 - 10; j < centroidY_DOWN2; j++)
-
-                                    {
-                                        if (centroidX_DOWN2 > centroidY_DOWN2)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXright_DOWN2 - 10; i < centroidXright_DOWN2; i++)
-                                {
-
-                                    for (double j = centroidYright_DOWN2 - 10; j < centroidYright_DOWN2; j++)
-
-                                    {
-                                        if (centroidXright_DOWN2 > centroidYright_DOWN2)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleft_DOWN2 - 10; i < centroidXleft_DOWN2; i++)
-                                {
-
-                                    for (double j = centroidYleft_DOWN2 - 10; j < centroidYleft_DOWN2; j++)
-
-                                    {
-                                        if (centroidXleft_DOWN2 > centroidYleft_DOWN2)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-                                colorValue = (colorValue / 2100);
-                                //recover = false;
-                            }
-                            else if (FocusPoint.Text == "15 Focus Points")
-                            {
-                                checkBoxCenter.Checked = false;
-                                checkBoxAverage.Checked = true;
-                                //=======================================Center======================================== 
-                                centroidX = (int)(cameraWidth / 2);
-                                centroidY = (int)(cameraHeight / 2);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //left 
-                                double centroidXleft = (int)(cameraWidth / 2.5);
-                                double centroidYleft = (int)(cameraHeight / 2);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //left 
-                                double centroidXleftmore = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore = (int)(cameraHeight / 2);
-
-
-                                //right
-                                double centroidXright = (int)(cameraWidth / 1.7);
-                                double centroidYright = (int)(cameraHeight / 2);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //right
-                                double centroidXrightmore = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore = (int)(cameraHeight / 2);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //=========================================UP======================================
-
-                                double centroidX_UP = (int)(cameraWidth / 2);
-                                double centroidY_UP = (int)(cameraHeight / 3);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //left 
-                                double centroidXleft_UP = (int)(cameraWidth / 2.5);
-                                double centroidYleft_UP = (int)(cameraHeight / 3);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //left 
-                                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore_UP = (int)(cameraHeight / 3);
-
-                                //right
-                                double centroidXright_UP = (int)(cameraWidth / 1.7);
-                                double centroidYright_UP = (int)(cameraHeight / 3);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //right
-                                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore_UP = (int)(cameraHeight / 3);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //=======================================DOWN========================================
-                                double centroidX_DOWN = (int)(cameraWidth / 2);
-                                double centroidY_DOWN = (int)(cameraHeight / 1.5);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //left 
-                                double centroidXleft_DOWN = (int)(cameraWidth / 2.5);
-                                double centroidYleft_DOWN = (int)(cameraHeight / 1.5);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //left 
-                                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
-
-                                //right
-                                double centroidXright_DOWN = (int)(cameraWidth / 1.7);
-                                double centroidYright_DOWN = (int)(cameraHeight / 1.5);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //right
-                                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-
-
-
-                                if (ShowFocusPoint.CheckState != 0)
-                                {
-
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore2.ToString()), Int32.Parse(centroidYleftmore2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //right
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //right
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //=========================================UP======================================
-
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //right
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //right
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //=======================================DOWN========================================
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //left 
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //right
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                    //right
-
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-
-
-
-                                }
-
-                                //==================Readlight Center
-                                for (double i = centroidX - 10; i < centroidX; i++)
-                                {
-
-                                    for (double j = centroidY - 10; j < centroidY; j++)
-
-                                    {
-                                        if (centroidX > centroidY)
-                                        {
-
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
-                                {
-
-                                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
-
-                                    {
-                                        if (centroidXleftmore > centroidYleftmore)
-                                        {
-
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleft - 10; i < centroidXleft; i++)
-                                {
-
-                                    for (double j = centroidYleft - 10; j < centroidYleft; j++)
-
-                                    {
-                                        if (centroidXleft > centroidYleft)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-
-
-                                for (double i = centroidXright - 10; i < centroidXright; i++)
-                                {
-
-                                    for (double j = centroidYright - 10; j < centroidYright; j++)
-
-                                    {
-                                        if (centroidXright > centroidYright)
-                                        {
-
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
-                                {
-
-                                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
-
-                                    {
-                                        if (centroidXrightmore > centroidYrightmore)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                //==================Readlight UP
-                                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
-                                {
-
-                                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
-
-                                    {
-                                        if (centroidX_UP > centroidY_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleft_UP - 10; i < centroidXleft_UP; i++)
-                                {
-
-                                    for (double j = centroidYleft_UP - 10; j < centroidYleft_UP; j++)
-
-                                    {
-                                        if (centroidXleft_UP > centroidYleft_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
-                                {
-
-                                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
-
-                                    {
-                                        if (centroidXleftmore_UP > centroidYleftmore_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-
-                                for (double i = centroidXright_UP - 10; i < centroidXright_UP; i++)
-                                {
-
-                                    for (double j = centroidYright_UP - 10; j < centroidYright_UP; j++)
-
-                                    {
-                                        if (centroidXright_UP > centroidYright_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
-                                {
-
-                                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
-
-                                    {
-                                        if (centroidXrightmore_UP > centroidYrightmore_UP)
-                                        {
-
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-                                //==================Readlight Down
-                                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
-                                {
-
-                                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
-
-                                    {
-                                        if (centroidX_DOWN > centroidY_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleft_DOWN - 10; i < centroidXleft_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYleft_DOWN - 10; j < centroidYleft_DOWN; j++)
-
-                                    {
-                                        if (centroidXleft_DOWN > centroidYleft_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
-
-                                    {
-                                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-                                for (double i = centroidXright_DOWN - 10; i < centroidXright_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYright_DOWN - 10; j < centroidYright_DOWN; j++)
-
-                                    {
-                                        if (centroidXright_DOWN > centroidYright_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
-
-                                    {
-                                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-                                colorValue = (colorValue / 1500);
-                            }
-                            else if (FocusPoint.Text == "9 Focus Points")
-                            {
-                                checkBoxCenter.Checked = false;
-                                checkBoxAverage.Checked = true;
-                                //=======================================Center======================================== 
-                                centroidX = (int)(cameraWidth / 2);
-                                centroidY = (int)(cameraHeight / 2);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-
-                                //left 
-                                double centroidXleftmore = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore = (int)(cameraHeight / 2);
-
-
-
-                                //right
-                                double centroidXrightmore = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore = (int)(cameraHeight / 2);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //=========================================UP======================================
-
-                                double centroidX_UP = (int)(cameraWidth / 2);
-                                double centroidY_UP = (int)(cameraHeight / 3);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-
-                                //left 
-                                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore_UP = (int)(cameraHeight / 3);
-
-
-                                //right
-                                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore_UP = (int)(cameraHeight / 3);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-                                //=======================================DOWN========================================
-                                double centroidX_DOWN = (int)(cameraWidth / 2);
-                                double centroidY_DOWN = (int)(cameraHeight / 1.5);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-
-                                //left 
-                                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
-                                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
-
-
-                                //right
-                                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
-                                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
-                                //CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-
-
-
-
-                                if (ShowFocusPoint.CheckState != 0)
-                                {
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //=========================================UP======================================
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //=======================================DOWN========================================
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //left 
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                    //right
-                                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                                }
-
-                                //==================Readlight Center
-                                for (double i = centroidX - 10; i < centroidX; i++)
-                                {
-
-                                    for (double j = centroidY - 10; j < centroidY; j++)
-
-                                    {
-                                        if (centroidX > centroidY)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
-                                {
-
-                                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
-
-                                    {
-                                        if (centroidXleftmore > centroidYleftmore)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-
-                                    }
-
-                                }
-
-
-
-
-
-
-
-                                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
-                                {
-
-                                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
-
-                                    {
-                                        if (centroidXrightmore > centroidYrightmore)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-                                //==================Readlight UP
-                                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
-                                {
-
-                                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
-
-                                    {
-                                        if (centroidX_UP > centroidY_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-
-                                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
-                                {
-
-                                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
-
-                                    {
-                                        if (centroidXleftmore_UP > centroidYleftmore_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-
-
-
-                                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
-                                {
-
-                                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
-
-                                    {
-                                        if (centroidXrightmore_UP > centroidYrightmore_UP)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-                                //==================Readlight Down
-                                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
-                                {
-
-                                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
-
-                                    {
-                                        if (centroidX_DOWN > centroidY_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-
-                                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
-
-                                    {
-                                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-
-                                        }
-
-                                    }
-
-                                }
-
-
-
-
-                                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
-                                {
-
-                                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
-
-                                    {
-                                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
-                                        {
-                                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-
-                                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
-                                        }
-
-
-                                    }
-
-                                }
-
-
-                                colorValue = (colorValue / 900);
-                            }
-                            else if (FocusPoint.Text == "Histogram" && Histogramcheck.Checked == false)
-                            {
-                                FocusPoint.Text = "21 Focus Points";
-                                Histogramcheck.Checked = false;
-                                MessageBox.Show("Please turn on Histogram.", "Message", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-
-                            }
-
-
-
-                            ExposuringText.Text = string.Format("{0:0.00}", Math.Log(Math.Pow(2.8, 2) / (AppSetting.Data.ExposureTime / 1000), 2.0));
+                            Focus_Point();
                             int hdrDetectionhigh = 0;
                             int hdrDetectionlow = 0;
                             int hdrDetectionmedium = 0;
@@ -2413,7 +1965,6 @@ namespace AllSky_2020
                                 croppedImage = histoImage.Copy();
                                 Histo.ClearHistogram();
                                 Histo.GenerateHistograms(croppedImage.Convert<Gray, Byte>(), 256);
-
                                 if (FocusPoint.Text == "Histogram")
                                 {
                                     for (int i = 0; i < croppedImage.Width; i++)
@@ -2422,24 +1973,14 @@ namespace AllSky_2020
                                         {
                                             colorHisto += croppedImage.Data[i, j, 0];
                                             if (autoHDR.Checked == true)
-                                            {
                                                 if (croppedImage.Data[i, j, 0] >= 255)
-                                                {
                                                     hdrDetectionhigh += 1;
-                                                }
                                                 else if (croppedImage.Data[i, j, 0] <= 60)
-                                                {
                                                     hdrDetectionlow += 1;
-
-                                                }
                                                 else
-                                                {
                                                     hdrDetectionmedium += 1;
-                                                }
-                                            }
                                         }
                                     }
-
                                     colorHisto = colorHisto / (croppedImage.Width * croppedImage.Height);
                                     Console.WriteLine(colorHisto);
                                     colorValue = colorHisto;
@@ -2457,15 +1998,16 @@ namespace AllSky_2020
                                 Console.WriteLine("hdrDetectionhigh =" + hdrDetectionhigh);
                                 Console.WriteLine("hdrDetectionlow =" + hdrDetectionlow);
                                 Console.WriteLine("hdrDetectionmedium =" + hdrDetectionmedium);
-
+                               
                                 if (hdrDetectionhigh > 12000 && hdrDetectionlow > 300000)
                                 {
                                     hdrOn = true;
                                 }
-                                
-
+                             
                                 if (hdrOn == true)
                                 {
+                                    
+
                                     Console.WriteLine("OnHDR");
                                     bool doOne = false;
                                     int imageMerge_status = 0;
@@ -2484,7 +2026,7 @@ namespace AllSky_2020
                                     }
                                     else
                                     {
-                                        Control_Jump = 1.6;
+                                        Control_Jump = 1.7;
                                     }
 
                                     if (colorValue > maxLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" 
@@ -2502,8 +2044,7 @@ namespace AllSky_2020
 
                                     }
                                     else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" 
-                                        && recover != false
-                                        && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
+                                        && recover != false && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
                                     {
                                         //AppSetting.Data.ExposureTime +
                                         bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
@@ -2511,7 +2052,7 @@ namespace AllSky_2020
                                         AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
                                         recover = false;
                                     }
-                                    else if (colorValue >= minLight_hdr && colorValue <= maxLight_hdr && doOne == false)
+                                    else if (colorValue >= minLight_hdr-10 && colorValue <= maxLight_hdr+10 && doOne == false)
                                     {
                                         ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                                         System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
@@ -2519,56 +2060,66 @@ namespace AllSky_2020
                                         EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                                         myEncoderParameters.Param[0] = myEncoderParameter;
                                         float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
-
-
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
-
-                                        if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight
-                                            || AppSetting.Data.ExposureTime >= 120000)
+                                        if(AppSetting.Data.ExposureTime >= 1)
                                         {
-                                            doOne = true;
-                                            imageMerge_status = 1;
-                                            expTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
-                                            hdrMedium = hdrOutput;
-                                            hdrMedium._GammaCorrect(0.4);
-                                            Console.WriteLine("expTimesMedium = " + expTimesMedium);
-                                            hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
-                                            maxLight_hdr = AppSetting.Data.maxLight - 40;
-                                            minLight_hdr = AppSetting.Data.minLight - 40;
-
-                                        }
-                                        else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false
+                                            if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight
                                             || AppSetting.Data.ExposureTime >= 120000)
-                                        {
-                                            doOne = true;
-                                            imageMerge_status = 2;
-                                            expTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
-                                            hdrLow = hdrOutput;
-                                            hdrLow._GammaCorrect(0.4);
-                                            Console.WriteLine("expTimesMin = " + expTimesMin);
-                                            hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
-                                            maxLight_hdr = AppSetting.Data.maxLight + 50;
-                                            minLight_hdr = AppSetting.Data.minLight + 30;
-                                            if (AppSetting.Data.ExposureTime >= 120000)
                                             {
-                                                AppSetting.Data.ExposureTime = 60000;
+                                                doOne = true;
+                                                imageMerge_status = 1;
+                                                expTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
+                                                hdrMedium = hdrOutput;
+                                                hdrMedium._GammaCorrect(0.4);
+                                                Console.WriteLine("expTimesMedium = " + expTimesMedium);
+                                                hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                                maxLight_hdr = AppSetting.Data.maxLight - 40;
+                                                minLight_hdr = AppSetting.Data.minLight - 40;
+                                                if (AppSetting.Data.ExposureTime >= 120000)
+                                                {
+                                                    AppSetting.Data.ExposureTime = 60000;
+                                                }
+                                            }
+                                            else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false
+                                                || AppSetting.Data.ExposureTime == 60000)
+                                            {
+                                                doOne = true;
+                                                imageMerge_status = 2;
+                                                expTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
+                                                hdrLow = hdrOutput;
+                                                hdrLow._GammaCorrect(0.4);
+                                                Console.WriteLine("expTimesMin = " + expTimesMin);
+                                                hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
+                                                maxLight_hdr = AppSetting.Data.maxLight + 50;
+                                                minLight_hdr = AppSetting.Data.minLight + 30;
+                                                if (AppSetting.Data.ExposureTime >= 120000)
+                                                {
+                                                    AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
+                                                }
+
+                                            }
+                                            else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false
+                                                || AppSetting.Data.ExposureTime == AppSetting.Data.MAX_SHUTTER)
+                                            {
+                                                doOne = true;
+                                                imageMerge_status = 3;
+                                                expTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
+                                                hdrHigh = hdrOutput;
+                                                hdrHigh._GammaCorrect(0.4);
+                                                hdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrHigh.jpg", jpgEncoder, myEncoderParameters);
+                                                maxLight_hdr = AppSetting.Data.maxLight;
+                                                minLight_hdr = AppSetting.Data.minLight;
                                             }
                                         }
-                                        else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false
-                                            || AppSetting.Data.ExposureTime == 60000)
-                                        {
-                                            doOne = true;
-                                            imageMerge_status = 3;
-                                            expTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
-                                            hdrHigh = hdrOutput;
-                                            hdrHigh._GammaCorrect(0.4);
-                                            hdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrHigh.jpg", jpgEncoder, myEncoderParameters);
-                                            maxLight_hdr = AppSetting.Data.maxLight;
-                                            minLight_hdr = AppSetting.Data.minLight;
-                                        }
+
+                                        
                                         if (imageMerge_status == 3)
                                         {
                                             imageMerge_status = 0;
+                                            if(AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
+                                            {
+                                                AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
+                                            }
                                             for (int i = 0; i < hdrMedium.Height; i++)
                                             {
                                                 for (int j = 0; j < hdrMedium.Width; j++)
@@ -2589,6 +2140,7 @@ namespace AllSky_2020
                                                     }
                                                 }
                                             }
+                                            hdrMedium._SmoothGaussian(1);
                                             hdrMedium._EqualizeHist();
                                             hdrMedium._GammaCorrect(1.4d);
                                             Image<Bgr, Byte> ImagehdrMedium = hdrMedium;
@@ -2621,11 +2173,7 @@ namespace AllSky_2020
                                                     ImagehdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder, myEncoderParameters);
                                                 }
 
-                                                if (hdrDetectionhigh > 12000 && hdrDetectionlow > 200000)
-                                                {
-                                                    hdrOn = true;
-                                                }
-                                                else
+                                                if (hdrDetectionhigh <= 20000 && hdrDetectionlow <= 200000)
                                                 {
                                                     hdrOn = false;
                                                 }
@@ -2638,46 +2186,71 @@ namespace AllSky_2020
                                 }
                                 else
                                 {
-                                    Control_Jump = 1.6;
-                                }
-
-                                if (colorValue > maxLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
-                                    && recover != false && AppSetting.Data.ExposureTime >= AppSetting.Data.MIN_SHUTTER)
-                                {
-                                    //AppSetting.Data.ExposureTime -
-                                    bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
-                                    Console.WriteLine("bestValue" + bestValue);
-                                    AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                    recover = false;
-                                    if (AppSetting.Data.ExposureTime == 0)
+                                    MainImageControl.Image = imageFrame;
+                                    ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+                                    System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
+                                    EncoderParameters myEncoderParameters = new EncoderParameters(1);
+                                    EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
+                                    myEncoderParameters.Param[0] = myEncoderParameter;
+                                    if (AppSetting.Data.ExposureTime > 1)
                                     {
-                                        AppSetting.Data.ExposureTime = 0.1;
+                                        if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+                                        {
+                                            Control_Jump = 2;
+                                        }
+                                        else if (colorValue > minLight - 5 && colorValue <= maxLight + 5)
+                                        {
+                                            Control_Jump = 2.1;
+                                        }
+                                        else if (colorValue > minLight - 2 && colorValue <= maxLight + 2)
+                                        {
+                                            Control_Jump = 2.11;
+                                        }
+                                        else
+                                        {
+                                            Exposure_Adjust();
+                                            Control_Jump = 1;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Control_Jump = 1.7;
                                     }
 
-                                }
-                                else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
-                                    && recover != false
-                                    && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
-                                {
-                                    //AppSetting.Data.ExposureTime +
-                                    bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
-                                    Console.WriteLine("bestValue" + bestValue);
-                                    AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                    recover = false;
-                                }
-                                timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
-                                if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0 && StopSave.Checked == false)
-                                {
+                                    if (colorValue > maxLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
+                                        && recover != false && AppSetting.Data.ExposureTime >= AppSetting.Data.MIN_SHUTTER)
+                                    {
+                                        //AppSetting.Data.ExposureTime -
+                                        bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
+                                        Console.WriteLine("bestValue" + bestValue);
+                                        AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
+                                        recover = false;
+                                        if (AppSetting.Data.ExposureTime == 0)
+                                        {
+                                            AppSetting.Data.ExposureTime = 0.1;
+                                        }
+
+                                    }
+                                    else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
+                                        && recover != false
+                                        && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
+                                    {
+                                        //AppSetting.Data.ExposureTime +
+                                        bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
+                                        Console.WriteLine("bestValue" + bestValue);
+                                        AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
+                                        recover = false;
+                                    }
                                     timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                    ProcessFrame.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder, myEncoderParameters);
+                                    Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
+                                    if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0)
+                                    {
+                                        timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                        imageFrame.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder, myEncoderParameters);
 
+                                    }
                                 }
-
                             }
-
-
-                        }
                             else if (autoHDR.CheckState != 0 && FocusPoint.Text != "Histogram")
                             {
                                 autoHDR.Checked = false;
@@ -2728,25 +2301,19 @@ namespace AllSky_2020
                                     Console.WriteLine("bestValue" + bestValue);
                                     AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
                                     recover = false;
-                                    if (AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
-                                    {
-                                        AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
-                                    }
+                                   
                                 }
-                                else if (colorValue >= minLight_hdr && colorValue <= maxLight_hdr && doOne == false)
+                                else if (colorValue >= minLight_hdr-10 && colorValue <= maxLight_hdr+10 && doOne == false)
                                 {
-
                                     ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                                     System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
                                     EncoderParameters myEncoderParameters = new EncoderParameters(1);
                                     EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                                     myEncoderParameters.Param[0] = myEncoderParameter;
                                     float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
-
-
                                     Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
                                     if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight
-                                             || AppSetting.Data.ExposureTime >= 120000)
+                                             || (AppSetting.Data.ExposureTime >= 120000 && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER))
                                     {
                                         doOne = true;
                                         imageMerge_status = 1;
@@ -2757,10 +2324,15 @@ namespace AllSky_2020
                                         hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
                                         maxLight_hdr = AppSetting.Data.maxLight - 40;
                                         minLight_hdr = AppSetting.Data.minLight - 40;
+                                        if (AppSetting.Data.ExposureTime >= 120000)
+                                        {
+                                            AppSetting.Data.ExposureTime = 60000;
+                                        }
+
 
                                     }
                                     else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false
-                                        || AppSetting.Data.ExposureTime >= 120000)
+                                        || (AppSetting.Data.ExposureTime >= 60000 && AppSetting.Data.ExposureTime <= 120000))
                                     {
                                         doOne = true;
                                         imageMerge_status = 2;
@@ -2773,11 +2345,12 @@ namespace AllSky_2020
                                         minLight_hdr = AppSetting.Data.minLight + 30;
                                         if (AppSetting.Data.ExposureTime >= 120000)
                                         {
-                                            AppSetting.Data.ExposureTime = 60000;
+                                            AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
                                         }
+                                        
                                     }
                                     else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false
-                                        || AppSetting.Data.ExposureTime == 60000)
+                                        || AppSetting.Data.ExposureTime >= AppSetting.Data.MAX_SHUTTER)
                                     {
                                         doOne = true;
                                         imageMerge_status = 3;
@@ -2790,15 +2363,16 @@ namespace AllSky_2020
                                     }
                                     if (imageMerge_status == 3)
                                     {
+                                        if (AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
+                                        {
+                                            AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
+                                        }
                                         imageMerge_status = 0;
 
                                         for (int i = 0; i < hdrMedium.Height; i++)
                                         {
-
                                             for (int j = 0; j < hdrMedium.Width; j++)
-
                                             {
-
                                                 if (hdrMedium.Data[i, j, 0] > AppSetting.Data.maxLight
                                                     && hdrMedium.Data[i, j, 1] > AppSetting.Data.maxLight
                                                     && hdrMedium.Data[i, j, 2] > AppSetting.Data.maxLight)
@@ -2873,42 +2447,41 @@ namespace AllSky_2020
 
 
                             }
-
-
-
-
-
-                            if (hdr_On.CheckState == 0 && autoHDR.Checked == false && hdrOn == false)
+                            if (autoHDR.Checked == false && hdr_On.Checked == false)
                             {
 
 
                                 minLight = AppSetting.Data.minLight;
                                 maxLight = AppSetting.Data.maxLight;
-                                
 
-                                if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+                                if (AppSetting.Data.ExposureTime > 1)
                                 {
-                                    Control_Jump = 2;
-                                }
-                                else if (colorValue > minLight - 5 && colorValue <= maxLight + 5)
-                                {
-                                    Control_Jump = 2.1;
-                                }
-                                else if (colorValue > minLight - 2 && colorValue <= maxLight + 2)
-                                {
-                                    Control_Jump = 2.11;
+                                    if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+                                    {
+                                        Control_Jump = 2;
+                                    }
+                                    else if (colorValue > minLight - 5 && colorValue <= maxLight + 5)
+                                    {
+                                        Control_Jump = 2.1;
+                                    }
+                                    else if (colorValue > minLight - 2 && colorValue <= maxLight + 2)
+                                    {
+                                        Control_Jump = 2.11;
+                                    }
+                                    else
+                                    {
+                                        Exposure_Adjust();
+                                        Control_Jump = 1;
+                                    }
                                 }
                                 else
                                 {
-                                    Exposure_Adjust();
-                                    Control_Jump = 1;
+                                    Control_Jump = 1.7;
                                 }
-
                                 if (colorValue >= maxLight && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false
                                     && AppSetting.Data.ExposureTime >= AppSetting.Data.MIN_SHUTTER)
                                 {
-                                    //Exposure_Adjust();
-                                    //AppSetting.Data.ExposureTime = ExposureTimeAverage;
+
                                     bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
                                     Console.WriteLine("bestValue" + bestValue);
                                     AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
@@ -2921,8 +2494,7 @@ namespace AllSky_2020
                                     {
                                         AppSetting.Data.ExposureTime = 0.1;
                                     }
-                                    //Exposure_Adjust();
-                                    //AppSetting.Data.ExposureTime = ExposureTimeAverage;
+
                                     bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
                                     Console.WriteLine("bestValue" + bestValue);
                                     AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
@@ -2948,6 +2520,15 @@ namespace AllSky_2020
 
                             if (keoGrams.Checked == true && StopSave.Checked == false)
                             {
+                                ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+                                System.Drawing.Imaging.Encoder myEncoder =
+                                        System.Drawing.Imaging.Encoder.Quality;
+                                EncoderParameters myEncoderParameters = new EncoderParameters(1);
+                                EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
+
+
+                                myEncoderParameters.Param[0] = myEncoderParameter;
+
                                 string timeMinutes = DateTime.Now.AddMinutes(-1).ToString("yyyy_MM_dd__HH_mm");
                                 Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder);
                                 Bitmap keogramsImage = keoGramsFrame.ToBitmap();
@@ -2972,14 +2553,7 @@ namespace AllSky_2020
                                 if (!File.Exists(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg"))
                                 {
 
-                                    ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
-                                    System.Drawing.Imaging.Encoder myEncoder =
-                                            System.Drawing.Imaging.Encoder.Quality;
-                                    EncoderParameters myEncoderParameters = new EncoderParameters(1);
-                                    EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
-
-
-                                    myEncoderParameters.Param[0] = myEncoderParameter;
+                                    
 
                                     var bitmap = new Bitmap(Minutesinday, keogramsImage.Height);
 
@@ -3050,6 +2624,14 @@ namespace AllSky_2020
                                     new Rectangle(new Point(), keograms.Size), GraphicsUnit.Pixel);
 
 
+                                //File.Delete(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg");
+                                if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && StopSave.Checked == false)
+                                {
+                                    timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                    outputImage.Save(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + DateTime.Now.ToString("yyyy_MM_dd__HH_mm") + "keoGrams" + ".jpg", jpgEncoder,
+                                    myEncoderParameters);
+                                }
+
 
 
                             }
@@ -3070,19 +2652,11 @@ namespace AllSky_2020
                                 50L);
 
                                 myEncoderParameters.Param[0] = myEncoderParameter;
-
-
-
                                 Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
 
                                 bmpImage_Frame.Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder,
                                     myEncoderParameters);
-                                if (keoGrams.CheckState != 0)
-                                {
-                                    //File.Delete(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg");
-                                    outputImage.Save(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + DateTime.Now.ToString("yyyy_MM_dd__HH_mm") + "keoGrams" + ".jpg", jpgEncoder,
-                                    myEncoderParameters);
-                                }
+                                
 
 
                                 if (SaveLog.CheckState != 0)
