@@ -141,6 +141,11 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
+            this.hdrDetectionhigh = new System.Windows.Forms.TextBox();
+            this.hdrDetectionlow = new System.Windows.Forms.TextBox();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label32 = new System.Windows.Forms.Label();
+            this.hdrDetection = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -605,6 +610,11 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.hdrDetection);
+            this.panel1.Controls.Add(this.label32);
+            this.panel1.Controls.Add(this.label31);
+            this.panel1.Controls.Add(this.hdrDetectionlow);
+            this.panel1.Controls.Add(this.hdrDetectionhigh);
             this.panel1.Controls.Add(this.label29);
             this.panel1.Controls.Add(this.autoHDR);
             this.panel1.Controls.Add(this.ClearProfilePixel);
@@ -644,7 +654,7 @@
             // autoHDR
             // 
             this.autoHDR.AutoSize = true;
-            this.autoHDR.Location = new System.Drawing.Point(89, 159);
+            this.autoHDR.Location = new System.Drawing.Point(62, 316);
             this.autoHDR.Name = "autoHDR";
             this.autoHDR.Size = new System.Drawing.Size(83, 17);
             this.autoHDR.TabIndex = 23;
@@ -653,17 +663,17 @@
             // 
             // ClearProfilePixel
             // 
-            this.ClearProfilePixel.Location = new System.Drawing.Point(289, 287);
+            this.ClearProfilePixel.Location = new System.Drawing.Point(354, 157);
             this.ClearProfilePixel.Name = "ClearProfilePixel";
-            this.ClearProfilePixel.Size = new System.Drawing.Size(75, 23);
+            this.ClearProfilePixel.Size = new System.Drawing.Size(42, 23);
             this.ClearProfilePixel.TabIndex = 22;
-            this.ClearProfilePixel.Text = "ClearAllProfile";
+            this.ClearProfilePixel.Text = "Clear";
             this.ClearProfilePixel.UseVisualStyleBackColor = true;
             this.ClearProfilePixel.Click += new System.EventHandler(this.ClearProfilePixel_Click);
             // 
             // SaveProfilePixel
             // 
-            this.SaveProfilePixel.Location = new System.Drawing.Point(289, 258);
+            this.SaveProfilePixel.Location = new System.Drawing.Point(275, 156);
             this.SaveProfilePixel.Name = "SaveProfilePixel";
             this.SaveProfilePixel.Size = new System.Drawing.Size(75, 23);
             this.SaveProfilePixel.TabIndex = 21;
@@ -674,7 +684,7 @@
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(286, 207);
+            this.label28.Location = new System.Drawing.Point(272, 114);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(36, 13);
             this.label28.TabIndex = 20;
@@ -683,7 +693,7 @@
             // ProfilePixelValues
             // 
             this.ProfilePixelValues.FormattingEnabled = true;
-            this.ProfilePixelValues.Location = new System.Drawing.Point(289, 225);
+            this.ProfilePixelValues.Location = new System.Drawing.Point(275, 130);
             this.ProfilePixelValues.Name = "ProfilePixelValues";
             this.ProfilePixelValues.Size = new System.Drawing.Size(121, 21);
             this.ProfilePixelValues.TabIndex = 19;
@@ -691,7 +701,7 @@
             // 
             // SavePixelValues
             // 
-            this.SavePixelValues.Location = new System.Drawing.Point(97, 260);
+            this.SavePixelValues.Location = new System.Drawing.Point(176, 156);
             this.SavePixelValues.Name = "SavePixelValues";
             this.SavePixelValues.Size = new System.Drawing.Size(75, 23);
             this.SavePixelValues.TabIndex = 18;
@@ -703,7 +713,7 @@
             // 
             this.label27.AutoSize = true;
             this.label27.CausesValidation = false;
-            this.label27.Location = new System.Drawing.Point(154, 207);
+            this.label27.Location = new System.Drawing.Point(148, 114);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(87, 13);
             this.label27.TabIndex = 17;
@@ -713,7 +723,7 @@
             // 
             this.pixelValuesmin.AutoSize = true;
             this.pixelValuesmin.CausesValidation = false;
-            this.pixelValuesmin.Location = new System.Drawing.Point(20, 207);
+            this.pixelValuesmin.Location = new System.Drawing.Point(17, 114);
             this.pixelValuesmin.Name = "pixelValuesmin";
             this.pixelValuesmin.Size = new System.Drawing.Size(84, 13);
             this.pixelValuesmin.TabIndex = 16;
@@ -721,14 +731,14 @@
             // 
             // pixelvalues_max
             // 
-            this.pixelvalues_max.Location = new System.Drawing.Point(157, 226);
+            this.pixelvalues_max.Location = new System.Drawing.Point(151, 130);
             this.pixelvalues_max.Name = "pixelvalues_max";
             this.pixelvalues_max.Size = new System.Drawing.Size(100, 20);
             this.pixelvalues_max.TabIndex = 15;
             // 
             // pixelvalues_min
             // 
-            this.pixelvalues_min.Location = new System.Drawing.Point(20, 226);
+            this.pixelvalues_min.Location = new System.Drawing.Point(20, 130);
             this.pixelvalues_min.Name = "pixelvalues_min";
             this.pixelvalues_min.Size = new System.Drawing.Size(100, 20);
             this.pixelvalues_min.TabIndex = 14;
@@ -736,7 +746,7 @@
             // keoGrams
             // 
             this.keoGrams.AutoSize = true;
-            this.keoGrams.Location = new System.Drawing.Point(184, 159);
+            this.keoGrams.Location = new System.Drawing.Point(151, 316);
             this.keoGrams.Name = "keoGrams";
             this.keoGrams.Size = new System.Drawing.Size(73, 17);
             this.keoGrams.TabIndex = 13;
@@ -746,7 +756,7 @@
             // hdr_On
             // 
             this.hdr_On.AutoSize = true;
-            this.hdr_On.Location = new System.Drawing.Point(20, 159);
+            this.hdr_On.Location = new System.Drawing.Point(6, 316);
             this.hdr_On.Name = "hdr_On";
             this.hdr_On.Size = new System.Drawing.Size(50, 17);
             this.hdr_On.TabIndex = 12;
@@ -762,11 +772,11 @@
             // 
             // Clear_Profile
             // 
-            this.Clear_Profile.Location = new System.Drawing.Point(289, 104);
+            this.Clear_Profile.Location = new System.Drawing.Point(354, 79);
             this.Clear_Profile.Name = "Clear_Profile";
-            this.Clear_Profile.Size = new System.Drawing.Size(75, 23);
+            this.Clear_Profile.Size = new System.Drawing.Size(42, 23);
             this.Clear_Profile.TabIndex = 11;
-            this.Clear_Profile.Text = "ClearAllProfile";
+            this.Clear_Profile.Text = "Clear";
             this.Clear_Profile.UseVisualStyleBackColor = true;
             this.Clear_Profile.Click += new System.EventHandler(this.Clear_Profile_Click);
             // 
@@ -775,14 +785,14 @@
             this.label24.AutoSize = true;
             this.label24.Location = new System.Drawing.Point(17, 33);
             this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(83, 13);
+            this.label24.Size = new System.Drawing.Size(54, 13);
             this.label24.TabIndex = 4;
-            this.label24.Text = "cannyThreshold";
+            this.label24.Text = "Threshold";
             // 
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(286, 36);
+            this.label26.Location = new System.Drawing.Point(272, 30);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(36, 13);
             this.label26.TabIndex = 10;
@@ -790,7 +800,7 @@
             // 
             // Save_HoughCircles
             // 
-            this.Save_HoughCircles.Location = new System.Drawing.Point(97, 79);
+            this.Save_HoughCircles.Location = new System.Drawing.Point(175, 78);
             this.Save_HoughCircles.Name = "Save_HoughCircles";
             this.Save_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.Save_HoughCircles.TabIndex = 7;
@@ -801,7 +811,7 @@
             // HoughCircles_Profile
             // 
             this.HoughCircles_Profile.FormattingEnabled = true;
-            this.HoughCircles_Profile.Location = new System.Drawing.Point(289, 52);
+            this.HoughCircles_Profile.Location = new System.Drawing.Point(275, 49);
             this.HoughCircles_Profile.Name = "HoughCircles_Profile";
             this.HoughCircles_Profile.Size = new System.Drawing.Size(121, 21);
             this.HoughCircles_Profile.TabIndex = 9;
@@ -809,7 +819,7 @@
             // 
             // SaveProfile_HoughCircles
             // 
-            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(289, 78);
+            this.SaveProfile_HoughCircles.Location = new System.Drawing.Point(275, 79);
             this.SaveProfile_HoughCircles.Name = "SaveProfile_HoughCircles";
             this.SaveProfile_HoughCircles.Size = new System.Drawing.Size(75, 23);
             this.SaveProfile_HoughCircles.TabIndex = 8;
@@ -820,15 +830,15 @@
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(119, 30);
+            this.label25.Location = new System.Drawing.Point(148, 30);
             this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(138, 13);
+            this.label25.Size = new System.Drawing.Size(113, 13);
             this.label25.TabIndex = 5;
-            this.label25.Text = "circleAccumulatorThreshold";
+            this.label25.Text = "AccumulatorThreshold";
             // 
             // circleAccumulatorThreshold_Box
             // 
-            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(157, 53);
+            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(151, 52);
             this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
             this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(99, 20);
             this.circleAccumulatorThreshold_Box.TabIndex = 6;
@@ -1329,6 +1339,50 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
+            // hdrDetectionhigh
+            // 
+            this.hdrDetectionhigh.Location = new System.Drawing.Point(20, 207);
+            this.hdrDetectionhigh.Name = "hdrDetectionhigh";
+            this.hdrDetectionhigh.Size = new System.Drawing.Size(100, 20);
+            this.hdrDetectionhigh.TabIndex = 25;
+            // 
+            // hdrDetectionlow
+            // 
+            this.hdrDetectionlow.Location = new System.Drawing.Point(151, 207);
+            this.hdrDetectionlow.Name = "hdrDetectionlow";
+            this.hdrDetectionlow.Size = new System.Drawing.Size(100, 20);
+            this.hdrDetectionlow.TabIndex = 26;
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.CausesValidation = false;
+            this.label31.Location = new System.Drawing.Point(17, 191);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(88, 13);
+            this.label31.TabIndex = 27;
+            this.label31.Text = "hdrDetectionhigh";
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.CausesValidation = false;
+            this.label32.Location = new System.Drawing.Point(148, 191);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(84, 13);
+            this.label32.TabIndex = 28;
+            this.label32.Text = "hdrDetectionlow";
+            // 
+            // hdrDetection
+            // 
+            this.hdrDetection.Location = new System.Drawing.Point(175, 231);
+            this.hdrDetection.Name = "hdrDetection";
+            this.hdrDetection.Size = new System.Drawing.Size(75, 23);
+            this.hdrDetection.TabIndex = 29;
+            this.hdrDetection.Text = "Save";
+            this.hdrDetection.UseVisualStyleBackColor = true;
+            this.hdrDetection.Click += new System.EventHandler(this.hdrDetection_Click);
+            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1496,6 +1550,11 @@
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.CheckBox StopSave;
         private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.TextBox hdrDetectionhigh;
+        private System.Windows.Forms.TextBox hdrDetectionlow;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Button hdrDetection;
     }
 }
 

@@ -184,6 +184,8 @@ namespace AllSky_2020
             ProfilePixelValues.Text = "Select Your Profile";
             minLight_hdr = AppSetting.Data.minLight;
             maxLight_hdr = AppSetting.Data.maxLight;
+            hdrDetectionhigh.Text = AppSetting.Data.hdrDetectionhigh.ToString();
+            hdrDetectionlow.Text = AppSetting.Data.hdrDetectionlow.ToString();
             int HoughCircleslineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
             int PixellineCount = File.ReadLines(@"./Pixel_Profile.txt").Count();
             if (IsAutoExposureTime.CheckState == 0)
@@ -602,6 +604,13 @@ namespace AllSky_2020
         {
             File.WriteAllText(@"./Pixel_Profile.txt", String.Empty);
             HoughCircles_Profile.Items.Clear();
+        }
+
+        private void hdrDetection_Click(object sender, EventArgs e)
+        {
+            AppSetting.Data.hdrDetectionhigh = Int16.Parse(hdrDetectionhigh.Text);
+            AppSetting.Data.hdrDetectionlow = Int16.Parse(hdrDetectionlow.Text);
+
         }
 
         private void Save_HoughCircles_Click(object sender, EventArgs e)
@@ -1999,7 +2008,7 @@ namespace AllSky_2020
                                 Console.WriteLine("hdrDetectionlow =" + hdrDetectionlow);
                                 Console.WriteLine("hdrDetectionmedium =" + hdrDetectionmedium);
                                
-                                if (hdrDetectionhigh > 12000 && hdrDetectionlow > 300000)
+                                if (hdrDetectionhigh > AppSetting.Data.hdrDetectionhigh && hdrDetectionlow > AppSetting.Data.hdrDetectionlow)
                                 {
                                     hdrOn = true;
                                 }
@@ -2043,8 +2052,7 @@ namespace AllSky_2020
                                         }
 
                                     }
-                                    else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" 
-                                        && recover != false && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
+                                    else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false)
                                     {
                                         //AppSetting.Data.ExposureTime +
                                         bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
@@ -2052,7 +2060,8 @@ namespace AllSky_2020
                                         AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
                                         recover = false;
                                     }
-                                    else if (colorValue >= minLight_hdr-10 && colorValue <= maxLight_hdr+10 && doOne == false)
+                                    else if (colorValue >= minLight_hdr-10 && colorValue <= maxLight_hdr+10 && doOne == false
+                                        && AppSetting.Data.ExposureTime >= AppSetting.Data.MIN_SHUTTER)
                                     {
                                         ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                                         System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
@@ -2061,10 +2070,8 @@ namespace AllSky_2020
                                         myEncoderParameters.Param[0] = myEncoderParameter;
                                         float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
-                                        if(AppSetting.Data.ExposureTime >= 1)
-                                        {
-                                            if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight
-                                            || AppSetting.Data.ExposureTime >= 120000)
+                                        
+                                            if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight)
                                             {
                                                 doOne = true;
                                                 imageMerge_status = 1;
@@ -2075,13 +2082,9 @@ namespace AllSky_2020
                                                 hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
                                                 maxLight_hdr = AppSetting.Data.maxLight - 40;
                                                 minLight_hdr = AppSetting.Data.minLight - 40;
-                                                if (AppSetting.Data.ExposureTime >= 120000)
-                                                {
-                                                    AppSetting.Data.ExposureTime = 60000;
-                                                }
+                                               
                                             }
-                                            else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false
-                                                || AppSetting.Data.ExposureTime == 60000)
+                                            else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false)
                                             {
                                                 doOne = true;
                                                 imageMerge_status = 2;
@@ -2092,14 +2095,11 @@ namespace AllSky_2020
                                                 hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
                                                 maxLight_hdr = AppSetting.Data.maxLight + 50;
                                                 minLight_hdr = AppSetting.Data.minLight + 30;
-                                                if (AppSetting.Data.ExposureTime >= 120000)
-                                                {
-                                                    AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
-                                                }
+                                                
 
                                             }
                                             else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false
-                                                || AppSetting.Data.ExposureTime == AppSetting.Data.MAX_SHUTTER)
+                                               )
                                             {
                                                 doOne = true;
                                                 imageMerge_status = 3;
@@ -2110,7 +2110,7 @@ namespace AllSky_2020
                                                 maxLight_hdr = AppSetting.Data.maxLight;
                                                 minLight_hdr = AppSetting.Data.minLight;
                                             }
-                                        }
+                                        
 
                                         
                                         if (imageMerge_status == 3)
@@ -2165,7 +2165,7 @@ namespace AllSky_2020
                                             CvInvoke.PutText(ImagehdrMedium, "AUTO HDR", new Point(borderWidth - 300, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
                                             Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
 
-                                            if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0)
+                                            if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0 || AppSetting.Data.ExposureTime >= 60000)
                                             {
                                                 if(StopSave.Checked == false)
                                                 {
@@ -2173,7 +2173,7 @@ namespace AllSky_2020
                                                     ImagehdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder, myEncoderParameters);
                                                 }
 
-                                                if (hdrDetectionhigh <= 20000 && hdrDetectionlow <= 200000)
+                                                if (hdrDetectionhigh <= AppSetting.Data.hdrDetectionhigh && hdrDetectionlow <= AppSetting.Data.hdrDetectionlow)
                                                 {
                                                     hdrOn = false;
                                                 }
@@ -2294,7 +2294,7 @@ namespace AllSky_2020
                                     }
 
                                 }
-                                else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
+                                else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false)
                                 {
                                     //AppSetting.Data.ExposureTime +
                                     bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
@@ -2312,8 +2312,7 @@ namespace AllSky_2020
                                     myEncoderParameters.Param[0] = myEncoderParameter;
                                     float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
                                     Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
-                                    if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight
-                                             || (AppSetting.Data.ExposureTime >= 120000 && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER))
+                                    if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight)
                                     {
                                         doOne = true;
                                         imageMerge_status = 1;
@@ -2324,15 +2323,11 @@ namespace AllSky_2020
                                         hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
                                         maxLight_hdr = AppSetting.Data.maxLight - 40;
                                         minLight_hdr = AppSetting.Data.minLight - 40;
-                                        if (AppSetting.Data.ExposureTime >= 120000)
-                                        {
-                                            AppSetting.Data.ExposureTime = 60000;
-                                        }
+                                       
 
 
                                     }
-                                    else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false
-                                        || (AppSetting.Data.ExposureTime >= 60000 && AppSetting.Data.ExposureTime <= 120000))
+                                    else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false)
                                     {
                                         doOne = true;
                                         imageMerge_status = 2;
@@ -2343,14 +2338,10 @@ namespace AllSky_2020
                                         hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
                                         maxLight_hdr = AppSetting.Data.maxLight + 50;
                                         minLight_hdr = AppSetting.Data.minLight + 30;
-                                        if (AppSetting.Data.ExposureTime >= 120000)
-                                        {
-                                            AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
-                                        }
+                                        
                                         
                                     }
-                                    else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false
-                                        || AppSetting.Data.ExposureTime >= AppSetting.Data.MAX_SHUTTER)
+                                    else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false)
                                     {
                                         doOne = true;
                                         imageMerge_status = 3;
@@ -2426,7 +2417,7 @@ namespace AllSky_2020
                                         CvInvoke.PutText(ImagehdrMedium, "HDR ON", new Point(borderWidth - 200, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
                                         timeNow_Chack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                        if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0 && StopSave.Checked == false)
+                                        if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0 && StopSave.Checked == false || AppSetting.Data.ExposureTime >= 60000)
                                         {
                                             timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
                                             ImagehdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder,
@@ -2510,6 +2501,10 @@ namespace AllSky_2020
 
                             }
 
+                            if(AppSetting.Data.ExposureTime > 1000000)
+                            {
+                                AppSetting.Data.ExposureTime = 1000000;
+                            }
                             ExpouseTimeText.Value = (decimal)AppSetting.Data.ExposureTime;
 
                             keoGramsImage = new Rectangle(new Point(cameraWidth / 2, cameraHeight / 2), new Size(1, cameraHeight));

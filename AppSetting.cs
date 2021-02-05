@@ -33,6 +33,8 @@ namespace AllSky_2020
             public double ZoomScale { get; set; } = 1;
             public int maxLight { get; set; } = 125;
             public int minLight { get; set; } = 80;
+            public int hdrDetectionhigh { get; set; } = 12000;
+            public int hdrDetectionlow { get; set; } = 300000;
             public double MIN_ISO { get; set; } = 0.0;        //100
             public double MAX_ISO { get; set; } = 3200;        //3200
             public double MIN_SHUTTER { get; set; } = 0.0;    //0.25 sec
