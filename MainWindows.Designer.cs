@@ -69,6 +69,10 @@
             this.SetCameraId = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label34 = new System.Windows.Forms.Label();
+            this.label33 = new System.Windows.Forms.Label();
+            this.pixelValuesLowHDR = new System.Windows.Forms.TextBox();
+            this.pixelValuesHighHDR = new System.Windows.Forms.TextBox();
             this.hdrDetection = new System.Windows.Forms.Button();
             this.label32 = new System.Windows.Forms.Label();
             this.label31 = new System.Windows.Forms.Label();
@@ -146,10 +150,6 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.pixelValuesHighHDR = new System.Windows.Forms.TextBox();
-            this.pixelValuesLowHDR = new System.Windows.Forms.TextBox();
-            this.label33 = new System.Windows.Forms.Label();
-            this.label34 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -649,6 +649,40 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(432, 339);
             this.panel1.TabIndex = 12;
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.CausesValidation = false;
+            this.label34.Location = new System.Drawing.Point(148, 233);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(95, 13);
+            this.label34.TabIndex = 33;
+            this.label34.Text = "PixelDetectionhigh";
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.CausesValidation = false;
+            this.label33.Location = new System.Drawing.Point(17, 233);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(95, 13);
+            this.label33.TabIndex = 32;
+            this.label33.Text = "PixelDetectionhigh";
+            // 
+            // pixelValuesLowHDR
+            // 
+            this.pixelValuesLowHDR.Location = new System.Drawing.Point(151, 252);
+            this.pixelValuesLowHDR.Name = "pixelValuesLowHDR";
+            this.pixelValuesLowHDR.Size = new System.Drawing.Size(100, 20);
+            this.pixelValuesLowHDR.TabIndex = 31;
+            // 
+            // pixelValuesHighHDR
+            // 
+            this.pixelValuesHighHDR.Location = new System.Drawing.Point(20, 252);
+            this.pixelValuesHighHDR.Name = "pixelValuesHighHDR";
+            this.pixelValuesHighHDR.Size = new System.Drawing.Size(100, 20);
+            this.pixelValuesHighHDR.TabIndex = 30;
             // 
             // hdrDetection
             // 
@@ -1391,40 +1425,6 @@
             this.UITimer.Enabled = true;
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
-            // 
-            // pixelValuesHighHDR
-            // 
-            this.pixelValuesHighHDR.Location = new System.Drawing.Point(20, 252);
-            this.pixelValuesHighHDR.Name = "pixelValuesHighHDR";
-            this.pixelValuesHighHDR.Size = new System.Drawing.Size(100, 20);
-            this.pixelValuesHighHDR.TabIndex = 30;
-            // 
-            // pixelValuesLowHDR
-            // 
-            this.pixelValuesLowHDR.Location = new System.Drawing.Point(151, 252);
-            this.pixelValuesLowHDR.Name = "pixelValuesLowHDR";
-            this.pixelValuesLowHDR.Size = new System.Drawing.Size(100, 20);
-            this.pixelValuesLowHDR.TabIndex = 31;
-            // 
-            // label33
-            // 
-            this.label33.AutoSize = true;
-            this.label33.CausesValidation = false;
-            this.label33.Location = new System.Drawing.Point(17, 233);
-            this.label33.Name = "label33";
-            this.label33.Size = new System.Drawing.Size(95, 13);
-            this.label33.TabIndex = 32;
-            this.label33.Text = "PixelDetectionhigh";
-            // 
-            // label34
-            // 
-            this.label34.AutoSize = true;
-            this.label34.CausesValidation = false;
-            this.label34.Location = new System.Drawing.Point(148, 233);
-            this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(95, 13);
-            this.label34.TabIndex = 33;
-            this.label34.Text = "PixelDetectionhigh";
             // 
             // MainWindows
             // 
