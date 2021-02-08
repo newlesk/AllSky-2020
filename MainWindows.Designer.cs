@@ -69,6 +69,11 @@
             this.SetCameraId = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.hdrDetection = new System.Windows.Forms.Button();
+            this.label32 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.hdrDetectionlow = new System.Windows.Forms.TextBox();
+            this.hdrDetectionhigh = new System.Windows.Forms.TextBox();
             this.label29 = new System.Windows.Forms.Label();
             this.autoHDR = new System.Windows.Forms.CheckBox();
             this.ClearProfilePixel = new System.Windows.Forms.Button();
@@ -141,11 +146,10 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
-            this.hdrDetectionhigh = new System.Windows.Forms.TextBox();
-            this.hdrDetectionlow = new System.Windows.Forms.TextBox();
-            this.label31 = new System.Windows.Forms.Label();
-            this.label32 = new System.Windows.Forms.Label();
-            this.hdrDetection = new System.Windows.Forms.Button();
+            this.pixelValuesHighHDR = new System.Windows.Forms.TextBox();
+            this.pixelValuesLowHDR = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.label34 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -610,6 +614,10 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label34);
+            this.panel1.Controls.Add(this.label33);
+            this.panel1.Controls.Add(this.pixelValuesLowHDR);
+            this.panel1.Controls.Add(this.pixelValuesHighHDR);
             this.panel1.Controls.Add(this.hdrDetection);
             this.panel1.Controls.Add(this.label32);
             this.panel1.Controls.Add(this.label31);
@@ -642,6 +650,50 @@
             this.panel1.Size = new System.Drawing.Size(432, 339);
             this.panel1.TabIndex = 12;
             // 
+            // hdrDetection
+            // 
+            this.hdrDetection.Location = new System.Drawing.Point(175, 278);
+            this.hdrDetection.Name = "hdrDetection";
+            this.hdrDetection.Size = new System.Drawing.Size(75, 23);
+            this.hdrDetection.TabIndex = 29;
+            this.hdrDetection.Text = "Save";
+            this.hdrDetection.UseVisualStyleBackColor = true;
+            this.hdrDetection.Click += new System.EventHandler(this.hdrDetection_Click);
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.CausesValidation = false;
+            this.label32.Location = new System.Drawing.Point(148, 191);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(84, 13);
+            this.label32.TabIndex = 28;
+            this.label32.Text = "hdrDetectionlow";
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.CausesValidation = false;
+            this.label31.Location = new System.Drawing.Point(17, 191);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(88, 13);
+            this.label31.TabIndex = 27;
+            this.label31.Text = "hdrDetectionhigh";
+            // 
+            // hdrDetectionlow
+            // 
+            this.hdrDetectionlow.Location = new System.Drawing.Point(151, 207);
+            this.hdrDetectionlow.Name = "hdrDetectionlow";
+            this.hdrDetectionlow.Size = new System.Drawing.Size(100, 20);
+            this.hdrDetectionlow.TabIndex = 26;
+            // 
+            // hdrDetectionhigh
+            // 
+            this.hdrDetectionhigh.Location = new System.Drawing.Point(20, 207);
+            this.hdrDetectionhigh.Name = "hdrDetectionhigh";
+            this.hdrDetectionhigh.Size = new System.Drawing.Size(100, 20);
+            this.hdrDetectionhigh.TabIndex = 25;
+            // 
             // label29
             // 
             this.label29.AutoSize = true;
@@ -660,6 +712,7 @@
             this.autoHDR.TabIndex = 23;
             this.autoHDR.Text = "AUTO HDR";
             this.autoHDR.UseVisualStyleBackColor = true;
+            this.autoHDR.CheckedChanged += new System.EventHandler(this.autoHDR_CheckedChanged);
             // 
             // ClearProfilePixel
             // 
@@ -1339,49 +1392,39 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
-            // hdrDetectionhigh
+            // pixelValuesHighHDR
             // 
-            this.hdrDetectionhigh.Location = new System.Drawing.Point(20, 207);
-            this.hdrDetectionhigh.Name = "hdrDetectionhigh";
-            this.hdrDetectionhigh.Size = new System.Drawing.Size(100, 20);
-            this.hdrDetectionhigh.TabIndex = 25;
+            this.pixelValuesHighHDR.Location = new System.Drawing.Point(20, 252);
+            this.pixelValuesHighHDR.Name = "pixelValuesHighHDR";
+            this.pixelValuesHighHDR.Size = new System.Drawing.Size(100, 20);
+            this.pixelValuesHighHDR.TabIndex = 30;
             // 
-            // hdrDetectionlow
+            // pixelValuesLowHDR
             // 
-            this.hdrDetectionlow.Location = new System.Drawing.Point(151, 207);
-            this.hdrDetectionlow.Name = "hdrDetectionlow";
-            this.hdrDetectionlow.Size = new System.Drawing.Size(100, 20);
-            this.hdrDetectionlow.TabIndex = 26;
+            this.pixelValuesLowHDR.Location = new System.Drawing.Point(151, 252);
+            this.pixelValuesLowHDR.Name = "pixelValuesLowHDR";
+            this.pixelValuesLowHDR.Size = new System.Drawing.Size(100, 20);
+            this.pixelValuesLowHDR.TabIndex = 31;
             // 
-            // label31
+            // label33
             // 
-            this.label31.AutoSize = true;
-            this.label31.CausesValidation = false;
-            this.label31.Location = new System.Drawing.Point(17, 191);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(88, 13);
-            this.label31.TabIndex = 27;
-            this.label31.Text = "hdrDetectionhigh";
+            this.label33.AutoSize = true;
+            this.label33.CausesValidation = false;
+            this.label33.Location = new System.Drawing.Point(17, 233);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(95, 13);
+            this.label33.TabIndex = 32;
+            this.label33.Text = "PixelDetectionhigh";
             // 
-            // label32
+            // label34
             // 
-            this.label32.AutoSize = true;
-            this.label32.CausesValidation = false;
-            this.label32.Location = new System.Drawing.Point(148, 191);
-            this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(84, 13);
-            this.label32.TabIndex = 28;
-            this.label32.Text = "hdrDetectionlow";
-            // 
-            // hdrDetection
-            // 
-            this.hdrDetection.Location = new System.Drawing.Point(175, 231);
-            this.hdrDetection.Name = "hdrDetection";
-            this.hdrDetection.Size = new System.Drawing.Size(75, 23);
-            this.hdrDetection.TabIndex = 29;
-            this.hdrDetection.Text = "Save";
-            this.hdrDetection.UseVisualStyleBackColor = true;
-            this.hdrDetection.Click += new System.EventHandler(this.hdrDetection_Click);
+            this.label34.AutoSize = true;
+            this.label34.CausesValidation = false;
+            this.label34.Location = new System.Drawing.Point(148, 233);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(95, 13);
+            this.label34.TabIndex = 33;
+            this.label34.Text = "PixelDetectionhigh";
             // 
             // MainWindows
             // 
@@ -1555,6 +1598,10 @@
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Button hdrDetection;
+        private System.Windows.Forms.TextBox pixelValuesLowHDR;
+        private System.Windows.Forms.TextBox pixelValuesHighHDR;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.Label label33;
     }
 }
 

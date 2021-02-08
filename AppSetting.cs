@@ -35,6 +35,8 @@ namespace AllSky_2020
             public int minLight { get; set; } = 80;
             public int hdrDetectionhigh { get; set; } = 12000;
             public int hdrDetectionlow { get; set; } = 300000;
+            public int hdrPixelvalueshigh { get; set; } = 255;
+            public int hdrPixelvalueslow { get; set; } = 60;
             public double MIN_ISO { get; set; } = 0.0;        //100
             public double MAX_ISO { get; set; } = 3200;        //3200
             public double MIN_SHUTTER { get; set; } = 0.0;    //0.25 sec

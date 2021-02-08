@@ -22,6 +22,8 @@
   "minLight": 100,
   "hdrDetectionhigh": 12000,
   "hdrDetectionlow": 300000,
+  "hdrPixelvalueshigh": 255,
+  "hdrPixelvalueslow": 60,
   "MIN_ISO": 0.0,
   "MAX_ISO": 3200.0,
   "MIN_SHUTTER": 0.0,
