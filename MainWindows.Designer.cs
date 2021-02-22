@@ -76,8 +76,8 @@
             this.hdrDetection = new System.Windows.Forms.Button();
             this.label32 = new System.Windows.Forms.Label();
             this.label31 = new System.Windows.Forms.Label();
-            this.hdrDetectionlow = new System.Windows.Forms.TextBox();
-            this.hdrDetectionhigh = new System.Windows.Forms.TextBox();
+            this.HdrDetectionLow = new System.Windows.Forms.TextBox();
+            this.HdrDetectionHigh = new System.Windows.Forms.TextBox();
             this.label29 = new System.Windows.Forms.Label();
             this.autoHDR = new System.Windows.Forms.CheckBox();
             this.ClearProfilePixel = new System.Windows.Forms.Button();
@@ -91,7 +91,7 @@
             this.pixelvalues_min = new System.Windows.Forms.TextBox();
             this.keoGrams = new System.Windows.Forms.CheckBox();
             this.hdr_On = new System.Windows.Forms.CheckBox();
-            this.cannyThreshold_Box = new System.Windows.Forms.TextBox();
+            this.CannyThreshold_Box = new System.Windows.Forms.TextBox();
             this.Clear_Profile = new System.Windows.Forms.Button();
             this.label24 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
@@ -99,8 +99,17 @@
             this.HoughCircles_Profile = new System.Windows.Forms.ComboBox();
             this.SaveProfile_HoughCircles = new System.Windows.Forms.Button();
             this.label25 = new System.Windows.Forms.Label();
-            this.circleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
+            this.CircleAccumulatorThreshold_Box = new System.Windows.Forms.TextBox();
             this.HoughCircles = new Emgu.CV.UI.ImageBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.label38 = new System.Windows.Forms.Label();
+            this.label37 = new System.Windows.Forms.Label();
+            this.label36 = new System.Windows.Forms.Label();
+            this.HdrDetectionLowText = new System.Windows.Forms.TextBox();
+            this.HdrDetectionmediumText = new System.Windows.Forms.TextBox();
+            this.HdrDetectionHighText = new System.Windows.Forms.TextBox();
+            this.label35 = new System.Windows.Forms.Label();
+            this.pixelValuesText = new System.Windows.Forms.TextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.StopSave = new System.Windows.Forms.CheckBox();
             this.label30 = new System.Windows.Forms.Label();
@@ -109,6 +118,7 @@
             this.SavePath = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.AutoISO = new System.Windows.Forms.CheckBox();
             this.SpeedMode = new System.Windows.Forms.CheckBox();
             this.ShowFocusPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxAverage = new System.Windows.Forms.CheckBox();
@@ -172,6 +182,7 @@
             this.tabPage2.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).BeginInit();
+            this.tabPage4.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -257,6 +268,7 @@
             // 
             this.TabControl.Controls.Add(this.tabPage1);
             this.TabControl.Controls.Add(this.tabPage2);
+            this.TabControl.Controls.Add(this.tabPage4);
             this.TabControl.Controls.Add(this.tabPage3);
             this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TabControl.Location = new System.Drawing.Point(0, 0);
@@ -621,8 +633,8 @@
             this.panel1.Controls.Add(this.hdrDetection);
             this.panel1.Controls.Add(this.label32);
             this.panel1.Controls.Add(this.label31);
-            this.panel1.Controls.Add(this.hdrDetectionlow);
-            this.panel1.Controls.Add(this.hdrDetectionhigh);
+            this.panel1.Controls.Add(this.HdrDetectionLow);
+            this.panel1.Controls.Add(this.HdrDetectionHigh);
             this.panel1.Controls.Add(this.label29);
             this.panel1.Controls.Add(this.autoHDR);
             this.panel1.Controls.Add(this.ClearProfilePixel);
@@ -636,7 +648,7 @@
             this.panel1.Controls.Add(this.pixelvalues_min);
             this.panel1.Controls.Add(this.keoGrams);
             this.panel1.Controls.Add(this.hdr_On);
-            this.panel1.Controls.Add(this.cannyThreshold_Box);
+            this.panel1.Controls.Add(this.CannyThreshold_Box);
             this.panel1.Controls.Add(this.Clear_Profile);
             this.panel1.Controls.Add(this.label24);
             this.panel1.Controls.Add(this.label26);
@@ -644,7 +656,7 @@
             this.panel1.Controls.Add(this.HoughCircles_Profile);
             this.panel1.Controls.Add(this.SaveProfile_HoughCircles);
             this.panel1.Controls.Add(this.label25);
-            this.panel1.Controls.Add(this.circleAccumulatorThreshold_Box);
+            this.panel1.Controls.Add(this.CircleAccumulatorThreshold_Box);
             this.panel1.Location = new System.Drawing.Point(401, 6);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(432, 339);
@@ -700,9 +712,9 @@
             this.label32.CausesValidation = false;
             this.label32.Location = new System.Drawing.Point(148, 191);
             this.label32.Name = "label32";
-            this.label32.Size = new System.Drawing.Size(84, 13);
+            this.label32.Size = new System.Drawing.Size(90, 13);
             this.label32.TabIndex = 28;
-            this.label32.Text = "hdrDetectionlow";
+            this.label32.Text = "HdrDetectionLow";
             // 
             // label31
             // 
@@ -710,23 +722,23 @@
             this.label31.CausesValidation = false;
             this.label31.Location = new System.Drawing.Point(17, 191);
             this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(88, 13);
+            this.label31.Size = new System.Drawing.Size(92, 13);
             this.label31.TabIndex = 27;
-            this.label31.Text = "hdrDetectionhigh";
+            this.label31.Text = "HdrDetectionHigh";
             // 
-            // hdrDetectionlow
+            // HdrDetectionLow
             // 
-            this.hdrDetectionlow.Location = new System.Drawing.Point(151, 207);
-            this.hdrDetectionlow.Name = "hdrDetectionlow";
-            this.hdrDetectionlow.Size = new System.Drawing.Size(100, 20);
-            this.hdrDetectionlow.TabIndex = 26;
+            this.HdrDetectionLow.Location = new System.Drawing.Point(151, 207);
+            this.HdrDetectionLow.Name = "HdrDetectionLow";
+            this.HdrDetectionLow.Size = new System.Drawing.Size(100, 20);
+            this.HdrDetectionLow.TabIndex = 26;
             // 
-            // hdrDetectionhigh
+            // HdrDetectionHigh
             // 
-            this.hdrDetectionhigh.Location = new System.Drawing.Point(20, 207);
-            this.hdrDetectionhigh.Name = "hdrDetectionhigh";
-            this.hdrDetectionhigh.Size = new System.Drawing.Size(100, 20);
-            this.hdrDetectionhigh.TabIndex = 25;
+            this.HdrDetectionHigh.Location = new System.Drawing.Point(20, 207);
+            this.HdrDetectionHigh.Name = "HdrDetectionHigh";
+            this.HdrDetectionHigh.Size = new System.Drawing.Size(100, 20);
+            this.HdrDetectionHigh.TabIndex = 25;
             // 
             // label29
             // 
@@ -850,12 +862,12 @@
             this.hdr_On.Text = "HDR";
             this.hdr_On.UseVisualStyleBackColor = true;
             // 
-            // cannyThreshold_Box
+            // CannyThreshold_Box
             // 
-            this.cannyThreshold_Box.Location = new System.Drawing.Point(20, 53);
-            this.cannyThreshold_Box.Name = "cannyThreshold_Box";
-            this.cannyThreshold_Box.Size = new System.Drawing.Size(100, 20);
-            this.cannyThreshold_Box.TabIndex = 3;
+            this.CannyThreshold_Box.Location = new System.Drawing.Point(20, 53);
+            this.CannyThreshold_Box.Name = "CannyThreshold_Box";
+            this.CannyThreshold_Box.Size = new System.Drawing.Size(100, 20);
+            this.CannyThreshold_Box.TabIndex = 3;
             // 
             // Clear_Profile
             // 
@@ -923,12 +935,12 @@
             this.label25.TabIndex = 5;
             this.label25.Text = "AccumulatorThreshold";
             // 
-            // circleAccumulatorThreshold_Box
+            // CircleAccumulatorThreshold_Box
             // 
-            this.circleAccumulatorThreshold_Box.Location = new System.Drawing.Point(151, 52);
-            this.circleAccumulatorThreshold_Box.Name = "circleAccumulatorThreshold_Box";
-            this.circleAccumulatorThreshold_Box.Size = new System.Drawing.Size(99, 20);
-            this.circleAccumulatorThreshold_Box.TabIndex = 6;
+            this.CircleAccumulatorThreshold_Box.Location = new System.Drawing.Point(151, 52);
+            this.CircleAccumulatorThreshold_Box.Name = "CircleAccumulatorThreshold_Box";
+            this.CircleAccumulatorThreshold_Box.Size = new System.Drawing.Size(99, 20);
+            this.CircleAccumulatorThreshold_Box.TabIndex = 6;
             // 
             // HoughCircles
             // 
@@ -937,6 +949,89 @@
             this.HoughCircles.Size = new System.Drawing.Size(389, 338);
             this.HoughCircles.TabIndex = 2;
             this.HoughCircles.TabStop = false;
+            // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.label38);
+            this.tabPage4.Controls.Add(this.label37);
+            this.tabPage4.Controls.Add(this.label36);
+            this.tabPage4.Controls.Add(this.HdrDetectionLowText);
+            this.tabPage4.Controls.Add(this.HdrDetectionmediumText);
+            this.tabPage4.Controls.Add(this.HdrDetectionHighText);
+            this.tabPage4.Controls.Add(this.label35);
+            this.tabPage4.Controls.Add(this.pixelValuesText);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(840, 345);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Values";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(408, 16);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(90, 13);
+            this.label38.TabIndex = 7;
+            this.label38.Text = "HdrDetectionLow";
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(275, 16);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(106, 13);
+            this.label37.TabIndex = 6;
+            this.label37.Text = "HdrDetectionmedium";
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(142, 16);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(92, 13);
+            this.label36.TabIndex = 5;
+            this.label36.Text = "HdrDetectionHigh";
+            // 
+            // HdrDetectionLowText
+            // 
+            this.HdrDetectionLowText.Location = new System.Drawing.Point(411, 32);
+            this.HdrDetectionLowText.Name = "HdrDetectionLowText";
+            this.HdrDetectionLowText.Size = new System.Drawing.Size(100, 20);
+            this.HdrDetectionLowText.TabIndex = 4;
+            // 
+            // HdrDetectionmediumText
+            // 
+            this.HdrDetectionmediumText.Location = new System.Drawing.Point(278, 32);
+            this.HdrDetectionmediumText.Name = "HdrDetectionmediumText";
+            this.HdrDetectionmediumText.Size = new System.Drawing.Size(100, 20);
+            this.HdrDetectionmediumText.TabIndex = 3;
+            // 
+            // HdrDetectionHighText
+            // 
+            this.HdrDetectionHighText.Location = new System.Drawing.Point(145, 32);
+            this.HdrDetectionHighText.Name = "HdrDetectionHighText";
+            this.HdrDetectionHighText.Size = new System.Drawing.Size(100, 20);
+            this.HdrDetectionHighText.TabIndex = 2;
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(13, 16);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(61, 13);
+            this.label35.TabIndex = 1;
+            this.label35.Text = "PixelValues";
+            this.label35.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // pixelValuesText
+            // 
+            this.pixelValuesText.Location = new System.Drawing.Point(16, 32);
+            this.pixelValuesText.Name = "pixelValuesText";
+            this.pixelValuesText.Size = new System.Drawing.Size(100, 20);
+            this.pixelValuesText.TabIndex = 0;
             // 
             // tabPage3
             // 
@@ -1014,6 +1109,7 @@
             // 
             // panel5
             // 
+            this.panel5.Controls.Add(this.AutoISO);
             this.panel5.Controls.Add(this.SpeedMode);
             this.panel5.Controls.Add(this.ShowFocusPoint);
             this.panel5.Controls.Add(this.checkBoxAverage);
@@ -1029,10 +1125,20 @@
             this.panel5.Size = new System.Drawing.Size(395, 100);
             this.panel5.TabIndex = 14;
             // 
+            // AutoISO
+            // 
+            this.AutoISO.AutoSize = true;
+            this.AutoISO.Location = new System.Drawing.Point(186, 31);
+            this.AutoISO.Name = "AutoISO";
+            this.AutoISO.Size = new System.Drawing.Size(69, 17);
+            this.AutoISO.TabIndex = 14;
+            this.AutoISO.Text = "Auto ISO";
+            this.AutoISO.UseVisualStyleBackColor = true;
+            // 
             // SpeedMode
             // 
             this.SpeedMode.AutoSize = true;
-            this.SpeedMode.Location = new System.Drawing.Point(194, 31);
+            this.SpeedMode.Location = new System.Drawing.Point(257, 31);
             this.SpeedMode.Name = "SpeedMode";
             this.SpeedMode.Size = new System.Drawing.Size(84, 17);
             this.SpeedMode.TabIndex = 13;
@@ -1463,6 +1569,8 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.HoughCircles)).EndInit();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -1563,10 +1671,10 @@
         private System.Windows.Forms.ComboBox FocusPoint;
         private System.Windows.Forms.Label FocusPointLable;
         private System.Windows.Forms.CheckBox SpeedMode;
-        private System.Windows.Forms.TextBox cannyThreshold_Box;
+        private System.Windows.Forms.TextBox CannyThreshold_Box;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.TextBox circleAccumulatorThreshold_Box;
+        private System.Windows.Forms.TextBox CircleAccumulatorThreshold_Box;
         private System.Windows.Forms.Button Save_HoughCircles;
         private System.Windows.Forms.Button SaveProfile_HoughCircles;
         private System.Windows.Forms.Label label26;
@@ -1593,8 +1701,8 @@
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.CheckBox StopSave;
         private System.Windows.Forms.Label label30;
-        private System.Windows.Forms.TextBox hdrDetectionhigh;
-        private System.Windows.Forms.TextBox hdrDetectionlow;
+        private System.Windows.Forms.TextBox HdrDetectionHigh;
+        private System.Windows.Forms.TextBox HdrDetectionLow;
         private System.Windows.Forms.Label label32;
         private System.Windows.Forms.Label label31;
         private System.Windows.Forms.Button hdrDetection;
@@ -1602,6 +1710,16 @@
         private System.Windows.Forms.TextBox pixelValuesHighHDR;
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TextBox pixelValuesText;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.TextBox HdrDetectionHighText;
+        private System.Windows.Forms.TextBox HdrDetectionLowText;
+        private System.Windows.Forms.TextBox HdrDetectionmediumText;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.CheckBox AutoISO;
     }
 }
 

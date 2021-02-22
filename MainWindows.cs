@@ -35,46 +35,50 @@ namespace AllSky_2020
     {
         public CAMERASTSTATE _CAMERASTSTATE;
         public string SystemMessage = "Ready.";
-        private Image<Bgr, Byte> RootFrame = null, ProcessFrame = null, ROIFrame, circleImage = null, keoGramsFrame = null;
-        private Image<Gray, Byte> houghCircles_Frame = null, ProcessFrameGray = null;
+        private Image<Bgr, Byte> RootFrame = null, ProcessFrame = null, ROIFrame, CircleImage = null, KeoGramsFrame = null;
+        private Image<Gray, Byte> HoughCirclesFrame = null, ProcessFrameGray = null;
         private Rectangle ROIRec;
-        private Rectangle keoGramsImage;
-        private IntPtr imageBuf;
+        private Rectangle KeoGramsImage;
+        private IntPtr ImageBuf;
         private bool GetImageState = false;
         private bool IsDefineROI = false;
         private bool IsDefineOrigin = false;
         private int CameraId, ConnectedCameras;
         public string SaveFileDialog;
-        private int colorValue;
-        private double centroidX, centroidY;
+        private int ColorValue;
+        private double CentroidX, CentroidY;
         private ASI_CAMERA_INFO Info;
-        private Stopwatch exposureCounter;
-        private string folderName;
-        private string timeNow;
-        private string timeFolder;
-        private string timeBefore;
-        private string timeNow_Chack;
-        private int houghCircles_X, houghCircles_Y;
+        private Stopwatch ExposureCounter;
+        private string FolderName;
+        private string TimeNow;
+        private string TimeFolder;
+        private string TimeBefore;
+        private string TimeNowChack;
+        private int HoughCirclesX, HoughCirclesY;
         private bool IsExpSuccess;
-        private bool recover;
-        private double cannyThreshold;
-        private double circleAccumulatorThreshold;
-        private double goldenRatio = (1 + (Math.Sqrt(5)) / 2);
-        private int houghCirclesradius = 0;
-        private bool houghCircles_Status, cameraLost = false;
-        private int maxLight_hdr;
-        private int minLight_hdr;
-        private Image<Bgr, Byte> hdrHigh = null;
-        private Image<Bgr, Byte> hdrLow = null;
-        private Image<Bgr, Byte> hdrMedium = null;
-        private Image<Bgr, Byte> hdrOutput = null;
-        private Image<Gray, Byte> croppedImage = null;
-        private Image<Bgr, Byte> imageFrame = null;
-        private int maxLight;
-        private int minLight;
-        private bool hdrOn = false;
-        private int imageMerge_status;
-        int modeHDR = 0;
+        private bool Recover;
+        private double CannyThreshold;
+        private double CircleAccumulatorThreshold;
+        private double GoldenRatio = (1 + (Math.Sqrt(5)) / 2);
+        private int HoughCirclesRadius = 0;
+        private bool HoughCirclesStatus;
+        private int MaxLightHdr;
+        private int MinLightHdr;
+        private Image<Bgr, Byte> HdrHigh = null;
+        private Image<Bgr, Byte> HdrLow = null;
+        private Image<Bgr, Byte> HdrMedium = null;
+        private Image<Bgr, Byte> HdrOutput = null;
+        private Image<Gray, Byte> CroppedImage = null;
+        private Image<Bgr, Byte> ImageFrame = null;
+        private Image<Bgr, Byte> HdrHighUp = null;
+        private Image<Bgr, Byte> HdrHighUpper = null;
+        //private Image<Bgr, Byte> NonHdr = null;
+        private int MaxLight;
+        private int MinLight;
+        private bool HdrOn = false;
+        private int ImageMergeStatus;
+        private int ModeHDR = 0;
+        private double HDRHighExposure = 0;
 
 
         public MainWindows()
@@ -84,7 +88,7 @@ namespace AllSky_2020
 
         private void InitializeSystem()
         {
-            exposureCounter = new Stopwatch();
+            ExposureCounter = new Stopwatch();
             LoadSetting();
             InitializeCamera();
             CaptureImage();
@@ -137,7 +141,7 @@ namespace AllSky_2020
         }
         private void CameraConnection()
         {
-            recover = false;
+            Recover = false;
             Info = new ASI_CAMERA_INFO();
             ASI_ERROR_CODE CAMProError = ASICameraDll2.ASIGetCameraProperty(out Info, CameraId);
             ASICameraDll2.ASIOpenCamera(CameraId);
@@ -180,18 +184,20 @@ namespace AllSky_2020
             MIN_SHUTTERText.Text = string.Format("{0:0}", AppSetting.Data.MIN_SHUTTER);
             MAX_SHUTTERText.Text = string.Format("{0:0}", AppSetting.Data.MAX_SHUTTER);
             MIN_APERTUREText.Text = string.Format("{0:0}", AppSetting.Data.MIN_APERTURE);
-            pixelvalues_min.Text = AppSetting.Data.minLight.ToString();
-            pixelvalues_max.Text = AppSetting.Data.maxLight.ToString();
+            pixelvalues_min.Text = AppSetting.Data.MinLight.ToString();
+            pixelvalues_max.Text = AppSetting.Data.MaxLight.ToString();
             HoughCircles_Profile.Text = "Select Your Profile";
             ProfilePixelValues.Text = "Select Your Profile";
-            minLight_hdr = AppSetting.Data.minLight;
-            maxLight_hdr = AppSetting.Data.maxLight;
-            hdrDetectionhigh.Text = AppSetting.Data.hdrDetectionhigh.ToString();
-            hdrDetectionlow.Text = AppSetting.Data.hdrDetectionlow.ToString();
+            MinLightHdr = AppSetting.Data.MinLight;
+            MaxLightHdr = AppSetting.Data.MaxLight;
+            HdrDetectionHigh.Text = AppSetting.Data.HdrDetectionHigh.ToString();
+            HdrDetectionLow.Text = AppSetting.Data.HdrDetectionLow.ToString();
             int HoughCircleslineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
             int PixellineCount = File.ReadLines(@"./Pixel_Profile.txt").Count();
             pixelValuesHighHDR.Text = AppSetting.Data.hdrPixelvalueshigh.ToString();
             pixelValuesLowHDR.Text = AppSetting.Data.hdrPixelvalueslow.ToString();
+            AutoISO.Checked = true;
+
 
             if (IsAutoExposureTime.CheckState == 0)
             {
@@ -239,10 +245,7 @@ namespace AllSky_2020
             Task Capdatatain = Task.Run(async () =>
             {
             STARTPROCESS:
-                if (cameraLost == true)
-                {
 
-                }
 
                 if (ConnectedCameras > 0)
                 {
@@ -273,7 +276,7 @@ namespace AllSky_2020
                     if (IsExpIdel)
                     {
 
-                        exposureCounter.Restart();
+                        ExposureCounter.Restart();
                         ASICameraDll2.ASIStartExposure(CameraId, ASI_BOOL.ASI_FALSE);
                     }
                     else
@@ -306,27 +309,27 @@ namespace AllSky_2020
                     if (IsExpSuccess)
                     {
 
-                        exposureCounter.Stop();
+                        ExposureCounter.Stop();
 
-                        if (imageBuf != IntPtr.Zero)
+                        if (ImageBuf != IntPtr.Zero)
                         {
-                            Marshal.FreeCoTaskMem(imageBuf);
-                            imageBuf = IntPtr.Zero;
+                            Marshal.FreeCoTaskMem(ImageBuf);
+                            ImageBuf = IntPtr.Zero;
                         }
 
-                        imageBuf = Marshal.AllocCoTaskMem((int)AppSetting.Data.ImageSize);
-                        GetExpError = ASICameraDll2.ASIGetDataAfterExp(CameraId, imageBuf, (int)AppSetting.Data.ImageSize);
+                        ImageBuf = Marshal.AllocCoTaskMem((int)AppSetting.Data.ImageSize);
+                        GetExpError = ASICameraDll2.ASIGetDataAfterExp(CameraId, ImageBuf, (int)AppSetting.Data.ImageSize);
                         if (GetExpError == ASI_ERROR_CODE.ASI_SUCCESS)
                         {
 
-                            RootFrame = new Image<Bgr, byte>((int)AppSetting.Data.ImageWidth, (int)AppSetting.Data.ImageHeight, (int)AppSetting.Data.ImageWidth * 3, imageBuf);
+                            RootFrame = new Image<Bgr, byte>((int)AppSetting.Data.ImageWidth, (int)AppSetting.Data.ImageHeight, (int)AppSetting.Data.ImageWidth * 3, ImageBuf);
                             ProcessFrameGray = RootFrame.Convert<Gray, Byte>();
                             ProcessFrame = RootFrame.Copy();
-                            houghCircles_Frame = RootFrame.Convert<Gray, Byte>();
+                            HoughCirclesFrame = RootFrame.Convert<Gray, Byte>();
                             ROIFrame = RootFrame.Copy();
-                            keoGramsFrame = RootFrame.Copy();
-                            hdrOutput = RootFrame.Copy();
-                            recover = true;
+                            KeoGramsFrame = RootFrame.Copy();
+                            HdrOutput = RootFrame.Copy();
+                            Recover = true;
                         }
 
                     }
@@ -337,17 +340,17 @@ namespace AllSky_2020
                     }
                     GC.Collect();
 
-                    if (colorValue <= 135 && AppSetting.Data.ExposureTime < 1 && SpeedMode.CheckState == 0)
+                    if (ColorValue <= 135 && AppSetting.Data.ExposureTime < 1 && SpeedMode.CheckState == 0)
                     {
                         await Task.Delay(50000);
 
                     }
-                    else if (colorValue <= AppSetting.Data.maxLight && colorValue >= AppSetting.Data.minLight && AppSetting.Data.ExposureTime < 1000 && SpeedMode.CheckState == 0)
+                    else if (ColorValue <= AppSetting.Data.MaxLight && ColorValue >= AppSetting.Data.MinLight && AppSetting.Data.ExposureTime < 1000 && SpeedMode.CheckState == 0)
                     {
                         await Task.Delay(50000);
 
                     }
-                    else if (colorValue <= AppSetting.Data.maxLight && colorValue >= AppSetting.Data.minLight && AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 10000 && SpeedMode.CheckState == 0)
+                    else if (ColorValue <= AppSetting.Data.MaxLight && ColorValue >= AppSetting.Data.MinLight && AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 10000 && SpeedMode.CheckState == 0)
                     {
                         await Task.Delay(5000);
 
@@ -501,10 +504,10 @@ namespace AllSky_2020
             DialogResult result = folderBrowserDialog1.ShowDialog();
             if (result == DialogResult.OK)
             {
-                folderName = folderBrowserDialog1.SelectedPath;
+                FolderName = folderBrowserDialog1.SelectedPath;
             }
 
-            AppSetting.Data.SaveFileDialog = folderName;
+            AppSetting.Data.SaveFileDialog = FolderName;
             AppSetting.Save();
 
         }
@@ -536,7 +539,8 @@ namespace AllSky_2020
                 }
             }
             System.Diagnostics.Debug.WriteLine("CameraID = " + AppSetting.Data.CameraId);
-            Application.Restart();
+            //Application.Restart();
+            InitializeSystem();
         }
         private void ResetZoom_Click(object sender, EventArgs e)
         {
@@ -547,10 +551,10 @@ namespace AllSky_2020
 
         private void SavePixelValues_Click(object sender, EventArgs e)
         {
-            AppSetting.Data.maxLight = int.Parse(pixelvalues_max.Text);
-            AppSetting.Data.minLight = int.Parse(pixelvalues_min.Text);
-            maxLight_hdr = AppSetting.Data.maxLight;
-            minLight_hdr = AppSetting.Data.minLight;
+            AppSetting.Data.MaxLight = int.Parse(pixelvalues_max.Text);
+            AppSetting.Data.MinLight = int.Parse(pixelvalues_min.Text);
+            MaxLightHdr = AppSetting.Data.MaxLight;
+            MinLightHdr = AppSetting.Data.MinLight;
         }
         private void SaveProfilePixel_Click(object sender, EventArgs e)
         {
@@ -577,30 +581,30 @@ namespace AllSky_2020
                 {
 
 
-                    maxLight = int.Parse(lines[0]);
+                    MaxLight = int.Parse(lines[0]);
 
 
-                    minLight = int.Parse(lines[1]);
+                    MinLight = int.Parse(lines[1]);
                 }
 
                 else if (ProfilePixelValues.Text == "Profile " + i && ProfilePixelValues.Text != "Profile 0")
                 {
 
-                    maxLight = int.Parse(lines[i * 2]);
+                    MaxLight = int.Parse(lines[i * 2]);
 
 
-                    minLight = int.Parse(lines[i * 2 + 1]);
+                    MinLight = int.Parse(lines[i * 2 + 1]);
                 }
 
 
             }
 
-            pixelvalues_min.Text = minLight.ToString();
-            pixelvalues_max.Text = maxLight.ToString();
-            AppSetting.Data.maxLight = maxLight;
-            AppSetting.Data.minLight = minLight;
-            maxLight_hdr = AppSetting.Data.maxLight;
-            minLight_hdr = AppSetting.Data.minLight;
+            pixelvalues_min.Text = MinLight.ToString();
+            pixelvalues_max.Text = MaxLight.ToString();
+            AppSetting.Data.MaxLight = MaxLight;
+            AppSetting.Data.MinLight = MinLight;
+            MaxLightHdr = AppSetting.Data.MaxLight;
+            MinLightHdr = AppSetting.Data.MinLight;
         }
 
         private void MainImageControl_Click(object sender, EventArgs e)
@@ -621,8 +625,8 @@ namespace AllSky_2020
 
         private void hdrDetection_Click(object sender, EventArgs e)
         {
-            AppSetting.Data.hdrDetectionhigh = Int32.Parse(hdrDetectionhigh.Text);
-            AppSetting.Data.hdrDetectionlow = Int32.Parse(hdrDetectionlow.Text);
+            AppSetting.Data.HdrDetectionHigh = Int32.Parse(HdrDetectionHigh.Text);
+            AppSetting.Data.HdrDetectionLow = Int32.Parse(HdrDetectionLow.Text);
             AppSetting.Data.hdrPixelvalueshigh = Int32.Parse(pixelValuesHighHDR.Text);
             AppSetting.Data.hdrPixelvalueslow = Int32.Parse(pixelValuesLowHDR.Text);
 
@@ -631,23 +635,24 @@ namespace AllSky_2020
 
         private void autoHDR_CheckedChanged(object sender, EventArgs e)
         {
-            imageMerge_status = 0;
+            ImageMergeStatus = 0;
+            ModeHDR = 0;
         }
 
         private void autoHDR_CheckedChanged_1(object sender, EventArgs e)
         {
-            imageMerge_status = 0;
+            ImageMergeStatus = 0;
         }
 
         private void Save_HoughCircles_Click(object sender, EventArgs e)
         {
-            houghCircles_Status = true;
-            int cameraWidth = Int16.Parse(ROITextWidth.Text);
-            int cameraHeight = Int16.Parse(ROITextHeight.Text);
+            HoughCirclesStatus = true;
+            int CameraWidth = Int16.Parse(ROITextWidth.Text);
+            int CameraHeight = Int16.Parse(ROITextHeight.Text);
             StringBuilder msgBuilder = new StringBuilder("Performance: ");
 
             //Load the image from file and resize it for display
-            Image<Bgr, Byte> img = ROIFrame.Resize(cameraWidth / 10, cameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
+            Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
 
             //Convert the image to grayscale and filter out the noise
             UMat uimage = new UMat();
@@ -663,39 +668,39 @@ namespace AllSky_2020
             #region circle detection
             Stopwatch watch = Stopwatch.StartNew();
 
-            cannyThreshold = double.Parse(cannyThreshold_Box.Text);
-            circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
+            CannyThreshold = double.Parse(CannyThreshold_Box.Text);
+            CircleAccumulatorThreshold = double.Parse(CircleAccumulatorThreshold_Box.Text);
 
-            //double circleAccumulatorThreshold = 120;
+            //double CircleAccumulatorThreshold = 120;
 
-            circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
-            //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, cannyThreshold, circleAccumulatorThreshold, 5);
-            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
+            CircleAccumulatorThreshold_Box.Text = CircleAccumulatorThreshold.ToString();
+            //CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 2.0, 20.0, CannyThreshold, CircleAccumulatorThreshold, 5);
+            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, CannyThreshold, CircleAccumulatorThreshold, 5);
             System.Diagnostics.Debug.WriteLine(circles);
             watch.Stop();
             msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
             #endregion
 
             #region draw circles
-            circleImage = img;
+            CircleImage = img;
             foreach (CircleF circle in circles)
             {
-                circleImage.Draw(circle, new Bgr(Color.Red), 2);
-                houghCircles_X = (int)circle.Center.X;
-                houghCircles_Y = (int)circle.Center.Y;
-                houghCirclesradius = (int)circle.Radius;
+                CircleImage.Draw(circle, new Bgr(Color.Red), 2);
+                HoughCirclesX = (int)circle.Center.X;
+                HoughCirclesY = (int)circle.Center.Y;
+                HoughCirclesRadius = (int)circle.Radius;
 
             }
 
-            HoughCircles.Image = circleImage;
+            HoughCircles.Image = CircleImage;
             #endregion
             //IsAutoExposureTime.Checked = true;
-            houghCircles_Status = false;
+            HoughCirclesStatus = false;
         }
 
         private void SaveProfile_HoughCircles_Click(object sender, EventArgs e)
         {
-            File.AppendAllText(@"./HoughCircles_Profile.txt", cannyThreshold_Box.Text + "\n" + circleAccumulatorThreshold_Box.Text + "\n");
+            File.AppendAllText(@"./HoughCircles_Profile.txt", CannyThreshold_Box.Text + "\n" + CircleAccumulatorThreshold_Box.Text + "\n");
             int lineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
             HoughCircles_Profile.Items.Clear();
             for (int i = 0; i < (lineCount / 2); i++)
@@ -709,7 +714,7 @@ namespace AllSky_2020
 
         private void HoughCircles_Profile_SelectedIndexChanged(object sender, EventArgs e)
         {
-            houghCircles_Status = true;
+            HoughCirclesStatus = true;
             int lineCount = File.ReadLines(@"./HoughCircles_Profile.txt").Count();
             string[] lines = File.ReadAllLines(@"./HoughCircles_Profile.txt", Encoding.UTF8);
 
@@ -719,31 +724,31 @@ namespace AllSky_2020
                 if (HoughCircles_Profile.Text == "Profile 0")
                 {
 
-                    cannyThreshold_Box.Text = lines[0];
+                    CannyThreshold_Box.Text = lines[0];
 
 
-                    circleAccumulatorThreshold_Box.Text = lines[1];
+                    CircleAccumulatorThreshold_Box.Text = lines[1];
 
                 }
 
                 else if (HoughCircles_Profile.Text == "Profile " + i && HoughCircles_Profile.Text != "Profile 0")
                 {
-                    cannyThreshold_Box.Text = lines[i * 2];
+                    CannyThreshold_Box.Text = lines[i * 2];
 
 
-                    circleAccumulatorThreshold_Box.Text = lines[i * 2 + 1];
+                    CircleAccumulatorThreshold_Box.Text = lines[i * 2 + 1];
                 }
 
 
             }
 
-            int cameraWidth = Int16.Parse(ROITextWidth.Text);
-            int cameraHeight = Int16.Parse(ROITextHeight.Text);
+            int CameraWidth = Int16.Parse(ROITextWidth.Text);
+            int CameraHeight = Int16.Parse(ROITextHeight.Text);
 
             StringBuilder msgBuilder = new StringBuilder("Performance: ");
 
             //Load the image from file and resize it for display
-            Image<Bgr, Byte> img = ROIFrame.Resize(cameraWidth / 10, cameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
+            Image<Bgr, Byte> img = ROIFrame.Resize(CameraWidth / 10, CameraHeight / 10, Emgu.CV.CvEnum.Inter.Linear, true);
 
             //Convert the image to grayscale and filter out the noise
             UMat uimage = new UMat();
@@ -759,32 +764,32 @@ namespace AllSky_2020
             #region circle detection
             Stopwatch watch = Stopwatch.StartNew();
 
-            cannyThreshold = double.Parse(cannyThreshold_Box.Text);
-            circleAccumulatorThreshold = double.Parse(circleAccumulatorThreshold_Box.Text);
-            circleAccumulatorThreshold_Box.Text = circleAccumulatorThreshold.ToString();
-            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, cannyThreshold, circleAccumulatorThreshold, 5);
+            CannyThreshold = double.Parse(CannyThreshold_Box.Text);
+            CircleAccumulatorThreshold = double.Parse(CircleAccumulatorThreshold_Box.Text);
+            CircleAccumulatorThreshold_Box.Text = CircleAccumulatorThreshold.ToString();
+            CircleF[] circles = CvInvoke.HoughCircles(uimage, HoughType.Gradient, 1.5, 27.0, CannyThreshold, CircleAccumulatorThreshold, 5);
             System.Diagnostics.Debug.WriteLine(circles);
             watch.Stop();
             msgBuilder.Append(String.Format("Hough circles - {0} ms; ", watch.ElapsedMilliseconds));
             #endregion
 
             #region draw circles
-            circleImage = img;
+            CircleImage = img;
             foreach (CircleF circle in circles)
             {
-                circleImage.Draw(circle, new Bgr(Color.Red), 2);
-                houghCircles_X = (int)circle.Center.X;
-                houghCircles_Y = (int)circle.Center.Y;
-                houghCirclesradius = (int)circle.Radius;
+                CircleImage.Draw(circle, new Bgr(Color.Red), 2);
+                HoughCirclesX = (int)circle.Center.X;
+                HoughCirclesY = (int)circle.Center.Y;
+                HoughCirclesRadius = (int)circle.Radius;
 
 
 
 
             }
 
-            HoughCircles.Image = circleImage;
+            HoughCircles.Image = CircleImage;
             #endregion
-            houghCircles_Status = false;
+            HoughCirclesStatus = false;
         }
 
         private void Clear_Profile_Click(object sender, EventArgs e)
@@ -794,633 +799,664 @@ namespace AllSky_2020
         }
 
 
-        public void Exposure_Adjust()
+        public void ExposureAdjust()
         {
             if (CameraStateText.Text != "ASI_EXP_WORKING"
-                && recover != false
-                && colorValue >= minLight
+                && Recover != false
+                && ColorValue >= MinLight
                 && AppSetting.Data.ExposureTime < 240000
                 && AppSetting.Data.ExposureTime > 1)
             {
-                if (AppSetting.Data.ExposureTime == 240000 && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false)
+                if (AppSetting.Data.ExposureTime == 240000 && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 120000;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime >= 120000 && AppSetting.Data.ExposureTime < 240000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 120000 && AppSetting.Data.ExposureTime < 240000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 60000;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime >= 60000 && AppSetting.Data.ExposureTime < 120000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 60000 && AppSetting.Data.ExposureTime < 120000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 30000;
-                    recover = false;
+                    Recover = false;
                 }
 
-                else if (AppSetting.Data.ExposureTime >= 30000 && AppSetting.Data.ExposureTime < 60000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 30000 && AppSetting.Data.ExposureTime < 60000 && Recover != false)
                 {
+
                     AppSetting.Data.ExposureTime = 15000;
-                    recover = false;
+
+                    Recover = false;
                 }
 
-                else if (AppSetting.Data.ExposureTime >= 15000 && AppSetting.Data.ExposureTime < 30000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 15000 && AppSetting.Data.ExposureTime < 30000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 8000;
-                    recover = false;
+                    if (AppSetting.Data.MIN_ISO >= 100)
+                    {
+                        AppSetting.Data.MIN_ISO = 50;
+                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                    }
+                    Recover = false;
                 }
 
-                else if (AppSetting.Data.ExposureTime >= 8000 && AppSetting.Data.ExposureTime < 15000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 8000 && AppSetting.Data.ExposureTime < 15000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 4000;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 4000 && AppSetting.Data.ExposureTime < 8000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 4000 && AppSetting.Data.ExposureTime < 8000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 2000;
-                    recover = false;
+
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 2000 && AppSetting.Data.ExposureTime < 4000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 2000 && AppSetting.Data.ExposureTime < 4000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 1000;
-                    recover = false;
+                    if (AppSetting.Data.MIN_ISO >= 50)
+                    {
+                        AppSetting.Data.MIN_ISO = 0;
+                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                    }
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 2000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 1000 && AppSetting.Data.ExposureTime < 2000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 500;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 500 && AppSetting.Data.ExposureTime < 1000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 250;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 250 && AppSetting.Data.ExposureTime < 500 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 125;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 125 && AppSetting.Data.ExposureTime < 250 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 66;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 66 && AppSetting.Data.ExposureTime < 125 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 33;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 66 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 33 && AppSetting.Data.ExposureTime < 66 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 16;
-                    recover = false;
+                    Recover = false;
                 }
 
-                else if (AppSetting.Data.ExposureTime >= 16 && AppSetting.Data.ExposureTime < 33 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 16 && AppSetting.Data.ExposureTime < 33 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 8;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime >= 8 && AppSetting.Data.ExposureTime < 16 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 8 && AppSetting.Data.ExposureTime < 16 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 4;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime >= 4 && AppSetting.Data.ExposureTime < 8 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 4 && AppSetting.Data.ExposureTime < 8 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 2;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime >= 2 && AppSetting.Data.ExposureTime < 4 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 2 && AppSetting.Data.ExposureTime < 4 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 1;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < 2 && recover != false)
+                else if (AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < 2 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 0.5;
-                    recover = false;
+                    Recover = false;
                 }
 
             }
 
             else if (CameraStateText.Text != "ASI_EXP_WORKING"
-                && recover != false
-                && colorValue <= minLight
+                && Recover != false
+                && ColorValue <= MinLight
                 && AppSetting.Data.ExposureTime > 1
                 && AppSetting.Data.ExposureTime < 240000)
             {
 
-                if (AppSetting.Data.ExposureTime == 120000 && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false)
+                if (AppSetting.Data.ExposureTime == 120000 && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 240000;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 60000 && AppSetting.Data.ExposureTime > 30000 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 60000 && AppSetting.Data.ExposureTime > 30000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 120000;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 30000 && AppSetting.Data.ExposureTime > 15000 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 30000 && AppSetting.Data.ExposureTime > 15000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 60000;
-                    recover = false;
+
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 15000 && AppSetting.Data.ExposureTime > 8000 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 15000 && AppSetting.Data.ExposureTime > 8000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 30000;
-                    recover = false;
-                }
-                else if (AppSetting.Data.ExposureTime <= 8000 && AppSetting.Data.ExposureTime > 4000 && recover != false)
-                {
-                    AppSetting.Data.ExposureTime = 15000;
-                    if (colorValue <= 50)
+                    if (ColorValue <= 30)
                     {
                         AppSetting.Data.ExposureTime = 120000;
                     }
-                    recover = false;
+                    Recover = false;
+                }
+                else if (AppSetting.Data.ExposureTime <= 8000 && AppSetting.Data.ExposureTime > 4000 && Recover != false)
+                {
+                    AppSetting.Data.ExposureTime = 15000;
+                    if (AppSetting.Data.MIN_ISO < 100)
+                    {
+                        AppSetting.Data.MIN_ISO = 100;
+                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                    }
+
+                    Recover = false;
                 }
 
-                else if (AppSetting.Data.ExposureTime <= 4000 && AppSetting.Data.ExposureTime > 2000 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 4000 && AppSetting.Data.ExposureTime > 2000 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 8000;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 2000 && AppSetting.Data.ExposureTime > 1000 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 2000 && AppSetting.Data.ExposureTime > 1000 && Recover != false)
                 {
+
                     AppSetting.Data.ExposureTime = 4000;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 1000 && AppSetting.Data.ExposureTime > 500 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 1000 && AppSetting.Data.ExposureTime > 500 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 2000;
-                    if (colorValue <= 40)
+                    if (AppSetting.Data.MIN_ISO < 50)
                     {
-                        AppSetting.Data.ExposureTime = 8000;
+                        AppSetting.Data.MIN_ISO = 50;
+                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
                     }
-                    recover = false;
+
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 500 && AppSetting.Data.ExposureTime > 250 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 500 && AppSetting.Data.ExposureTime > 250 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 1000;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 250 && AppSetting.Data.ExposureTime > 125 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 250 && AppSetting.Data.ExposureTime > 125 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 500;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 125 && AppSetting.Data.ExposureTime > 66 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 125 && AppSetting.Data.ExposureTime > 66 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 250;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 66 && AppSetting.Data.ExposureTime > 33 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 66 && AppSetting.Data.ExposureTime > 33 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 125;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime > 16 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 33 && AppSetting.Data.ExposureTime > 16 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 66;
-                    recover = false;
+                    Recover = false;
                 }
 
 
-                else if (AppSetting.Data.ExposureTime <= 16 && AppSetting.Data.ExposureTime > 8 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 16 && AppSetting.Data.ExposureTime > 8 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 33;
-                    recover = false;
+                    Recover = false;
                 }
 
-                else if (AppSetting.Data.ExposureTime <= 8 && AppSetting.Data.ExposureTime > 4 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 8 && AppSetting.Data.ExposureTime > 4 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 16;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 4 && AppSetting.Data.ExposureTime > 2 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 4 && AppSetting.Data.ExposureTime > 2 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 8;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 2 && AppSetting.Data.ExposureTime > 1 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 2 && AppSetting.Data.ExposureTime > 1 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 4;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 1 && AppSetting.Data.ExposureTime > 0.5 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 1 && AppSetting.Data.ExposureTime > 0.5 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 2;
-                    recover = false;
+                    Recover = false;
                 }
-                else if (AppSetting.Data.ExposureTime <= 0.5 && recover != false)
+                else if (AppSetting.Data.ExposureTime <= 0.5 && Recover != false)
                 {
                     AppSetting.Data.ExposureTime = 1;
-                    recover = false;
+                    Recover = false;
                 }
             }
         }
 
         public void Focus_Point()
         {
-            Bitmap bmpImage_Frame = imageFrame.ToBitmap();
-            int cameraWidth;
-            int cameraHeight;
-            int thickness = 5;
+            Bitmap BmpImageFrame = ImageFrame.ToBitmap();
+            int CameraWidth;
+            int CameraHeight;
+            int Thickness = 5;
             //When open houghCircles Change focus
-            if (houghCircles_X > 0 && houghCircles_Y > 0)
+            if (HoughCirclesX > 0 && HoughCirclesY > 0)
             {
-                cameraWidth = (houghCircles_X * 10) * 2;
-                cameraHeight = (houghCircles_Y * 10) * 2;
+                CameraWidth = (HoughCirclesX * 10) * 2;
+                CameraHeight = (HoughCirclesY * 10) * 2;
             }
             else
             {
-                cameraWidth = Int16.Parse(ROITextWidth.Text);
-                cameraHeight = Int16.Parse(ROITextHeight.Text);
+                CameraWidth = Int16.Parse(ROITextWidth.Text);
+                CameraHeight = Int16.Parse(ROITextHeight.Text);
             }
 
-            if (FocusPoint.Text == "21 Focus Points" && houghCircles_Status == false)
+            if (FocusPoint.Text == "21 Focus Points" && HoughCirclesStatus == false)
             {
                 checkBoxCenter.Checked = false;
                 checkBoxAverage.Checked = true;
                 //=======================================Center Line======================================== 
-                centroidX = (int)(cameraWidth / 2);
-                centroidY = (int)(cameraHeight / 2);
+                CentroidX = (int)(CameraWidth / 2);
+                CentroidY = (int)(CameraHeight / 2);
                 //left 
-                double centroidXleft = (int)(cameraWidth / 2.5);
-                double centroidYleft = (int)(cameraHeight / 2);
+                double CentroidXleft = (int)(CameraWidth / 2.5);
+                double CentroidYleft = (int)(CameraHeight / 2);
                 //left 
-                double centroidXleftmore = (int)(cameraWidth / 3.2);
-                double centroidYleftmore = (int)(cameraHeight / 2);
+                double CentroidXleftmore = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore = (int)(CameraHeight / 2);
                 //right
-                double centroidXright = (int)(cameraWidth / 1.7);
-                double centroidYright = (int)(cameraHeight / 2);
+                double CentroidXright = (int)(CameraWidth / 1.7);
+                double CentroidYright = (int)(CameraHeight / 2);
                 //right
-                double centroidXrightmore = (int)(cameraWidth / 1.5);
-                double centroidYrightmore = (int)(cameraHeight / 2);
+                double CentroidXrightmore = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore = (int)(CameraHeight / 2);
                 //=========================================UP Line======================================
-                double centroidX_UP = (int)(cameraWidth / 2);
-                double centroidY_UP = (int)(cameraHeight / 3);
+                double CentroidX_UP = (int)(CameraWidth / 2);
+                double CentroidY_UP = (int)(CameraHeight / 3);
                 //left 
-                double centroidXleft_UP = (int)(cameraWidth / 2.5);
-                double centroidYleft_UP = (int)(cameraHeight / 3);
+                double CentroidXleft_UP = (int)(CameraWidth / 2.5);
+                double CentroidYleft_UP = (int)(CameraHeight / 3);
                 //left 
-                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
-                double centroidYleftmore_UP = (int)(cameraHeight / 3);
+                double CentroidXleftmore_UP = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore_UP = (int)(CameraHeight / 3);
                 //right
-                double centroidXright_UP = (int)(cameraWidth / 1.7);
-                double centroidYright_UP = (int)(cameraHeight / 3);
+                double CentroidXright_UP = (int)(CameraWidth / 1.7);
+                double CentroidYright_UP = (int)(CameraHeight / 3);
                 //right
-                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
-                double centroidYrightmore_UP = (int)(cameraHeight / 3);
+                double CentroidXrightmore_UP = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore_UP = (int)(CameraHeight / 3);
                 //=======================================DOWN Line========================================
-                double centroidX_DOWN = (int)(cameraWidth / 2);
-                double centroidY_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidX_DOWN = (int)(CameraWidth / 2);
+                double CentroidY_DOWN = (int)(CameraHeight / 1.5);
                 //left 
-                double centroidXleft_DOWN = (int)(cameraWidth / 2.5);
-                double centroidYleft_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXleft_DOWN = (int)(CameraWidth / 2.5);
+                double CentroidYleft_DOWN = (int)(CameraHeight / 1.5);
                 //left 
-                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
-                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXleftmore_DOWN = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore_DOWN = (int)(CameraHeight / 1.5);
                 //right
-                double centroidXright_DOWN = (int)(cameraWidth / 1.7);
-                double centroidYright_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXright_DOWN = (int)(CameraWidth / 1.7);
+                double CentroidYright_DOWN = (int)(CameraHeight / 1.5);
                 //right
-                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
-                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXrightmore_DOWN = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore_DOWN = (int)(CameraHeight / 1.5);
                 //=========================================UP 3 DOT======================================
-                double centroidX_UP2 = (int)(cameraWidth / 2);
-                double centroidY_UP2 = (int)(cameraHeight / 6);
+                double CentroidX_UP2 = (int)(CameraWidth / 2);
+                double CentroidY_UP2 = (int)(CameraHeight / 6);
                 //right
-                double centroidXright_UP2 = (int)(cameraWidth / 1.7);
-                double centroidYright_UP2 = (int)(cameraHeight / 6);
+                double CentroidXright_UP2 = (int)(CameraWidth / 1.7);
+                double CentroidYright_UP2 = (int)(CameraHeight / 6);
                 //left 
-                double centroidXleft_UP2 = (int)(cameraWidth / 2.5);
-                double centroidYleft_UP2 = (int)(cameraHeight / 6);
+                double CentroidXleft_UP2 = (int)(CameraWidth / 2.5);
+                double CentroidYleft_UP2 = (int)(CameraHeight / 6);
                 //=======================================DOWN 3 DOT========================================
-                double centroidX_DOWN2 = (int)(cameraWidth / 2);
-                double centroidY_DOWN2 = (int)(cameraHeight / 1.2);
+                double CentroidX_DOWN2 = (int)(CameraWidth / 2);
+                double CentroidY_DOWN2 = (int)(CameraHeight / 1.2);
                 //right
-                double centroidXright_DOWN2 = (int)(cameraWidth / 1.7);
-                double centroidYright_DOWN2 = (int)(cameraHeight / 1.2);
+                double CentroidXright_DOWN2 = (int)(CameraWidth / 1.7);
+                double CentroidYright_DOWN2 = (int)(CameraHeight / 1.2);
                 //left 
-                double centroidXleft_DOWN2 = (int)(cameraWidth / 2.5);
-                double centroidYleft_DOWN2 = (int)(cameraHeight / 1.2);
+                double CentroidXleft_DOWN2 = (int)(CameraWidth / 2.5);
+                double CentroidYleft_DOWN2 = (int)(CameraHeight / 1.2);
 
                 if (ShowFocusPoint.CheckState != 0)
                 {
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft.ToString()), Int32.Parse(CentroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore.ToString()), Int32.Parse(CentroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright.ToString()), Int32.Parse(CentroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore.ToString()), Int32.Parse(CentroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=========================================UP======================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_UP.ToString()), Int32.Parse(CentroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft_UP.ToString()), Int32.Parse(CentroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore_UP.ToString()), Int32.Parse(CentroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_UP.ToString()), Int32.Parse(CentroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_UP.ToString()), Int32.Parse(CentroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=======================================DOWN========================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_DOWN.ToString()), Int32.Parse(CentroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft_DOWN.ToString()), Int32.Parse(CentroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore_DOWN.ToString()), Int32.Parse(CentroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_DOWN.ToString()), Int32.Parse(CentroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_DOWN.ToString()), Int32.Parse(CentroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=========================================UP 3 DOT======================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP2.ToString()), Int32.Parse(centroidY_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_UP2.ToString()), Int32.Parse(CentroidY_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP2.ToString()), Int32.Parse(centroidYright_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP2.ToString()), Int32.Parse(centroidYleft_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_UP2.ToString()), Int32.Parse(CentroidYright_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft_UP2.ToString()), Int32.Parse(CentroidYleft_UP2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=======================================DOWN 3 DOT========================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN2.ToString()), Int32.Parse(centroidY_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN2.ToString()), Int32.Parse(centroidYleft_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_DOWN2.ToString()), Int32.Parse(CentroidY_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft_DOWN2.ToString()), Int32.Parse(CentroidYleft_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN2.ToString()), Int32.Parse(centroidYright_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_DOWN2.ToString()), Int32.Parse(CentroidYright_DOWN2.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                 }
 
                 //==================Readlight Center
-                for (double i = centroidX - 10; i < centroidX; i++)
+                for (double i = CentroidX - 10; i < CentroidX; i++)
                 {
-                    for (double j = centroidY - 10; j < centroidY; j++)
+                    for (double j = CentroidY - 10; j < CentroidY; j++)
                     {
-                        if (centroidX > centroidY)
+                        if (CentroidX > CentroidY)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
+                for (double i = CentroidXleftmore - 10; i < CentroidXleftmore; i++)
                 {
-                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
+                    for (double j = CentroidYleftmore - 10; j < CentroidYleftmore; j++)
                     {
-                        if (centroidXleftmore > centroidYleftmore)
+                        if (CentroidXleftmore > CentroidYleftmore)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft - 10; i < centroidXleft; i++)
+                for (double i = CentroidXleft - 10; i < CentroidXleft; i++)
                 {
-                    for (double j = centroidYleft - 10; j < centroidYleft; j++)
+                    for (double j = CentroidYleft - 10; j < CentroidYleft; j++)
                     {
-                        if (centroidXleft > centroidYleft)
+                        if (CentroidXleft > CentroidYleft)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
 
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright - 10; i < centroidXright; i++)
+                for (double i = CentroidXright - 10; i < CentroidXright; i++)
                 {
-                    for (double j = centroidYright - 10; j < centroidYright; j++)
+                    for (double j = CentroidYright - 10; j < CentroidYright; j++)
                     {
-                        if (centroidXright > centroidYright)
+                        if (CentroidXright > CentroidYright)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
+                for (double i = CentroidXrightmore - 10; i < CentroidXrightmore; i++)
                 {
-                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
+                    for (double j = CentroidYrightmore - 10; j < CentroidYrightmore; j++)
                     {
-                        if (centroidXrightmore > centroidYrightmore)
+                        if (CentroidXrightmore > CentroidYrightmore)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight UP
-                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
+                for (double i = CentroidX_UP - 10; i < CentroidX_UP; i++)
                 {
-                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
+                    for (double j = CentroidY_UP - 10; j < CentroidY_UP; j++)
                     {
-                        if (centroidX_UP > centroidY_UP)
+                        if (CentroidX_UP > CentroidY_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft_UP - 10; i < centroidXleft_UP; i++)
+                for (double i = CentroidXleft_UP - 10; i < CentroidXleft_UP; i++)
                 {
-                    for (double j = centroidYleft_UP - 10; j < centroidYleft_UP; j++)
+                    for (double j = CentroidYleft_UP - 10; j < CentroidYleft_UP; j++)
                     {
-                        if (centroidXleft_UP > centroidYleft_UP)
+                        if (CentroidXleft_UP > CentroidYleft_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
+                for (double i = CentroidXleftmore_UP - 10; i < CentroidXleftmore_UP; i++)
                 {
-                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
+                    for (double j = CentroidYleftmore_UP - 10; j < CentroidYleftmore_UP; j++)
                     {
-                        if (centroidXleftmore_UP > centroidYleftmore_UP)
+                        if (CentroidXleftmore_UP > CentroidYleftmore_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright_UP - 10; i < centroidXright_UP; i++)
+                for (double i = CentroidXright_UP - 10; i < CentroidXright_UP; i++)
                 {
-                    for (double j = centroidYright_UP - 10; j < centroidYright_UP; j++)
+                    for (double j = CentroidYright_UP - 10; j < CentroidYright_UP; j++)
 
                     {
-                        if (centroidXright_UP > centroidYright_UP)
+                        if (CentroidXright_UP > CentroidYright_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
 
                     }
 
                 }
-                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
+                for (double i = CentroidXrightmore_UP - 10; i < CentroidXrightmore_UP; i++)
                 {
-                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
+                    for (double j = CentroidYrightmore_UP - 10; j < CentroidYrightmore_UP; j++)
                     {
-                        if (centroidXrightmore_UP > centroidYrightmore_UP)
+                        if (CentroidXrightmore_UP > CentroidYrightmore_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight Down
-                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
+                for (double i = CentroidX_DOWN - 10; i < CentroidX_DOWN; i++)
                 {
-                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
+                    for (double j = CentroidY_DOWN - 10; j < CentroidY_DOWN; j++)
                     {
-                        if (centroidX_DOWN > centroidY_DOWN)
+                        if (CentroidX_DOWN > CentroidY_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft_DOWN - 10; i < centroidXleft_DOWN; i++)
+                for (double i = CentroidXleft_DOWN - 10; i < CentroidXleft_DOWN; i++)
                 {
-                    for (double j = centroidYleft_DOWN - 10; j < centroidYleft_DOWN; j++)
+                    for (double j = CentroidYleft_DOWN - 10; j < CentroidYleft_DOWN; j++)
                     {
-                        if (centroidXleft_DOWN > centroidYleft_DOWN)
+                        if (CentroidXleft_DOWN > CentroidYleft_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
+                for (double i = CentroidXleftmore_DOWN - 10; i < CentroidXleftmore_DOWN; i++)
                 {
-                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
+                    for (double j = CentroidYleftmore_DOWN - 10; j < CentroidYleftmore_DOWN; j++)
                     {
-                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
+                        if (CentroidXleftmore_DOWN > CentroidYleftmore_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright_DOWN - 10; i < centroidXright_DOWN; i++)
+                for (double i = CentroidXright_DOWN - 10; i < CentroidXright_DOWN; i++)
                 {
-                    for (double j = centroidYright_DOWN - 10; j < centroidYright_DOWN; j++)
+                    for (double j = CentroidYright_DOWN - 10; j < CentroidYright_DOWN; j++)
                     {
-                        if (centroidXright_DOWN > centroidYright_DOWN)
+                        if (CentroidXright_DOWN > CentroidYright_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
+                for (double i = CentroidXrightmore_DOWN - 10; i < CentroidXrightmore_DOWN; i++)
                 {
-                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
+                    for (double j = CentroidYrightmore_DOWN - 10; j < CentroidYrightmore_DOWN; j++)
                     {
-                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
+                        if (CentroidXrightmore_DOWN > CentroidYrightmore_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight UP DOT
-                for (double i = centroidX_UP2 - 10; i < centroidX_UP2; i++)
+                for (double i = CentroidX_UP2 - 10; i < CentroidX_UP2; i++)
                 {
-                    for (double j = centroidY_UP2 - 10; j < centroidY_UP2; j++)
+                    for (double j = CentroidY_UP2 - 10; j < CentroidY_UP2; j++)
                     {
-                        if (centroidX_UP2 > centroidY_UP2)
+                        if (CentroidX_UP2 > CentroidY_UP2)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright_UP2 - 10; i < centroidXright_UP2; i++)
+                for (double i = CentroidXright_UP2 - 10; i < CentroidXright_UP2; i++)
                 {
-                    for (double j = centroidYright_UP2 - 10; j < centroidYright_UP2; j++)
+                    for (double j = CentroidYright_UP2 - 10; j < CentroidYright_UP2; j++)
                     {
-                        if (centroidXright_UP2 > centroidYright_UP2)
+                        if (CentroidXright_UP2 > CentroidYright_UP2)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft_UP2 - 10; i < centroidXleft_UP2; i++)
+                for (double i = CentroidXleft_UP2 - 10; i < CentroidXleft_UP2; i++)
                 {
-                    for (double j = centroidYleft_UP2 - 10; j < centroidYleft_UP2; j++)
+                    for (double j = CentroidYleft_UP2 - 10; j < CentroidYleft_UP2; j++)
                     {
-                        if (centroidXleft_UP2 > centroidYleft_UP2)
+                        if (CentroidXleft_UP2 > CentroidYleft_UP2)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight DOWN DOT
-                for (double i = centroidX_DOWN2 - 10; i < centroidX_DOWN2; i++)
+                for (double i = CentroidX_DOWN2 - 10; i < CentroidX_DOWN2; i++)
                 {
-                    for (double j = centroidY_DOWN2 - 10; j < centroidY_DOWN2; j++)
+                    for (double j = CentroidY_DOWN2 - 10; j < CentroidY_DOWN2; j++)
                     {
-                        if (centroidX_DOWN2 > centroidY_DOWN2)
+                        if (CentroidX_DOWN2 > CentroidY_DOWN2)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright_DOWN2 - 10; i < centroidXright_DOWN2; i++)
+                for (double i = CentroidXright_DOWN2 - 10; i < CentroidXright_DOWN2; i++)
                 {
-                    for (double j = centroidYright_DOWN2 - 10; j < centroidYright_DOWN2; j++)
+                    for (double j = CentroidYright_DOWN2 - 10; j < CentroidYright_DOWN2; j++)
                     {
-                        if (centroidXright_DOWN2 > centroidYright_DOWN2)
+                        if (CentroidXright_DOWN2 > CentroidYright_DOWN2)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft_DOWN2 - 10; i < centroidXleft_DOWN2; i++)
+                for (double i = CentroidXleft_DOWN2 - 10; i < CentroidXleft_DOWN2; i++)
                 {
-                    for (double j = centroidYleft_DOWN2 - 10; j < centroidYleft_DOWN2; j++)
+                    for (double j = CentroidYleft_DOWN2 - 10; j < CentroidYleft_DOWN2; j++)
                     {
-                        if (centroidXleft_DOWN2 > centroidYleft_DOWN2)
+                        if (CentroidXleft_DOWN2 > CentroidYleft_DOWN2)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                colorValue = (colorValue / 2100);
+                ColorValue = (ColorValue / 2100);
 
             }
             else if (FocusPoint.Text == "15 Focus Points")
@@ -1428,409 +1464,409 @@ namespace AllSky_2020
                 checkBoxCenter.Checked = false;
                 checkBoxAverage.Checked = true;
                 //=======================================Center======================================== 
-                centroidX = (int)(cameraWidth / 2);
-                centroidY = (int)(cameraHeight / 2);
+                CentroidX = (int)(CameraWidth / 2);
+                CentroidY = (int)(CameraHeight / 2);
                 //left 
-                double centroidXleft = (int)(cameraWidth / 2.5);
-                double centroidYleft = (int)(cameraHeight / 2);
+                double CentroidXleft = (int)(CameraWidth / 2.5);
+                double CentroidYleft = (int)(CameraHeight / 2);
                 //left 
-                double centroidXleftmore = (int)(cameraWidth / 3.2);
-                double centroidYleftmore = (int)(cameraHeight / 2);
+                double CentroidXleftmore = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore = (int)(CameraHeight / 2);
                 //right
-                double centroidXright = (int)(cameraWidth / 1.7);
-                double centroidYright = (int)(cameraHeight / 2);
+                double CentroidXright = (int)(CameraWidth / 1.7);
+                double CentroidYright = (int)(CameraHeight / 2);
                 //right
-                double centroidXrightmore = (int)(cameraWidth / 1.5);
-                double centroidYrightmore = (int)(cameraHeight / 2);
+                double CentroidXrightmore = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore = (int)(CameraHeight / 2);
                 //=========================================UP======================================
-                double centroidX_UP = (int)(cameraWidth / 2);
-                double centroidY_UP = (int)(cameraHeight / 3);
+                double CentroidX_UP = (int)(CameraWidth / 2);
+                double CentroidY_UP = (int)(CameraHeight / 3);
                 //left 
-                double centroidXleft_UP = (int)(cameraWidth / 2.5);
-                double centroidYleft_UP = (int)(cameraHeight / 3);
+                double CentroidXleft_UP = (int)(CameraWidth / 2.5);
+                double CentroidYleft_UP = (int)(CameraHeight / 3);
                 //left 
-                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
-                double centroidYleftmore_UP = (int)(cameraHeight / 3);
+                double CentroidXleftmore_UP = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore_UP = (int)(CameraHeight / 3);
                 //right
-                double centroidXright_UP = (int)(cameraWidth / 1.7);
-                double centroidYright_UP = (int)(cameraHeight / 3);
+                double CentroidXright_UP = (int)(CameraWidth / 1.7);
+                double CentroidYright_UP = (int)(CameraHeight / 3);
                 //right
-                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
-                double centroidYrightmore_UP = (int)(cameraHeight / 3);
+                double CentroidXrightmore_UP = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore_UP = (int)(CameraHeight / 3);
                 //=======================================DOWN========================================
-                double centroidX_DOWN = (int)(cameraWidth / 2);
-                double centroidY_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidX_DOWN = (int)(CameraWidth / 2);
+                double CentroidY_DOWN = (int)(CameraHeight / 1.5);
                 //left 
-                double centroidXleft_DOWN = (int)(cameraWidth / 2.5);
-                double centroidYleft_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXleft_DOWN = (int)(CameraWidth / 2.5);
+                double CentroidYleft_DOWN = (int)(CameraHeight / 1.5);
                 //left 
-                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
-                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXleftmore_DOWN = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore_DOWN = (int)(CameraHeight / 1.5);
                 //right
-                double centroidXright_DOWN = (int)(cameraWidth / 1.7);
-                double centroidYright_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXright_DOWN = (int)(CameraWidth / 1.7);
+                double CentroidYright_DOWN = (int)(CameraHeight / 1.5);
                 //right
-                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
-                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXrightmore_DOWN = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore_DOWN = (int)(CameraHeight / 1.5);
 
                 if (ShowFocusPoint.CheckState != 0)
                 {
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft.ToString()), Int32.Parse(centroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft.ToString()), Int32.Parse(CentroidYleft.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore.ToString()), Int32.Parse(CentroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright.ToString()), Int32.Parse(centroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright.ToString()), Int32.Parse(CentroidYright.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore.ToString()), Int32.Parse(CentroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=========================================UP======================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_UP.ToString()), Int32.Parse(CentroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_UP.ToString()), Int32.Parse(centroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft_UP.ToString()), Int32.Parse(CentroidYleft_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore_UP.ToString()), Int32.Parse(CentroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_UP.ToString()), Int32.Parse(centroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_UP.ToString()), Int32.Parse(CentroidYright_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_UP.ToString()), Int32.Parse(CentroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=======================================DOWN========================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_DOWN.ToString()), Int32.Parse(CentroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleft_DOWN.ToString()), Int32.Parse(centroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleft_DOWN.ToString()), Int32.Parse(CentroidYleft_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore_DOWN.ToString()), Int32.Parse(CentroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXright_DOWN.ToString()), Int32.Parse(centroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXright_DOWN.ToString()), Int32.Parse(CentroidYright_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_DOWN.ToString()), Int32.Parse(CentroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                 }
                 //==================Readlight Center
-                for (double i = centroidX - 10; i < centroidX; i++)
+                for (double i = CentroidX - 10; i < CentroidX; i++)
                 {
-                    for (double j = centroidY - 10; j < centroidY; j++)
+                    for (double j = CentroidY - 10; j < CentroidY; j++)
                     {
-                        if (centroidX > centroidY)
+                        if (CentroidX > CentroidY)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
+                for (double i = CentroidXleftmore - 10; i < CentroidXleftmore; i++)
                 {
-                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
+                    for (double j = CentroidYleftmore - 10; j < CentroidYleftmore; j++)
                     {
-                        if (centroidXleftmore > centroidYleftmore)
+                        if (CentroidXleftmore > CentroidYleftmore)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
 
                         }
                     }
                 }
-                for (double i = centroidXleft - 10; i < centroidXleft; i++)
+                for (double i = CentroidXleft - 10; i < CentroidXleft; i++)
                 {
-                    for (double j = centroidYleft - 10; j < centroidYleft; j++)
+                    for (double j = CentroidYleft - 10; j < CentroidYleft; j++)
                     {
-                        if (centroidXleft > centroidYleft)
+                        if (CentroidXleft > CentroidYleft)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright - 10; i < centroidXright; i++)
+                for (double i = CentroidXright - 10; i < CentroidXright; i++)
                 {
-                    for (double j = centroidYright - 10; j < centroidYright; j++)
+                    for (double j = CentroidYright - 10; j < CentroidYright; j++)
                     {
-                        if (centroidXright > centroidYright)
+                        if (CentroidXright > CentroidYright)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
+                for (double i = CentroidXrightmore - 10; i < CentroidXrightmore; i++)
                 {
-                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
+                    for (double j = CentroidYrightmore - 10; j < CentroidYrightmore; j++)
                     {
-                        if (centroidXrightmore > centroidYrightmore)
+                        if (CentroidXrightmore > CentroidYrightmore)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight UP
-                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
+                for (double i = CentroidX_UP - 10; i < CentroidX_UP; i++)
                 {
-                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
+                    for (double j = CentroidY_UP - 10; j < CentroidY_UP; j++)
                     {
-                        if (centroidX_UP > centroidY_UP)
+                        if (CentroidX_UP > CentroidY_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft_UP - 10; i < centroidXleft_UP; i++)
+                for (double i = CentroidXleft_UP - 10; i < CentroidXleft_UP; i++)
                 {
-                    for (double j = centroidYleft_UP - 10; j < centroidYleft_UP; j++)
+                    for (double j = CentroidYleft_UP - 10; j < CentroidYleft_UP; j++)
                     {
-                        if (centroidXleft_UP > centroidYleft_UP)
+                        if (CentroidXleft_UP > CentroidYleft_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
+                for (double i = CentroidXleftmore_UP - 10; i < CentroidXleftmore_UP; i++)
                 {
-                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
+                    for (double j = CentroidYleftmore_UP - 10; j < CentroidYleftmore_UP; j++)
                     {
-                        if (centroidXleftmore_UP > centroidYleftmore_UP)
+                        if (CentroidXleftmore_UP > CentroidYleftmore_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright_UP - 10; i < centroidXright_UP; i++)
+                for (double i = CentroidXright_UP - 10; i < CentroidXright_UP; i++)
                 {
-                    for (double j = centroidYright_UP - 10; j < centroidYright_UP; j++)
+                    for (double j = CentroidYright_UP - 10; j < CentroidYright_UP; j++)
                     {
-                        if (centroidXright_UP > centroidYright_UP)
+                        if (CentroidXright_UP > CentroidYright_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
+                for (double i = CentroidXrightmore_UP - 10; i < CentroidXrightmore_UP; i++)
                 {
-                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
+                    for (double j = CentroidYrightmore_UP - 10; j < CentroidYrightmore_UP; j++)
                     {
-                        if (centroidXrightmore_UP > centroidYrightmore_UP)
+                        if (CentroidXrightmore_UP > CentroidYrightmore_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight Down
-                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
+                for (double i = CentroidX_DOWN - 10; i < CentroidX_DOWN; i++)
                 {
-                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
+                    for (double j = CentroidY_DOWN - 10; j < CentroidY_DOWN; j++)
                     {
-                        if (centroidX_DOWN > centroidY_DOWN)
+                        if (CentroidX_DOWN > CentroidY_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleft_DOWN - 10; i < centroidXleft_DOWN; i++)
+                for (double i = CentroidXleft_DOWN - 10; i < CentroidXleft_DOWN; i++)
                 {
-                    for (double j = centroidYleft_DOWN - 10; j < centroidYleft_DOWN; j++)
+                    for (double j = CentroidYleft_DOWN - 10; j < CentroidYleft_DOWN; j++)
                     {
-                        if (centroidXleft_DOWN > centroidYleft_DOWN)
+                        if (CentroidXleft_DOWN > CentroidYleft_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
+                for (double i = CentroidXleftmore_DOWN - 10; i < CentroidXleftmore_DOWN; i++)
                 {
-                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
+                    for (double j = CentroidYleftmore_DOWN - 10; j < CentroidYleftmore_DOWN; j++)
                     {
-                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
+                        if (CentroidXleftmore_DOWN > CentroidYleftmore_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXright_DOWN - 10; i < centroidXright_DOWN; i++)
+                for (double i = CentroidXright_DOWN - 10; i < CentroidXright_DOWN; i++)
                 {
-                    for (double j = centroidYright_DOWN - 10; j < centroidYright_DOWN; j++)
+                    for (double j = CentroidYright_DOWN - 10; j < CentroidYright_DOWN; j++)
                     {
-                        if (centroidXright_DOWN > centroidYright_DOWN)
+                        if (CentroidXright_DOWN > CentroidYright_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
+                for (double i = CentroidXrightmore_DOWN - 10; i < CentroidXrightmore_DOWN; i++)
                 {
-                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
+                    for (double j = CentroidYrightmore_DOWN - 10; j < CentroidYrightmore_DOWN; j++)
                     {
-                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
+                        if (CentroidXrightmore_DOWN > CentroidYrightmore_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                colorValue = (colorValue / 1500);
+                ColorValue = (ColorValue / 1500);
             }
             else if (FocusPoint.Text == "9 Focus Points")
             {
                 checkBoxCenter.Checked = false;
                 checkBoxAverage.Checked = true;
                 //=======================================Center======================================== 
-                centroidX = (int)(cameraWidth / 2);
-                centroidY = (int)(cameraHeight / 2);
+                CentroidX = (int)(CameraWidth / 2);
+                CentroidY = (int)(CameraHeight / 2);
                 //left 
-                double centroidXleftmore = (int)(cameraWidth / 3.2);
-                double centroidYleftmore = (int)(cameraHeight / 2);
+                double CentroidXleftmore = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore = (int)(CameraHeight / 2);
                 //right
-                double centroidXrightmore = (int)(cameraWidth / 1.5);
-                double centroidYrightmore = (int)(cameraHeight / 2);
+                double CentroidXrightmore = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore = (int)(CameraHeight / 2);
                 //=========================================UP======================================
-                double centroidX_UP = (int)(cameraWidth / 2);
-                double centroidY_UP = (int)(cameraHeight / 3);
+                double CentroidX_UP = (int)(CameraWidth / 2);
+                double CentroidY_UP = (int)(CameraHeight / 3);
                 //left 
-                double centroidXleftmore_UP = (int)(cameraWidth / 3.2);
-                double centroidYleftmore_UP = (int)(cameraHeight / 3);
+                double CentroidXleftmore_UP = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore_UP = (int)(CameraHeight / 3);
                 //right
-                double centroidXrightmore_UP = (int)(cameraWidth / 1.5);
-                double centroidYrightmore_UP = (int)(cameraHeight / 3);
+                double CentroidXrightmore_UP = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore_UP = (int)(CameraHeight / 3);
                 //=======================================DOWN========================================
-                double centroidX_DOWN = (int)(cameraWidth / 2);
-                double centroidY_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidX_DOWN = (int)(CameraWidth / 2);
+                double CentroidY_DOWN = (int)(CameraHeight / 1.5);
                 //left 
-                double centroidXleftmore_DOWN = (int)(cameraWidth / 3.2);
-                double centroidYleftmore_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXleftmore_DOWN = (int)(CameraWidth / 3.2);
+                double CentroidYleftmore_DOWN = (int)(CameraHeight / 1.5);
                 //right
-                double centroidXrightmore_DOWN = (int)(cameraWidth / 1.5);
-                double centroidYrightmore_DOWN = (int)(cameraHeight / 1.5);
+                double CentroidXrightmore_DOWN = (int)(CameraWidth / 1.5);
+                double CentroidYrightmore_DOWN = (int)(CameraHeight / 1.5);
                 if (ShowFocusPoint.CheckState != 0)
                 {
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore.ToString()), Int32.Parse(centroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore.ToString()), Int32.Parse(CentroidYleftmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore.ToString()), Int32.Parse(centroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore.ToString()), Int32.Parse(CentroidYrightmore.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=========================================UP======================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_UP.ToString()), Int32.Parse(centroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_UP.ToString()), Int32.Parse(CentroidY_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_UP.ToString()), Int32.Parse(centroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore_UP.ToString()), Int32.Parse(CentroidYleftmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_UP.ToString()), Int32.Parse(centroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_UP.ToString()), Int32.Parse(CentroidYrightmore_UP.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //=======================================DOWN========================================
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX_DOWN.ToString()), Int32.Parse(centroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX_DOWN.ToString()), Int32.Parse(CentroidY_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //left 
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXleftmore_DOWN.ToString()), Int32.Parse(centroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXleftmore_DOWN.ToString()), Int32.Parse(CentroidYleftmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                     //right
-                    CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidXrightmore_DOWN.ToString()), Int32.Parse(centroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                    CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidXrightmore_DOWN.ToString()), Int32.Parse(CentroidYrightmore_DOWN.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                 }
 
                 //==================Readlight Center
-                for (double i = centroidX - 10; i < centroidX; i++)
+                for (double i = CentroidX - 10; i < CentroidX; i++)
                 {
-                    for (double j = centroidY - 10; j < centroidY; j++)
+                    for (double j = CentroidY - 10; j < CentroidY; j++)
                     {
-                        if (centroidX > centroidY)
+                        if (CentroidX > CentroidY)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore - 10; i < centroidXleftmore; i++)
+                for (double i = CentroidXleftmore - 10; i < CentroidXleftmore; i++)
                 {
-                    for (double j = centroidYleftmore - 10; j < centroidYleftmore; j++)
+                    for (double j = CentroidYleftmore - 10; j < CentroidYleftmore; j++)
                     {
-                        if (centroidXleftmore > centroidYleftmore)
+                        if (CentroidXleftmore > CentroidYleftmore)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore - 10; i < centroidXrightmore; i++)
+                for (double i = CentroidXrightmore - 10; i < CentroidXrightmore; i++)
                 {
-                    for (double j = centroidYrightmore - 10; j < centroidYrightmore; j++)
+                    for (double j = CentroidYrightmore - 10; j < CentroidYrightmore; j++)
                     {
-                        if (centroidXrightmore > centroidYrightmore)
+                        if (CentroidXrightmore > CentroidYrightmore)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight UP
-                for (double i = centroidX_UP - 10; i < centroidX_UP; i++)
+                for (double i = CentroidX_UP - 10; i < CentroidX_UP; i++)
                 {
-                    for (double j = centroidY_UP - 10; j < centroidY_UP; j++)
+                    for (double j = CentroidY_UP - 10; j < CentroidY_UP; j++)
                     {
-                        if (centroidX_UP > centroidY_UP)
+                        if (CentroidX_UP > CentroidY_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore_UP - 10; i < centroidXleftmore_UP; i++)
+                for (double i = CentroidXleftmore_UP - 10; i < CentroidXleftmore_UP; i++)
                 {
-                    for (double j = centroidYleftmore_UP - 10; j < centroidYleftmore_UP; j++)
+                    for (double j = CentroidYleftmore_UP - 10; j < CentroidYleftmore_UP; j++)
                     {
-                        if (centroidXleftmore_UP > centroidYleftmore_UP)
+                        if (CentroidXleftmore_UP > CentroidYleftmore_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore_UP - 10; i < centroidXrightmore_UP; i++)
+                for (double i = CentroidXrightmore_UP - 10; i < CentroidXrightmore_UP; i++)
                 {
-                    for (double j = centroidYrightmore_UP - 10; j < centroidYrightmore_UP; j++)
+                    for (double j = CentroidYrightmore_UP - 10; j < CentroidYrightmore_UP; j++)
                     {
-                        if (centroidXrightmore_UP > centroidYrightmore_UP)
+                        if (CentroidXrightmore_UP > CentroidYrightmore_UP)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
                 //==================Readlight Down
-                for (double i = centroidX_DOWN - 10; i < centroidX_DOWN; i++)
+                for (double i = CentroidX_DOWN - 10; i < CentroidX_DOWN; i++)
                 {
-                    for (double j = centroidY_DOWN - 10; j < centroidY_DOWN; j++)
+                    for (double j = CentroidY_DOWN - 10; j < CentroidY_DOWN; j++)
                     {
-                        if (centroidX_DOWN > centroidY_DOWN)
+                        if (CentroidX_DOWN > CentroidY_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXleftmore_DOWN - 10; i < centroidXleftmore_DOWN; i++)
+                for (double i = CentroidXleftmore_DOWN - 10; i < CentroidXleftmore_DOWN; i++)
                 {
-                    for (double j = centroidYleftmore_DOWN - 10; j < centroidYleftmore_DOWN; j++)
+                    for (double j = CentroidYleftmore_DOWN - 10; j < CentroidYleftmore_DOWN; j++)
                     {
-                        if (centroidXleftmore_DOWN > centroidYleftmore_DOWN)
+                        if (CentroidXleftmore_DOWN > CentroidYleftmore_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                for (double i = centroidXrightmore_DOWN - 10; i < centroidXrightmore_DOWN; i++)
+                for (double i = CentroidXrightmore_DOWN - 10; i < CentroidXrightmore_DOWN; i++)
                 {
-                    for (double j = centroidYrightmore_DOWN - 10; j < centroidYrightmore_DOWN; j++)
+                    for (double j = CentroidYrightmore_DOWN - 10; j < CentroidYrightmore_DOWN; j++)
                     {
-                        if (centroidXrightmore_DOWN > centroidYrightmore_DOWN)
+                        if (CentroidXrightmore_DOWN > CentroidYrightmore_DOWN)
                         {
-                            Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                         }
                     }
                 }
-                colorValue = (colorValue / 900);
+                ColorValue = (ColorValue / 900);
             }
             else if (FocusPoint.Text == "Histogram" && Histogramcheck.Checked == false)
             {
@@ -1846,7 +1882,7 @@ namespace AllSky_2020
         {
             if (CameraStateText.Text == "ASI_EXP_FAILED")
             {
-                cameraLost = true;
+
                 if (ConnectedCameras > 0)
                 {
                     ConnectedCameras = ASICameraDll2.ASIGetNumOfConnectedCameras();
@@ -1855,6 +1891,9 @@ namespace AllSky_2020
                 {
                     SystemMessage = "Retring to connect to the camera.";
                     Application.Restart();
+                    //return;
+                    //InitializeSystem();
+                    //InitializeSystem();
                 }
                 SystemMessage = "No camera connected";
                 MainImageControl.Image = new Image<Bgr, byte>(AppDomain.CurrentDomain.BaseDirectory + "TAllSyk.jpg");
@@ -1863,6 +1902,7 @@ namespace AllSky_2020
             }
             else
             {
+                pixelValuesText.Text = ColorValue.ToString();
                 ASI_EXPOSURE_STATUS ExpStatus = ASI_EXPOSURE_STATUS.ASI_EXP_IDLE;
                 ASI_ERROR_CODE GetExpError = ASICameraDll2.ASIGetExpStatus(CameraId, out ExpStatus);
 
@@ -1903,18 +1943,18 @@ namespace AllSky_2020
                     Point SunXY = AzmAltToXY.CalculateXYPoint(SunAltAz.Alt.Degs, SunAltAz.Az.Degs, 20);
                     //CvInvoke.Circle(ProcessFrame, SunXY, 20, new Bgr(Color.LightGreen).MCvScalar, 2);
 
-                    int cameraWidth;
-                    int cameraHeight;
+                    int CameraWidth;
+                    int CameraHeight;
                     //When open houghCircles Change focus
-                    if (houghCircles_X > 0 && houghCircles_Y > 0)
+                    if (HoughCirclesX > 0 && HoughCirclesY > 0)
                     {
-                        cameraWidth = (houghCircles_X * 10) * 2;
-                        cameraHeight = (houghCircles_Y * 10) * 2;
+                        CameraWidth = (HoughCirclesX * 10) * 2;
+                        CameraHeight = (HoughCirclesY * 10) * 2;
                     }
                     else
                     {
-                        cameraWidth = Int16.Parse(ROITextWidth.Text);
-                        cameraHeight = Int16.Parse(ROITextHeight.Text);
+                        CameraWidth = Int16.Parse(ROITextWidth.Text);
+                        CameraHeight = Int16.Parse(ROITextHeight.Text);
                     }
 
 
@@ -1924,105 +1964,141 @@ namespace AllSky_2020
                         MainImageControl.Image = ProcessFrame;
                     }
 
-                    string timesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
-                    int thickness = 5;
-                    int borderHeight = Int32.Parse(AppSetting.Data.ImageHeight.ToString());
-                    int borderWidth = Int32.Parse(AppSetting.Data.ImageWidth.ToString());
-                    float exposureTime_Show = float.Parse(AppSetting.Data.ExposureTime.ToString());
+                    string TimesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
+                    int Thickness = 5;
+                    int BorderHeight = Int32.Parse(AppSetting.Data.ImageHeight.ToString());
+                    int BorderWidth = Int32.Parse(AppSetting.Data.ImageWidth.ToString());
+                    float ExposureTimeShow = float.Parse(AppSetting.Data.ExposureTime.ToString());
 
-                    imageFrame = ProcessFrame;
-                    timeNow = DateTime.Now.ToString("yyyy_MM_dd__HH_mm_ss");
-                    timeFolder = DateTime.Now.ToString("yyyy-MM-dd");
-                    timeNow_Chack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                    borderHeight = borderHeight - 300;
-                    var borderTime = new Rectangle(0, borderHeight, 800, 100);
-                    imageFrame.Draw(borderTime, new Bgr(Color.Black), -1);
-                    imageFrame.Draw(borderTime, new Bgr(Color.White), 2);
-                    CvInvoke.PutText(imageFrame, "UTC " + timesStamp, new Point(0, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                    borderWidth = borderWidth - 600;
-                    var borderExposureTime = new Rectangle(borderWidth, borderHeight, 300, 100);
-                    imageFrame.Draw(borderExposureTime, new Bgr(Color.Black), -1);
-                    imageFrame.Draw(borderExposureTime, new Bgr(Color.White), 2);
-                    if (exposureTime_Show < 1000 && exposureTime_Show > 1)
+                    ImageFrame = ProcessFrame;
+                    TimeNow = DateTime.Now.ToString("yyyy_MM_dd__HH_mm_ss");
+                    TimeFolder = DateTime.Now.ToString("yyyy-MM-dd");
+                    TimeNowChack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                    BorderHeight = BorderHeight - 300;
+                    var BorderTime = new Rectangle(0, BorderHeight, 800, 100);
+                    ImageFrame.Draw(BorderTime, new Bgr(Color.Black), -1);
+                    ImageFrame.Draw(BorderTime, new Bgr(Color.White), 2);
+                    CvInvoke.PutText(ImageFrame, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                    BorderWidth = BorderWidth - 600;
+                    var BorderExposureTime = new Rectangle(BorderWidth, BorderHeight, 300, 100);
+                    ImageFrame.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
+                    ImageFrame.Draw(BorderExposureTime, new Bgr(Color.White), 2);
+                    if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                     {
-                        CvInvoke.PutText(imageFrame, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                        CvInvoke.PutText(ImageFrame, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     }
-                    else if (exposureTime_Show >= 1000)
+                    else if (ExposureTimeShow >= 1000)
                     {
-                        CvInvoke.PutText(imageFrame, Math.Round(AppSetting.Data.ExposureTime / 1000, 0) + " sec", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                        CvInvoke.PutText(ImageFrame, Math.Round(AppSetting.Data.ExposureTime / 1000, 0) + " sec", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     }
-                    else if (exposureTime_Show >= 0 && exposureTime_Show <= 1)
+                    else if (ExposureTimeShow >= 0 && ExposureTimeShow <= 1)
                     {
-                        CvInvoke.PutText(imageFrame, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                        CvInvoke.PutText(ImageFrame, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     }
 
-                    Bitmap bmpImage_Frame = imageFrame.ToBitmap();
+                    Bitmap BmpImageFrame = ImageFrame.ToBitmap();
 
                     if (IsAutoExposureTime.CheckState != 0) //On-Off AutoExposureTime 
                     {
+                        if (AutoISO.CheckState != 0)
+                        {
+                            if (AppSetting.Data.ExposureTime <= 1000)
+                            {
+                                if (AppSetting.Data.MIN_ISO > 0)
+                                {
+                                    AppSetting.Data.MIN_ISO = 0;
+                                    MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                    ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                }
+                            }
+                            else if (AppSetting.Data.ExposureTime >= 10000 && AppSetting.Data.ExposureTime < 100000)
+                            {
+                                if (AppSetting.Data.MIN_ISO < 50)
+                                {
+                                    AppSetting.Data.MIN_ISO = 50;
+                                    MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                    ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                }
+
+                            }
+                            else if (AppSetting.Data.ExposureTime >= 100000)
+                            {
+                                if (AppSetting.Data.MIN_ISO < 100)
+                                {
+                                    AppSetting.Data.MIN_ISO = 100;
+                                    MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                    ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                }
+
+                            }
+
+                        }
 
 
                         if (checkBoxCenter.CheckState != 0) //checkBoxCenter
                         {
                             checkBoxAverage.Checked = false;
-                            centroidX = (int)(cameraWidth / 2);
-                            centroidY = (int)(cameraHeight / 2);
-                            for (double i = centroidX - 10; i < centroidX; i++)
+                            CentroidX = (int)(CameraWidth / 2);
+                            CentroidY = (int)(CameraHeight / 2);
+                            for (double i = CentroidX - 10; i < CentroidX; i++)
                             {
-                                for (double j = centroidY - 10; j < centroidY; j++)
+                                for (double j = CentroidY - 10; j < CentroidY; j++)
                                 {
-                                    Color pixel = bmpImage_Frame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                                    colorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                                    Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                                    ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
                                 }
                             }
-                            colorValue = (colorValue / 100);
+                            ColorValue = (ColorValue / 100);
                             if (ShowFocusPoint.CheckState != 0)
                             {
-                                CvInvoke.PutText(imageFrame, "X", new Point(Int32.Parse(centroidX.ToString()), Int32.Parse(centroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, thickness);
+                                CvInvoke.PutText(ImageFrame, "X", new Point(Int32.Parse(CentroidX.ToString()), Int32.Parse(CentroidY.ToString())), FontFace.HersheySimplex, 1.5, new Bgr(Color.Red).MCvScalar, Thickness);
                             }
                         }
                         else
                         {
                             Focus_Point();
-                            int hdrDetectionhigh = 0;
-                            int hdrDetectionlow = 0;
-                            int hdrDetectionmedium = 0;
-                            double bestValue;
-                            double Control_Jump = 1;
-                            Console.WriteLine("Pixel Values: " + colorValue);
+                            int HdrDetectionHigh = 0;
+                            int HdrDetectionLow = 0;
+                            int HdrDetectionmedium = 0;
+                            double BestValue;
+                            double ControlJump = 1;
+                            Console.WriteLine("Pixel Values: " + ColorValue);
 
-                            if (Histogramcheck.CheckState != 0 && houghCirclesradius != 0)
+                            if (Histogramcheck.CheckState != 0 && HoughCirclesRadius != 0)
                             {
 
-                                int colorHisto = 0;
-                                Image<Gray, Byte> histoImage = houghCircles_Frame;
-                                histoImage.ROI = new Rectangle((int)centroidX - houghCirclesradius * 7, (int)centroidY - houghCirclesradius * 7, houghCirclesradius * 7 * 2, houghCirclesradius * 7 * 2);
-                                croppedImage = histoImage.Copy();
+                                int ColorHisto = 0;
+                                Image<Gray, Byte> HistoImage = HoughCirclesFrame;
+                                HistoImage.ROI = new Rectangle((int)CentroidX - HoughCirclesRadius * 7, (int)CentroidY - HoughCirclesRadius * 7, HoughCirclesRadius * 7 * 2, HoughCirclesRadius * 7 * 2);
+                                CroppedImage = HistoImage.Copy();
                                 Histo.ClearHistogram();
-                                Histo.GenerateHistograms(croppedImage.Convert<Gray, Byte>(), 256);
+                                Histo.GenerateHistograms(CroppedImage.Convert<Gray, Byte>(), 256);
                                 if (FocusPoint.Text == "Histogram")
                                 {
-                                    for (int i = 0; i < croppedImage.Width; i++)
+                                    for (int i = 0; i < CroppedImage.Width; i++)
                                     {
-                                        for (int j = 0; j < croppedImage.Height; j++)
+                                        for (int j = 0; j < CroppedImage.Height; j++)
                                         {
-                                            colorHisto += croppedImage.Data[i, j, 0];
+                                            ColorHisto += CroppedImage.Data[i, j, 0];
                                             if (autoHDR.Checked == true)
-                                                if (croppedImage.Data[i, j, 0] >= AppSetting.Data.hdrPixelvalueshigh)
-                                                    hdrDetectionhigh += 1;
-                                                else if (croppedImage.Data[i, j, 0] <= AppSetting.Data.hdrPixelvalueslow)
-                                                    hdrDetectionlow += 1;
+                                                if (CroppedImage.Data[i, j, 0] >= AppSetting.Data.hdrPixelvalueshigh)
+                                                    HdrDetectionHigh += 1;
+                                                else if (CroppedImage.Data[i, j, 0] <= AppSetting.Data.hdrPixelvalueslow)
+                                                    HdrDetectionLow += 1;
                                                 else
-                                                    hdrDetectionmedium += 1;
+                                                    HdrDetectionmedium += 1;
                                         }
                                     }
-                                    colorHisto = colorHisto / (croppedImage.Width * croppedImage.Height);
-                                    Console.WriteLine(colorHisto);
-                                    colorValue = colorHisto;
+                                    ColorHisto = ColorHisto / (CroppedImage.Width * CroppedImage.Height);
+                                    Console.WriteLine(ColorHisto);
+                                    ColorValue = ColorHisto;
                                 }
                                 Histo.Refresh();
                             }
-                            else if (Histogramcheck.Checked == true && houghCirclesradius == 0)
+                            else if (Histogramcheck.Checked == true && HoughCirclesRadius == 0)
                             {
                                 Histogramcheck.Checked = false;
                                 MessageBox.Show("Please turn on HoughCircles.", "Message", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
@@ -2031,70 +2107,77 @@ namespace AllSky_2020
                             if (autoHDR.Checked == true && FocusPoint.Text == "Histogram")
                             {
 
-                                Console.WriteLine("hdrDetectionhigh =" + hdrDetectionhigh);
-                                Console.WriteLine("hdrDetectionlow =" + hdrDetectionlow);
-                                Console.WriteLine("hdrDetectionmedium =" + hdrDetectionmedium);
+                                HdrDetectionHighText.Text = HdrDetectionHigh.ToString();
+                                HdrDetectionmediumText.Text = HdrDetectionmedium.ToString();
+                                HdrDetectionLowText.Text = HdrDetectionLow.ToString();
+
+                                Console.WriteLine("HdrDetectionHigh =" + HdrDetectionHigh);
+                                Console.WriteLine("HdrDetectionLow =" + HdrDetectionLow);
+                                Console.WriteLine("HdrDetectionmedium =" + HdrDetectionmedium);
+
                                 ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                                 System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
                                 EncoderParameters myEncoderParameters = new EncoderParameters(1);
                                 EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                                 myEncoderParameters.Param[0] = myEncoderParameter;
 
-                                if (hdrDetectionhigh > AppSetting.Data.hdrDetectionhigh && hdrDetectionlow > AppSetting.Data.hdrDetectionlow)
+                                if (HdrDetectionHigh > AppSetting.Data.HdrDetectionHigh && HdrDetectionLow > AppSetting.Data.HdrDetectionLow)
                                 {
-                                    hdrOn = true;
+                                    HdrOn = true;
                                 }
 
-
-
-
-                                if (hdrOn == true)
+                                if (HdrOn == true)
                                 {
-                                    hdrOn = false;
+
                                     Console.WriteLine("OnHDR");
-                                    bool doOne = false;
+                                    bool DoOne = false;
 
                                     if (AppSetting.Data.ExposureTime > 1)
                                     {
-                                        if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+                                        if (ColorValue > MinLight - 2 && ColorValue <= MaxLight + 2)
                                         {
-                                            Control_Jump = 2;
+                                            ControlJump = 2.1;
+                                            Console.WriteLine("ControlJump = 2;");
+                                        }
+                                        else if (ColorValue > MinLight - 40 && ColorValue <= MaxLight + 40)
+                                        {
+                                            ControlJump = 2;
+                                            Console.WriteLine("ControlJump = 2;");
                                         }
                                         else
                                         {
-                                            Exposure_Adjust();
-                                            Control_Jump = 1;
+                                            Console.WriteLine("ControlJump = 1;");
+                                            ControlJump = 1;
+                                            ExposureAdjust();
                                         }
                                     }
                                     else
                                     {
-                                        Control_Jump = 1.8;
+                                        ControlJump = 1.8;
                                     }
 
-
-
-                                    if (colorValue > maxLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
-                                        && recover != false && AppSetting.Data.ExposureTime >= 1)
+                                    if (ColorValue > MaxLightHdr && CameraStateText.Text != "ASI_EXP_WORKING"
+                                        && Recover != false && AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
                                     {
                                         //AppSetting.Data.ExposureTime -
-                                        bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
-                                        Console.WriteLine("bestValue" + bestValue);
-                                        AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                        recover = false;
+                                        BestValue = ((AppSetting.Data.ExposureTime / GoldenRatio) * (ControlJump));
+                                        Console.WriteLine("BestValue" + BestValue);
+                                        AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                        Recover = false;
                                         if (AppSetting.Data.ExposureTime < 0.3)
                                         {
                                             AppSetting.Data.ExposureTime = 0.3;
                                         }
 
                                     }
-                                    else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false
-                                        && AppSetting.Data.ExposureTime >= 1)
+                                    else if (ColorValue < MinLightHdr && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false
+                                        && AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
                                     {
                                         //AppSetting.Data.ExposureTime +
-                                        bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
-                                        Console.WriteLine("bestValue" + bestValue);
-                                        AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                        recover = false;
+                                        BestValue = ((AppSetting.Data.ExposureTime * GoldenRatio) / (ControlJump));
+                                        Console.WriteLine("BestValue" + BestValue);
+                                        AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                        Recover = false;
                                     }
 
 
@@ -2102,213 +2185,463 @@ namespace AllSky_2020
                                     if (AppSetting.Data.ExposureTime < 1)
                                     {
 
-                                        if (imageMerge_status == 0 && imageMerge_status == 3 && recover != false)
+                                        float ExpTimesMedium = 1, ExpTimesMax = 1, ExpTimesMin = 1;
+                                        Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
+
+                                        if (ModeHDR == 0)
                                         {
-                                            AppSetting.Data.ExposureTime = 0.5;
-                                            modeHDR = 3;
-                                            if (colorValue <= 60)
+                                            if (ImageMergeStatus == 0 && Recover != false)
                                             {
-                                                AppSetting.Data.ExposureTime = 1;
+                                                AppSetting.Data.ExposureTime = 0.5;
+
                                             }
-                                            recover = false;
+                                            else
+                                            {
+                                                if (AppSetting.Data.ExposureTime != 0.5 && AppSetting.Data.ExposureTime != 0.3
+                                                    && AppSetting.Data.ExposureTime != 0.6 && AppSetting.Data.ExposureTime != 0.7
+                                                    && AppSetting.Data.ExposureTime != 0.8
+                                                    && ModeHDR == 0)
+                                                {
+                                                    AppSetting.Data.ExposureTime = 0.5;
+                                                }
+
+                                            }
+
+                                            if (AppSetting.Data.ExposureTime == 0.5 && DoOne == false && Recover != false)
+                                            {
+
+                                                if (ColorValue <= 50)
+                                                {
+                                                    AppSetting.Data.ExposureTime = 2;
+                                                }
+
+                                                HdrMedium = HdrOutput;
+                                                // NonHdr = ProcessFrame;
+                                                HdrMedium._GammaCorrect(0.4);
+                                                Console.WriteLine("ExpTimesMedium = " + ExpTimesMedium);
+                                                HdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                                AppSetting.Data.ExposureTime = 0.3;
+                                                DoOne = true;
+                                                ImageMergeStatus = 1;
+                                                ExpTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
+                                                Recover = false;
+
+                                            }
+                                            else if (AppSetting.Data.ExposureTime == 0.3 && DoOne == false && Recover != false)
+                                            {
+
+                                                DoOne = true;
+                                                ImageMergeStatus = 2;
+                                                ExpTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
+                                                HdrLow = HdrOutput;
+                                                HdrLow._GammaCorrect(0.3);
+                                                Console.WriteLine("ExpTimesMin = " + ExpTimesMin);
+                                                HdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrLow.jpg", jpgEncoder, myEncoderParameters);
+                                                AppSetting.Data.ExposureTime = 0.6;
+                                                Recover = false;
+                                            }
+                                            else if (AppSetting.Data.ExposureTime == 0.6 && DoOne == false && Recover != false)
+                                            {
+                                                DoOne = true;
+                                                ExpTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
+                                                HdrHigh = HdrOutput;
+                                                HdrHigh._GammaCorrect(0.5);
+                                                HdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHigh.jpg", jpgEncoder, myEncoderParameters);
+                                                AppSetting.Data.ExposureTime = 0.7;
+                                                Recover = false;
+
+
+
+                                            }
+                                            else if (AppSetting.Data.ExposureTime == 0.7 && DoOne == false && Recover != false)
+                                            {
+                                                DoOne = true;
+                                                HdrHighUp = HdrOutput;
+                                                HdrHighUp._GammaCorrect(0.6);
+                                                HdrHighUp.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHighUp.jpg", jpgEncoder, myEncoderParameters);
+                                                AppSetting.Data.ExposureTime = 0.8;
+                                                Recover = false;
+
+
+
+                                            }
+                                            else if (AppSetting.Data.ExposureTime == 0.8 && DoOne == false && Recover != false)
+                                            {
+                                                DoOne = true;
+                                                HdrHighUpper = HdrOutput;
+                                                HdrHighUpper._GammaCorrect(0.7);
+                                                HdrHighUpper.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHighUpper.jpg", jpgEncoder, myEncoderParameters);
+                                                AppSetting.Data.ExposureTime = 0.5;
+                                                Recover = false;
+                                                ImageMergeStatus = 5;
+
+
+
+                                            }
                                         }
                                         else
                                         {
-                                            if (AppSetting.Data.ExposureTime != 0.5 && AppSetting.Data.ExposureTime != 0.3 && AppSetting.Data.ExposureTime != 0.6)
+                                            if (ColorValue > MaxLightHdr && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                             {
-                                                AppSetting.Data.ExposureTime = 0.5;
-                                                recover = false;
+                                                //AppSetting.Data.ExposureTime -
+                                                BestValue = ((AppSetting.Data.ExposureTime / GoldenRatio) * (ControlJump));
+                                                Console.WriteLine("BestValue" + BestValue);
+                                                AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                                Recover = false;
+                                                if (AppSetting.Data.ExposureTime < 0.3)
+                                                {
+                                                    AppSetting.Data.ExposureTime = 0.3;
+                                                }
+
+                                            }
+                                            else if (ColorValue < MinLightHdr && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
+                                            {
+                                                //AppSetting.Data.ExposureTime +
+                                                BestValue = ((AppSetting.Data.ExposureTime * GoldenRatio) / (ControlJump));
+                                                Console.WriteLine("BestValue" + BestValue);
+                                                AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                                Recover = false;
                                             }
 
-
-                                        }
-
-
-                                        float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
-                                        Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
-
-
-                                        if ((AppSetting.Data.ExposureTime == 0.5 && doOne == false && recover != false) || modeHDR == 3)
-                                        {
-                                            if (hdrDetectionhigh <= AppSetting.Data.hdrDetectionhigh && hdrDetectionlow <= AppSetting.Data.hdrDetectionlow)
+                                            if (ColorValue >= MinLightHdr && ColorValue <= MaxLightHdr && DoOne == false)
                                             {
-                                                hdrOn = false;
-                                                imageMerge_status = 0;
+
+
+                                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
+
+                                                if (MaxLightHdr == AppSetting.Data.MaxLight && MinLightHdr == AppSetting.Data.MinLight)
+                                                {
+                                                    if (HdrDetectionHigh <= AppSetting.Data.HdrDetectionHigh && HdrDetectionLow <= AppSetting.Data.HdrDetectionLow)
+                                                    {
+                                                        HdrOn = false;
+                                                        ImageMergeStatus = 0;
+                                                    }
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 1;
+                                                    ExpTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrMedium = HdrOutput;
+                                                    //NonHdr = ProcessFrame;
+                                                    HdrMedium._GammaCorrect(0.4);
+                                                    Console.WriteLine("ExpTimesMedium = " + ExpTimesMedium);
+                                                    HdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                                    MaxLightHdr = AppSetting.Data.MaxLight - 40;
+                                                    MinLightHdr = AppSetting.Data.MinLight - 40;
+
+
+
+
+                                                }
+                                                else if (MaxLightHdr == AppSetting.Data.MaxLight - 40 && MinLightHdr == AppSetting.Data.MinLight - 40 && DoOne == false)
+                                                {
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 2;
+                                                    ExpTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrLow = HdrOutput;
+                                                    HdrLow._GammaCorrect(0.3);
+                                                    Console.WriteLine("ExpTimesMin = " + ExpTimesMin);
+                                                    HdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrLow.jpg", jpgEncoder, myEncoderParameters);
+                                                    MaxLightHdr = AppSetting.Data.MaxLight + 50;
+                                                    MinLightHdr = AppSetting.Data.MinLight + 30;
+
+
+
+                                                }
+                                                else if (MaxLightHdr == AppSetting.Data.MaxLight + 50 && MinLightHdr == AppSetting.Data.MinLight + 30 && DoOne == false)
+                                                {
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 3;
+                                                    ExpTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrHigh = HdrOutput;
+                                                    HdrHigh._GammaCorrect(0.5);
+                                                    HdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHigh.jpg", jpgEncoder, myEncoderParameters);
+
+                                                    MaxLightHdr = AppSetting.Data.MaxLight;
+                                                    MinLightHdr = AppSetting.Data.MinLight;
+
+
+
+                                                }
                                             }
-                                            doOne = true;
-                                            imageMerge_status = 1;
-                                            expTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
-                                            hdrMedium = hdrOutput;
-                                            hdrMedium._GammaCorrect(0.4);
-                                            Console.WriteLine("expTimesMedium = " + expTimesMedium);
-                                            hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
-                                            AppSetting.Data.ExposureTime = 0.3;
-                                            recover = false;
-
 
                                         }
-                                        else if ((AppSetting.Data.ExposureTime == 0.3 && doOne == false && recover != false) || modeHDR == 1)
-                                        {
-                                            doOne = true;
-                                            imageMerge_status = 2;
-                                            expTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
-                                            hdrLow = hdrOutput;
-                                            hdrLow._GammaCorrect(0.4);
-                                            Console.WriteLine("expTimesMin = " + expTimesMin);
-                                            hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
-                                            AppSetting.Data.ExposureTime = 0.6;
-                                            recover = false;
 
 
-                                        }
-                                        else if ((AppSetting.Data.ExposureTime == 0.6 && doOne == false && recover != false) || modeHDR == 2)
-                                        {
-                                            doOne = true;
-                                            imageMerge_status = 3;
-                                            expTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
-                                            hdrHigh = hdrOutput;
-                                            hdrHigh._GammaCorrect(0.4);
-                                            hdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrHigh.jpg", jpgEncoder, myEncoderParameters);
-                                            recover = false;
-                                            AppSetting.Data.ExposureTime = 0.5;
-
-
-                                        }
 
 
 
                                     }
                                     else if (AppSetting.Data.ExposureTime >= 1)
                                     {
-                                        if (colorValue >= minLight_hdr && colorValue <= maxLight_hdr && doOne == false)
+                                        if (AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
+                                        {
+                                            if (ColorValue >= MinLightHdr && ColorValue <= MaxLightHdr && DoOne == false)
+                                            {
+
+                                                float ExpTimesMedium = 1, ExpTimesMax = 1, ExpTimesMin = 1;
+                                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
+
+                                                if (MaxLightHdr == AppSetting.Data.MaxLight && MinLightHdr == AppSetting.Data.MinLight && DoOne == false && Recover != false)
+                                                {
+
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 1;
+                                                    ExpTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrMedium = HdrOutput;
+                                                    //NonHdr = ProcessFrame;
+                                                    HdrMedium._GammaCorrect(0.4);
+                                                    Console.WriteLine("ExpTimesMedium = " + ExpTimesMedium);
+                                                    HdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                                    MaxLightHdr = AppSetting.Data.MaxLight - 40;
+                                                    MinLightHdr = AppSetting.Data.MinLight - 40;
+                                                    ModeHDR = 1;
+
+
+
+                                                }
+                                                else if (MaxLightHdr == AppSetting.Data.MaxLight - 40 && MinLightHdr == AppSetting.Data.MinLight - 40 && DoOne == false && Recover != false)
+                                                {
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 2;
+                                                    ExpTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrLow = HdrOutput;
+                                                    HdrLow._GammaCorrect(0.3);
+                                                    Console.WriteLine("ExpTimesMin = " + ExpTimesMin);
+                                                    HdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrLow.jpg", jpgEncoder, myEncoderParameters);
+                                                    MaxLightHdr = AppSetting.Data.MaxLight + 50;
+                                                    MinLightHdr = AppSetting.Data.MinLight + 30;
+                                                    ModeHDR = 2;
+
+
+                                                }
+                                                else if (MaxLightHdr == AppSetting.Data.MaxLight + 50 && MinLightHdr == AppSetting.Data.MinLight + 30 && DoOne == false && Recover != false)
+                                                {
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 3;
+                                                    ExpTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrHigh = HdrOutput;
+                                                    HdrHigh._GammaCorrect(0.5);
+                                                    HdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHigh.jpg", jpgEncoder, myEncoderParameters);
+                                                    MaxLightHdr = AppSetting.Data.MaxLight;
+                                                    MinLightHdr = AppSetting.Data.MinLight;
+                                                    ModeHDR = 3;
+
+
+                                                }
+                                            }
+
+
+                                        }
+                                        else
                                         {
 
-                                            float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
-                                            Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
-
-                                            if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight)
+                                            if (AppSetting.Data.ExposureTime == HDRHighExposure)
                                             {
-                                                if (hdrDetectionhigh <= AppSetting.Data.hdrDetectionhigh && hdrDetectionlow <= AppSetting.Data.hdrDetectionlow)
+
+                                                float ExpTimesMedium = 1, ExpTimesMax = 1, ExpTimesMin = 1;
+                                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
+
+                                                if (HDRHighExposure == (AppSetting.Data.MAX_SHUTTER / 2) && Recover != false && DoOne == false)
                                                 {
-                                                    hdrOn = false;
-                                                    imageMerge_status = 0;
+
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    //ImageMergeStatus = 1;
+                                                    ExpTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrMedium = HdrOutput;
+                                                    //NonHdr = ProcessFrame;
+                                                    HdrMedium._GammaCorrect(0.4);
+                                                    Console.WriteLine("ExpTimesMedium = " + ExpTimesMedium);
+                                                    HdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                                    ModeHDR = 1;
+                                                    AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER / 4;
+                                                    HDRHighExposure = (AppSetting.Data.MAX_SHUTTER / 4);
+
+
+
+
                                                 }
-                                                doOne = true;
-                                                imageMerge_status = 1;
-                                                expTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
-                                                hdrMedium = hdrOutput;
-                                                hdrMedium._GammaCorrect(0.4);
-                                                Console.WriteLine("expTimesMedium = " + expTimesMedium);
-                                                hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
-                                                maxLight_hdr = AppSetting.Data.maxLight - 40;
-                                                minLight_hdr = AppSetting.Data.minLight - 40;
-                                                modeHDR = 1;
+                                                else if (HDRHighExposure == (AppSetting.Data.MAX_SHUTTER / 4) && Recover != false && DoOne == false)
+                                                {
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    //ImageMergeStatus = 2;
+                                                    ExpTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrLow = HdrOutput;
+                                                    HdrLow._GammaCorrect(0.3);
+                                                    Console.WriteLine("ExpTimesMin = " + ExpTimesMin);
+                                                    HdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrLow.jpg", jpgEncoder, myEncoderParameters);
+                                                    ModeHDR = 2;
+                                                    AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
+                                                    HDRHighExposure = AppSetting.Data.MAX_SHUTTER;
 
 
+                                                }
+                                                else if (HDRHighExposure == AppSetting.Data.MAX_SHUTTER && Recover != false && DoOne == false)
+                                                {
+                                                    DoOne = true;
+                                                    Recover = false;
+                                                    ImageMergeStatus = 3;
+                                                    ExpTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
+                                                    HdrHigh = HdrOutput;
+                                                    HdrHigh._GammaCorrect(0.5);
+                                                    HdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHigh.jpg", jpgEncoder, myEncoderParameters);
+                                                    ModeHDR = 3;
+                                                    AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER / 2;
+                                                    HDRHighExposure = AppSetting.Data.MAX_SHUTTER / 2;
 
+
+                                                }
                                             }
-                                            else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false)
+                                            else
                                             {
-                                                doOne = true;
-                                                imageMerge_status = 2;
-                                                expTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
-                                                hdrLow = hdrOutput;
-                                                hdrLow._GammaCorrect(0.4);
-                                                Console.WriteLine("expTimesMin = " + expTimesMin);
-                                                hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
-                                                maxLight_hdr = AppSetting.Data.maxLight + 50;
-                                                minLight_hdr = AppSetting.Data.minLight + 30;
-                                                modeHDR = 2;
 
-
-                                            }
-                                            else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false)
-                                            {
-                                                doOne = true;
-                                                imageMerge_status = 3;
-                                                expTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
-                                                hdrHigh = hdrOutput;
-                                                hdrHigh._GammaCorrect(0.4);
-                                                hdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrHigh.jpg", jpgEncoder, myEncoderParameters);
-
-                                                maxLight_hdr = AppSetting.Data.maxLight;
-                                                minLight_hdr = AppSetting.Data.minLight;
-                                                modeHDR = 3;
-
-
+                                                Recover = false;
+                                                HDRHighExposure = AppSetting.Data.MAX_SHUTTER / 2;
+                                                AppSetting.Data.ExposureTime = HDRHighExposure;
                                             }
                                         }
+
                                     }
 
-
-
-                                    if (imageMerge_status == 3)
+                                    if (ImageMergeStatus == 3 || ImageMergeStatus == 5)
                                     {
-                                        modeHDR = 0;
-                                        imageMerge_status = 0;
+                                        ModeHDR = 0;
+                                        ImageMergeStatus = 0;
                                         if (AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
                                         {
                                             AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
                                         }
-                                        for (int i = 0; i < hdrMedium.Height; i++)
+                                        if (ImageMergeStatus == 3)
                                         {
-                                            for (int j = 0; j < hdrMedium.Width; j++)
+                                            for (int i = 0; i < HdrMedium.Height; i++)
                                             {
-                                                if (hdrMedium.Data[i, j, 0] > AppSetting.Data.maxLight && hdrMedium.Data[i, j, 1] > AppSetting.Data.maxLight && hdrMedium.Data[i, j, 2] > AppSetting.Data.maxLight)
+                                                for (int j = 0; j < HdrMedium.Width; j++)
                                                 {
-                                                    hdrMedium.Data[i, j, 0] = (byte)((hdrMedium.Data[i, j, 0] + hdrLow.Data[i, j, 0]) / 2);
-                                                    hdrMedium.Data[i, j, 1] = (byte)((hdrMedium.Data[i, j, 1] + hdrLow.Data[i, j, 1]) / 2);
-                                                    hdrMedium.Data[i, j, 2] = (byte)((hdrMedium.Data[i, j, 2] + hdrLow.Data[i, j, 2]) / 2);
-                                                }
-                                                else if (hdrMedium.Data[i, j, 0] < AppSetting.Data.minLight && hdrMedium.Data[i, j, 1] < AppSetting.Data.minLight && hdrMedium.Data[i, j, 2] < AppSetting.Data.minLight
-                                                    && hdrMedium.Data[i, j, 0] > 10 && hdrMedium.Data[i, j, 1] > 10 && hdrMedium.Data[i, j, 2] > 10)
-                                                {
-                                                    hdrMedium.Data[i, j, 0] = (byte)((hdrMedium.Data[i, j, 0] + hdrHigh.Data[i, j, 0]) / 2);
-                                                    hdrMedium.Data[i, j, 1] = (byte)((hdrMedium.Data[i, j, 1] + hdrHigh.Data[i, j, 1]) / 2);
-                                                    hdrMedium.Data[i, j, 2] = (byte)((hdrMedium.Data[i, j, 2] + hdrHigh.Data[i, j, 2]) / 2);
+                                                    if (HdrMedium.Data[i, j, 0] > AppSetting.Data.MaxLight && HdrMedium.Data[i, j, 1] > AppSetting.Data.MaxLight && HdrMedium.Data[i, j, 2] > AppSetting.Data.MaxLight)
+                                                    {
+                                                        HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrLow.Data[i, j, 0]) / 2);
+                                                        HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrLow.Data[i, j, 1]) / 2);
+                                                        HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrLow.Data[i, j, 2]) / 2);
 
+
+                                                    }
+                                                    else if (HdrMedium.Data[i, j, 0] < AppSetting.Data.MinLight && HdrMedium.Data[i, j, 1] < AppSetting.Data.MinLight && HdrMedium.Data[i, j, 2] < AppSetting.Data.MinLight
+                                                        && HdrMedium.Data[i, j, 0] > 10 && HdrMedium.Data[i, j, 1] > 10 && HdrMedium.Data[i, j, 2] > 10)
+                                                    {
+                                                        HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrHigh.Data[i, j, 0]) / 2);
+                                                        HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrHigh.Data[i, j, 1]) / 2);
+                                                        HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrHigh.Data[i, j, 2]) / 2);
+
+                                                    }
                                                 }
                                             }
                                         }
-                                        hdrMedium._SmoothGaussian(1);
-                                        hdrMedium._EqualizeHist();
-                                        hdrMedium._GammaCorrect(1.4d);
-                                        Image<Bgr, Byte> ImagehdrMedium = hdrMedium;
-                                        ImagehdrMedium.Draw(borderTime, new Bgr(Color.Black), -1);
-                                        ImagehdrMedium.Draw(borderTime, new Bgr(Color.White), 2);
-                                        ImagehdrMedium.Draw(borderExposureTime, new Bgr(Color.Black), -1);
-                                        ImagehdrMedium.Draw(borderExposureTime, new Bgr(Color.White), 2);
-                                        CvInvoke.PutText(ImagehdrMedium, "UTC " + timesStamp, new Point(0, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                                        else if (AppSetting.Data.ExposureTime < 1)
+                                        {
+                                            for (int i = 0; i < HdrMedium.Height; i++)
+                                            {
+                                                for (int j = 0; j < HdrMedium.Width; j++)
+                                                {
+                                                    if (HdrMedium.Data[i, j, 0] > AppSetting.Data.MaxLight
+                                                        && HdrMedium.Data[i, j, 1] > AppSetting.Data.MaxLight
+                                                        && HdrMedium.Data[i, j, 2] > AppSetting.Data.MaxLight)
+                                                    {
+                                                        HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrLow.Data[i, j, 0]) / 2);
+                                                        HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrLow.Data[i, j, 1]) / 2);
+                                                        HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrLow.Data[i, j, 2]) / 2);
+                                                    }
+                                                    else if (HdrMedium.Data[i, j, 0] < AppSetting.Data.MinLight
+                                                        && HdrMedium.Data[i, j, 1] < AppSetting.Data.MinLight
+                                                        && HdrMedium.Data[i, j, 2] < AppSetting.Data.MinLight
+                                                        && HdrMedium.Data[i, j, 0] > AppSetting.Data.MinLight - 10
+                                                        && HdrMedium.Data[i, j, 1] > AppSetting.Data.MinLight - 10
+                                                        && HdrMedium.Data[i, j, 2] > AppSetting.Data.MinLight - 10
+                                                        && HdrMedium.Data[i, j, 0] > 10
+                                                        && HdrMedium.Data[i, j, 1] > 10
+                                                        && HdrMedium.Data[i, j, 2] > 10)
+                                                    {
+                                                        HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrHigh.Data[i, j, 0]) / 2);
+                                                        HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrHigh.Data[i, j, 1]) / 2);
+                                                        HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrHigh.Data[i, j, 2]) / 2);
 
-                                        if (exposureTime_Show < 1000 && exposureTime_Show > 1)
-                                        {
-                                            CvInvoke.PutText(ImagehdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                                        }
-                                        else if (exposureTime_Show >= 1000)
-                                        {
-                                            CvInvoke.PutText(ImagehdrMedium, Math.Round(AppSetting.Data.ExposureTime / 1000, 0) + " sec", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                                        }
-                                        else if (exposureTime_Show >= 0 && exposureTime_Show <= 1)
-                                        {
-                                            CvInvoke.PutText(ImagehdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                                        }
-                                        CvInvoke.PutText(ImagehdrMedium, "AUTO HDR", new Point(borderWidth - 300, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                                        Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
+                                                    }
+                                                    else if (HdrMedium.Data[i, j, 0] < AppSetting.Data.MinLight - 10
+                                                        && HdrMedium.Data[i, j, 1] < AppSetting.Data.MinLight - 10
+                                                        && HdrMedium.Data[i, j, 2] < AppSetting.Data.MinLight - 10
+                                                        && HdrMedium.Data[i, j, 0] > AppSetting.Data.MinLight - 20
+                                                        && HdrMedium.Data[i, j, 1] > AppSetting.Data.MinLight - 20
+                                                        && HdrMedium.Data[i, j, 2] > AppSetting.Data.MinLight - 20
+                                                        && HdrMedium.Data[i, j, 0] > 10
+                                                        && HdrMedium.Data[i, j, 1] > 10
+                                                        && HdrMedium.Data[i, j, 2] > 10)
+                                                    {
+                                                        HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrHighUp.Data[i, j, 0]) / 2);
+                                                        HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrHighUp.Data[i, j, 1]) / 2);
+                                                        HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrHighUp.Data[i, j, 2]) / 2);
 
-                                        if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0 || AppSetting.Data.ExposureTime >= 60000)
+                                                    }
+                                                    else if (HdrMedium.Data[i, j, 0] < AppSetting.Data.MinLight - 20
+                                                        && HdrMedium.Data[i, j, 1] < AppSetting.Data.MinLight - 20
+                                                        && HdrMedium.Data[i, j, 2] < AppSetting.Data.MinLight - 20
+                                                        && HdrMedium.Data[i, j, 0] > 10
+                                                        && HdrMedium.Data[i, j, 1] > 10
+                                                        && HdrMedium.Data[i, j, 2] > 10)
+                                                    {
+                                                        HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrHighUpper.Data[i, j, 0]) / 2);
+                                                        HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrHighUpper.Data[i, j, 1]) / 2);
+                                                        HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrHighUpper.Data[i, j, 2]) / 2);
+
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        HdrMedium._SmoothGaussian(1);
+                                        HdrMedium._EqualizeHist();
+                                        HdrMedium._GammaCorrect(1.4d);
+                                        Image<Bgr, Byte> ImageHdrMedium = HdrMedium;
+                                        ImageHdrMedium.Draw(BorderTime, new Bgr(Color.Black), -1);
+                                        ImageHdrMedium.Draw(BorderTime, new Bgr(Color.White), 2);
+                                        ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
+                                        ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.White), 2);
+                                        CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+
+                                        if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
+                                        {
+                                            CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        }
+                                        else if (ExposureTimeShow >= 1000)
+                                        {
+                                            CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime / 1000, 0) + " sec", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        }
+                                        else if (ExposureTimeShow >= 0 && ExposureTimeShow <= 1)
+                                        {
+                                            CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        }
+                                        CvInvoke.PutText(ImageHdrMedium, "AUTO HDR", new Point(BorderWidth - 300, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
+                                        //Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\NonHdr\" + TimeFolder);
+
+                                        if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && ConnectedCameras > 0 || AppSetting.Data.ExposureTime >= 60000)
                                         {
                                             if (StopSave.Checked == false)
                                             {
-                                                timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                                ImagehdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder, myEncoderParameters);
+                                                TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                                //NonHdr.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\NonHdr\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder,
+                                                //myEncoderParameters);
+                                                ImageHdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder, myEncoderParameters);
                                             }
 
-                                            if (hdrDetectionhigh <= AppSetting.Data.hdrDetectionhigh && hdrDetectionlow <= AppSetting.Data.hdrDetectionlow)
-                                            {
-                                                hdrOn = false;
-                                            }
+                                            HdrOn = false;
+
                                         }
-                                        MainImageControl.Image = ImagehdrMedium;
+                                        MainImageControl.Image = ImageHdrMedium;
 
 
                                     }
@@ -2316,62 +2649,76 @@ namespace AllSky_2020
                                 }
                                 else
                                 {
-                                    MainImageControl.Image = imageFrame;
+                                    if (AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
+                                    {
+                                        AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
+                                    }
+                                    MainImageControl.Image = ImageFrame;
                                     if (AppSetting.Data.ExposureTime > 1)
                                     {
-                                        if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+                                        if (ColorValue > MinLight - 2 && ColorValue <= MaxLight + 2)
                                         {
-                                            Control_Jump = 2;
+                                            ControlJump = 2.11;
+                                            Console.WriteLine("ControlJump = 2.11;");
                                         }
-                                        else if (colorValue > minLight - 5 && colorValue <= maxLight + 5)
+                                        else if (ColorValue > MinLight - 5 && ColorValue <= MaxLight + 5)
                                         {
-                                            Control_Jump = 2.1;
+                                            ControlJump = 2.1;
+                                            Console.WriteLine("ControlJump = 2.1;");
                                         }
-                                        else if (colorValue > minLight - 2 && colorValue <= maxLight + 2)
+                                        else if (ColorValue > MinLight - 40 && ColorValue <= MaxLight + 40)
                                         {
-                                            Control_Jump = 2.11;
+                                            ControlJump = 2;
+                                            Console.WriteLine("ControlJump = 2;");
                                         }
                                         else
                                         {
-                                            Exposure_Adjust();
-                                            Control_Jump = 1;
+                                            Console.WriteLine("ControlJump = 1;");
+                                            ControlJump = 1;
+                                            ExposureAdjust();
                                         }
                                     }
                                     else
                                     {
-                                        Control_Jump = 1.7;
+                                        ControlJump = 1.7;
                                     }
 
-                                    if (colorValue > maxLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
-                                        && recover != false)
+                                    if (ColorValue > MaxLightHdr && CameraStateText.Text != "ASI_EXP_WORKING"
+                                        && Recover != false)
                                     {
                                         //AppSetting.Data.ExposureTime -
-                                        bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
-                                        Console.WriteLine("bestValue" + bestValue);
-                                        AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                        recover = false;
+                                        BestValue = ((AppSetting.Data.ExposureTime / GoldenRatio) * (ControlJump));
+                                        Console.WriteLine("BestValue" + BestValue);
+                                        AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                        Recover = false;
                                         if (AppSetting.Data.ExposureTime < 0.3)
                                         {
                                             AppSetting.Data.ExposureTime = 0.3;
                                         }
+                                        if (AppSetting.Data.ExposureTime >= AppSetting.Data.MAX_SHUTTER)
+                                        {
+                                            AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
+                                        }
 
                                     }
-                                    else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING"
-                                        && recover != false
+                                    else if (ColorValue < MinLightHdr && CameraStateText.Text != "ASI_EXP_WORKING"
+                                        && Recover != false
                                         && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
                                     {
                                         //AppSetting.Data.ExposureTime +
-                                        bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
-                                        Console.WriteLine("bestValue" + bestValue);
-                                        AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                        recover = false;
+                                        BestValue = ((AppSetting.Data.ExposureTime * GoldenRatio) / (ControlJump));
+                                        Console.WriteLine("BestValue" + BestValue);
+                                        AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                        Recover = false;
                                     }
-                                    timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                    Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
-                                    if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0)
+                                    //TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                    Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
+
+                                    if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && ConnectedCameras > 0)
                                     {
-                                        timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                        imageFrame.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder, myEncoderParameters);
+
+                                        TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                        ImageFrame.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder, myEncoderParameters);
 
                                     }
                                 }
@@ -2384,131 +2731,142 @@ namespace AllSky_2020
                             //=========================Force HDR===========================
                             else if (hdr_On.CheckState != 0)
                             {
-                                bool doOne;
-                                doOne = false;
-                                int imageMerge_status = 0;
+                                bool DoOne;
+                                DoOne = false;
+                                int ImageMergeStatus = 0;
                                 autoHDR.Checked = false;
                                 if (AppSetting.Data.ExposureTime > 1)
                                 {
-                                    if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+
+                                    if (ColorValue > MinLight - 2 && ColorValue <= MaxLight + 2 && AppSetting.Data.ExposureTime < 5000)
                                     {
-                                        Control_Jump = 2;
+                                        ControlJump = 2.1;
+                                        Console.WriteLine("ControlJump = 2;");
+                                    }
+                                    else if (ColorValue > MinLight - 40 && ColorValue <= MaxLight + 40)
+                                    {
+                                        ControlJump = 2;
+                                        Console.WriteLine("ControlJump = 2;");
                                     }
                                     else
                                     {
-                                        Exposure_Adjust();
-                                        Control_Jump = 1;
+                                        Console.WriteLine("ControlJump = 1;");
+                                        ControlJump = 1;
+                                        ExposureAdjust();
                                     }
+
                                 }
                                 else
                                 {
-                                    Control_Jump = 1.6;
+                                    ControlJump = 1.6;
                                 }
 
-                                if (colorValue > maxLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false)
+                                if (ColorValue > MaxLightHdr && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                 {
                                     //AppSetting.Data.ExposureTime -
-                                    bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
-                                    Console.WriteLine("bestValue" + bestValue);
-                                    AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                    recover = false;
+                                    BestValue = ((AppSetting.Data.ExposureTime / GoldenRatio) * (ControlJump));
+                                    Console.WriteLine("BestValue" + BestValue);
+                                    AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                    Recover = false;
                                     if (AppSetting.Data.ExposureTime < 0.3)
                                     {
                                         AppSetting.Data.ExposureTime = 0.3;
                                     }
 
                                 }
-                                else if (colorValue < minLight_hdr && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false)
+                                else if (ColorValue < MinLightHdr && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                 {
                                     //AppSetting.Data.ExposureTime +
-                                    bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
-                                    Console.WriteLine("bestValue" + bestValue);
-                                    AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                    recover = false;
+                                    BestValue = ((AppSetting.Data.ExposureTime * GoldenRatio) / (ControlJump));
+                                    Console.WriteLine("BestValue" + BestValue);
+                                    AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                    Recover = false;
 
                                 }
-                                else if (colorValue >= minLight_hdr - 10 && colorValue <= maxLight_hdr + 10 && doOne == false)
+                                else if (ColorValue >= MinLightHdr - 10 && ColorValue <= MaxLightHdr + 10 && DoOne == false)
                                 {
                                     ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                                     System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
                                     EncoderParameters myEncoderParameters = new EncoderParameters(1);
                                     EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                                     myEncoderParameters.Param[0] = myEncoderParameter;
-                                    float expTimesMedium = 1, expTimesMax = 1, expTimesMin = 1;
+                                    float ExpTimesMedium = 1, ExpTimesMax = 1, ExpTimesMin = 1;
                                     Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\");
-                                    if (maxLight_hdr == AppSetting.Data.maxLight && minLight_hdr == AppSetting.Data.minLight)
+                                    if (MaxLightHdr == AppSetting.Data.MaxLight && MinLightHdr == AppSetting.Data.MinLight)
                                     {
-                                        doOne = true;
-                                        imageMerge_status = 1;
-                                        expTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
-                                        hdrMedium = hdrOutput;
-                                        hdrMedium._GammaCorrect(0.4);
-                                        Console.WriteLine("expTimesMedium = " + expTimesMedium);
-                                        hdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrMedium.jpg", jpgEncoder, myEncoderParameters);
-                                        maxLight_hdr = AppSetting.Data.maxLight - 40;
-                                        minLight_hdr = AppSetting.Data.minLight - 40;
+                                        DoOne = true;
+                                        ImageMergeStatus = 1;
+                                        ExpTimesMedium = (float)AppSetting.Data.ExposureTime / 1000;
+                                        //ProcessFrame.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                        HdrMedium = HdrOutput;
+                                        //NonHdr = ProcessFrame;
+                                        HdrMedium._GammaCorrect(0.5);
+                                        Console.WriteLine("ExpTimesMedium = " + ExpTimesMedium);
+                                        HdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrMedium.jpg", jpgEncoder, myEncoderParameters);
+                                        MaxLightHdr = AppSetting.Data.MaxLight - 40;
+                                        MinLightHdr = AppSetting.Data.MinLight - 40;
 
 
 
                                     }
-                                    else if (maxLight_hdr == AppSetting.Data.maxLight - 40 && minLight_hdr == AppSetting.Data.minLight - 40 && doOne == false)
+                                    else if (MaxLightHdr == AppSetting.Data.MaxLight - 40 && MinLightHdr == AppSetting.Data.MinLight - 40 && DoOne == false)
                                     {
-                                        doOne = true;
-                                        imageMerge_status = 2;
-                                        expTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
-                                        hdrLow = hdrOutput;
-                                        hdrLow._GammaCorrect(0.4);
-                                        Console.WriteLine("expTimesMin = " + expTimesMin);
-                                        hdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrLow.jpg", jpgEncoder, myEncoderParameters);
-                                        maxLight_hdr = AppSetting.Data.maxLight + 50;
-                                        minLight_hdr = AppSetting.Data.minLight + 30;
+                                        DoOne = true;
+                                        ImageMergeStatus = 2;
+                                        ExpTimesMin = (float)AppSetting.Data.ExposureTime / 1000;
+                                        HdrLow = HdrOutput;
+                                        HdrLow._GammaCorrect(0.5);
+                                        Console.WriteLine("ExpTimesMin = " + ExpTimesMin);
+                                        HdrLow.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrLow.jpg", jpgEncoder, myEncoderParameters);
+                                        MaxLightHdr = AppSetting.Data.MaxLight + 50;
+                                        MinLightHdr = AppSetting.Data.MinLight + 30;
 
 
                                     }
-                                    else if (maxLight_hdr == AppSetting.Data.maxLight + 50 && minLight_hdr == AppSetting.Data.minLight + 30 && doOne == false)
+                                    else if (MaxLightHdr == AppSetting.Data.MaxLight + 50 && MinLightHdr == AppSetting.Data.MinLight + 30 && DoOne == false)
                                     {
-                                        doOne = true;
-                                        imageMerge_status = 3;
-                                        expTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
-                                        hdrHigh = hdrOutput;
-                                        hdrHigh._GammaCorrect(0.4);
-                                        hdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "hdrHigh.jpg", jpgEncoder, myEncoderParameters);
-                                        maxLight_hdr = AppSetting.Data.maxLight;
-                                        minLight_hdr = AppSetting.Data.minLight;
+                                        DoOne = true;
+                                        ImageMergeStatus = 3;
+                                        ExpTimesMax = (float)AppSetting.Data.ExposureTime / 1000;
+                                        HdrHigh = HdrOutput;
+                                        HdrHigh._GammaCorrect(0.5);
+                                        HdrHigh.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\HDR" + @"\" + "HdrHigh.jpg", jpgEncoder, myEncoderParameters);
+                                        MaxLightHdr = AppSetting.Data.MaxLight;
+                                        MinLightHdr = AppSetting.Data.MinLight;
                                     }
-                                    if (imageMerge_status == 3)
+                                    if (ImageMergeStatus == 3)
                                     {
                                         if (AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
                                         {
                                             AppSetting.Data.ExposureTime = AppSetting.Data.MAX_SHUTTER;
                                         }
-                                        imageMerge_status = 0;
+                                        ImageMergeStatus = 0;
 
-                                        for (int i = 0; i < hdrMedium.Height; i++)
+                                        for (int i = 0; i < HdrMedium.Height; i++)
                                         {
-                                            for (int j = 0; j < hdrMedium.Width; j++)
+                                            for (int j = 0; j < HdrMedium.Width; j++)
                                             {
-                                                if (hdrMedium.Data[i, j, 0] > AppSetting.Data.maxLight
-                                                    && hdrMedium.Data[i, j, 1] > AppSetting.Data.maxLight
-                                                    && hdrMedium.Data[i, j, 2] > AppSetting.Data.maxLight)
+                                                if (HdrMedium.Data[i, j, 0] > AppSetting.Data.MaxLight
+                                                    && HdrMedium.Data[i, j, 1] > AppSetting.Data.MaxLight
+                                                    && HdrMedium.Data[i, j, 2] > AppSetting.Data.MaxLight)
                                                 {
 
-                                                    hdrMedium.Data[i, j, 0] = (byte)((hdrMedium.Data[i, j, 0] + hdrLow.Data[i, j, 0]) / 2);
-                                                    hdrMedium.Data[i, j, 1] = (byte)((hdrMedium.Data[i, j, 1] + hdrLow.Data[i, j, 1]) / 2);
-                                                    hdrMedium.Data[i, j, 2] = (byte)((hdrMedium.Data[i, j, 2] + hdrLow.Data[i, j, 2]) / 2);
+                                                    HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrLow.Data[i, j, 0]) / 2);
+                                                    HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrLow.Data[i, j, 1]) / 2);
+                                                    HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrLow.Data[i, j, 2]) / 2);
 
                                                 }
-                                                else if (hdrMedium.Data[i, j, 0] < AppSetting.Data.minLight
-                                                    && hdrMedium.Data[i, j, 1] < AppSetting.Data.minLight
-                                                    && hdrMedium.Data[i, j, 2] < AppSetting.Data.minLight
-                                                    && hdrMedium.Data[i, j, 0] > 10
-                                                    && hdrMedium.Data[i, j, 1] > 10
-                                                    && hdrMedium.Data[i, j, 2] > 10)
+                                                else if (HdrMedium.Data[i, j, 0] < AppSetting.Data.MinLight
+                                                    && HdrMedium.Data[i, j, 1] < AppSetting.Data.MinLight
+                                                    && HdrMedium.Data[i, j, 2] < AppSetting.Data.MinLight
+                                                    && HdrMedium.Data[i, j, 0] > 10
+                                                    && HdrMedium.Data[i, j, 1] > 10
+                                                    && HdrMedium.Data[i, j, 2] > 10)
                                                 {
 
-                                                    hdrMedium.Data[i, j, 0] = (byte)((hdrMedium.Data[i, j, 0] + hdrHigh.Data[i, j, 0]) / 2);
-                                                    hdrMedium.Data[i, j, 1] = (byte)((hdrMedium.Data[i, j, 1] + hdrHigh.Data[i, j, 1]) / 2);
-                                                    hdrMedium.Data[i, j, 2] = (byte)((hdrMedium.Data[i, j, 2] + hdrHigh.Data[i, j, 2]) / 2);
+                                                    HdrMedium.Data[i, j, 0] = (byte)((HdrMedium.Data[i, j, 0] + HdrHigh.Data[i, j, 0]) / 2);
+                                                    HdrMedium.Data[i, j, 1] = (byte)((HdrMedium.Data[i, j, 1] + HdrHigh.Data[i, j, 1]) / 2);
+                                                    HdrMedium.Data[i, j, 2] = (byte)((HdrMedium.Data[i, j, 2] + HdrHigh.Data[i, j, 2]) / 2);
 
                                                 }
 
@@ -2516,40 +2874,46 @@ namespace AllSky_2020
 
 
                                         }
-                                        hdrMedium._SmoothGaussian(1);
-                                        hdrMedium._EqualizeHist();
-                                        hdrMedium._GammaCorrect(1.4d);
-                                        Image<Bgr, Byte> ImagehdrMedium = hdrMedium;
-                                        ImagehdrMedium.Draw(borderTime, new Bgr(Color.Black), -1);
-                                        ImagehdrMedium.Draw(borderTime, new Bgr(Color.White), 2);
-                                        ImagehdrMedium.Draw(borderExposureTime, new Bgr(Color.Black), -1);
-                                        ImagehdrMedium.Draw(borderExposureTime, new Bgr(Color.White), 2);
-                                        CvInvoke.PutText(ImagehdrMedium, "UTC " + timesStamp, new Point(0, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                                        if (exposureTime_Show < 1000 && exposureTime_Show > 1)
+                                        HdrMedium._SmoothGaussian(1);
+                                        HdrMedium._EqualizeHist();
+                                        HdrMedium._GammaCorrect(1.3d);
+                                        Image<Bgr, Byte> ImageHdrMedium = HdrMedium;
+                                        ImageHdrMedium.Draw(BorderTime, new Bgr(Color.Black), -1);
+                                        ImageHdrMedium.Draw(BorderTime, new Bgr(Color.White), 2);
+                                        ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
+                                        ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.White), 2);
+                                        CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                                         {
-                                            CvInvoke.PutText(ImagehdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                                            CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
-                                        else if (exposureTime_Show >= 1000)
+                                        else if (ExposureTimeShow >= 1000)
                                         {
-                                            CvInvoke.PutText(ImagehdrMedium, Math.Round(AppSetting.Data.ExposureTime / 1000, 0) + " sec", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                                            CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime / 1000, 0) + " sec", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
-                                        else if (exposureTime_Show >= 0 && exposureTime_Show <= 1)
+                                        else if (ExposureTimeShow >= 0 && ExposureTimeShow <= 1)
                                         {
-                                            CvInvoke.PutText(ImagehdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(borderWidth + 50, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
+                                            CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
 
-                                        CvInvoke.PutText(ImagehdrMedium, "HDR ON", new Point(borderWidth - 200, borderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, thickness);
-                                        Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
-                                        timeNow_Chack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                        if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && ConnectedCameras > 0 && StopSave.Checked == false || AppSetting.Data.ExposureTime >= 60000)
+                                        CvInvoke.PutText(ImageHdrMedium, "HDR ON", new Point(BorderWidth - 200, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
+                                        //Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\NonHdr\" + TimeFolder);
+                                        //TimeNowChack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                        if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && ConnectedCameras > 0 && StopSave.Checked == false || AppSetting.Data.ExposureTime >= 60000)
                                         {
-                                            timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                            ImagehdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder,
+                                            TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+
+
+                                            //NonHdr.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\NonHdr\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder,
+                                            //myEncoderParameters);
+
+                                            ImageHdrMedium.ToBitmap().Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder,
                                             myEncoderParameters);
                                         }
 
 
-                                        MainImageControl.Image = ImagehdrMedium;
+                                        MainImageControl.Image = ImageHdrMedium;
                                     }
 
 
@@ -2566,59 +2930,67 @@ namespace AllSky_2020
                             {
 
 
-                                minLight = AppSetting.Data.minLight;
-                                maxLight = AppSetting.Data.maxLight;
+                                MinLight = AppSetting.Data.MinLight;
+                                MaxLight = AppSetting.Data.MaxLight;
 
                                 if (AppSetting.Data.ExposureTime > 1)
                                 {
-                                    if (colorValue > minLight - 30 && colorValue <= maxLight + 30)
+
+
+
+                                    if (ColorValue > MinLight - 2 && ColorValue <= MaxLight + 2)
                                     {
-                                        Control_Jump = 2;
+                                        ControlJump = 2.11;
+                                        Console.WriteLine("ControlJump = 2.11;");
                                     }
-                                    else if (colorValue > minLight - 5 && colorValue <= maxLight + 5)
+                                    else if (ColorValue > MinLight - 5 && ColorValue <= MaxLight + 5)
                                     {
-                                        Control_Jump = 2.1;
+                                        ControlJump = 2.1;
+                                        Console.WriteLine("ControlJump = 2.1;");
                                     }
-                                    else if (colorValue > minLight - 2 && colorValue <= maxLight + 2)
+                                    else if (ColorValue > MinLight - 40 && ColorValue <= MaxLight + 40)
                                     {
-                                        Control_Jump = 2.11;
+                                        ControlJump = 2;
+                                        Console.WriteLine("ControlJump = 2;");
                                     }
                                     else
                                     {
-                                        Exposure_Adjust();
-                                        Control_Jump = 1;
+                                        Console.WriteLine("ControlJump = 1;");
+                                        ControlJump = 1;
+                                        ExposureAdjust();
                                     }
+
                                 }
                                 else
                                 {
-                                    Control_Jump = 1.7;
+                                    ControlJump = 1.7;
                                 }
-                                if (colorValue >= maxLight && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false
+                                if (ColorValue >= MaxLight && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false
                                    )
                                 {
 
-                                    bestValue = ((AppSetting.Data.ExposureTime / goldenRatio) * (Control_Jump));
-                                    Console.WriteLine("bestValue" + bestValue);
-                                    AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
-                                    recover = false;
+                                    BestValue = ((AppSetting.Data.ExposureTime / GoldenRatio) * (ControlJump));
+                                    Console.WriteLine("BestValue" + BestValue);
+                                    AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
+                                    Recover = false;
                                     if (AppSetting.Data.ExposureTime < 0.3)
                                     {
                                         AppSetting.Data.ExposureTime = 0.3;
                                     }
                                     //AppSetting.Data.ExposureTime -
                                 }
-                                else if (colorValue <= minLight && CameraStateText.Text != "ASI_EXP_WORKING" && recover != false && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
+                                else if (ColorValue <= MinLight && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false && AppSetting.Data.ExposureTime <= AppSetting.Data.MAX_SHUTTER)
                                 {
                                     if (AppSetting.Data.ExposureTime < 0.3)
                                     {
                                         AppSetting.Data.ExposureTime = 0.3;
                                     }
 
-                                    bestValue = ((AppSetting.Data.ExposureTime * goldenRatio) / (Control_Jump));
-                                    Console.WriteLine("bestValue" + bestValue);
-                                    AppSetting.Data.ExposureTime = Math.Round(bestValue, 2);
+                                    BestValue = ((AppSetting.Data.ExposureTime * GoldenRatio) / (ControlJump));
+                                    Console.WriteLine("BestValue" + BestValue);
+                                    AppSetting.Data.ExposureTime = Math.Round(BestValue, 2);
 
-                                    recover = false;
+                                    Recover = false;
                                     //AppSetting.Data.ExposureTime +
                                 }
                                 else if (AppSetting.Data.ExposureTime > AppSetting.Data.MAX_SHUTTER)
@@ -2629,15 +3001,12 @@ namespace AllSky_2020
 
                             }
 
-                            if (AppSetting.Data.ExposureTime > 1000000)
-                            {
-                                AppSetting.Data.ExposureTime = 1000000;
-                            }
+
                             ExpouseTimeText.Value = (decimal)AppSetting.Data.ExposureTime;
 
-                            keoGramsImage = new Rectangle(new Point(cameraWidth / 2, cameraHeight / 2), new Size(1, cameraHeight));
-                            keoGramsFrame.ROI = keoGramsImage;
-                            Bitmap outputImage = keoGramsFrame.ToBitmap();
+                            KeoGramsImage = new Rectangle(new Point(CameraWidth / 2, CameraHeight / 2), new Size(1, CameraHeight));
+                            KeoGramsFrame.ROI = KeoGramsImage;
+                            Bitmap outputImage = KeoGramsFrame.ToBitmap();
 
 
 
@@ -2653,32 +3022,32 @@ namespace AllSky_2020
                                 myEncoderParameters.Param[0] = myEncoderParameter;
 
                                 string timeMinutes = DateTime.Now.AddMinutes(-1).ToString("yyyy_MM_dd__HH_mm");
-                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder);
-                                Bitmap keogramsImage = keoGramsFrame.ToBitmap();
-                                string pathKeograms = AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + timeMinutes + "keoGrams" + ".jpg";
+                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder);
+                                Bitmap KeoGramsImage = KeoGramsFrame.ToBitmap();
+                                string pathKeograms = AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + timeMinutes + "keoGrams" + ".jpg";
                                 Console.WriteLine(pathKeograms);
                                 int Minutesinday = (int)DateTime.Now.TimeOfDay.TotalMinutes;
 
 
                                 if (File.Exists(pathKeograms))
                                 {
-                                    keogramsImage = new Bitmap(pathKeograms);
-                                    Console.WriteLine("keogramsImage1");
+                                    KeoGramsImage = new Bitmap(pathKeograms);
+                                    Console.WriteLine("KeoGramsImage1");
                                 }
-                                else if (File.Exists(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg") && !File.Exists(pathKeograms))
+                                else if (File.Exists(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + "keoGrams" + ".jpg") && !File.Exists(pathKeograms))
                                 {
-                                    keogramsImage = new Bitmap(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg");
-                                    Console.WriteLine("keogramsImage2");
+                                    KeoGramsImage = new Bitmap(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + "keoGrams" + ".jpg");
+                                    Console.WriteLine("KeoGramsImage2");
                                 }
 
-                                Bitmap keograms = keoGramsFrame.ToBitmap();
+                                Bitmap keograms = KeoGramsFrame.ToBitmap();
 
-                                if (!File.Exists(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg"))
+                                if (!File.Exists(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + "keoGrams" + ".jpg"))
                                 {
 
 
 
-                                    var bitmap = new Bitmap(Minutesinday, keogramsImage.Height);
+                                    var bitmap = new Bitmap(Minutesinday, KeoGramsImage.Height);
 
                                     for (var x = 0; x < bitmap.Width; x++)
                                     {
@@ -2690,31 +3059,20 @@ namespace AllSky_2020
                                         }
                                     }
 
-                                    bitmap.Save(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg", jpgEncoder,
+                                    bitmap.Save(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + "keoGrams" + ".jpg", jpgEncoder,
                                     myEncoderParameters);
-                                    Console.WriteLine("keogramsImagebitmap1");
+                                    Console.WriteLine("KeoGramsImagebitmap1");
 
                                 }
-                                /*else if (!File.Exists(pathKeograms))
+                                else if (!File.Exists(pathKeograms))
                                 {
-                                    Console.WriteLine("keogramsImagebitmap2");
-                                    var directory = new DirectoryInfo(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder);
+                                    Console.WriteLine("KeoGramsImagebitmap2");
+                                    var directory = new DirectoryInfo(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder);
                                     var myFile = (from f in directory.GetFiles()
                                                   orderby f.LastWriteTime descending
                                                   select f).First();
 
-
-                                    ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
-                                    System.Drawing.Imaging.Encoder myEncoder =
-                                            System.Drawing.Imaging.Encoder.Quality;
-                                    EncoderParameters myEncoderParameters = new EncoderParameters(1);
-                                    EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder,
-                                    50L);
-
-
-                                    myEncoderParameters.Param[0] = myEncoderParameter;
-
-                                    var bitmap = new Bitmap(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + myFile.ToString());
+                                    var bitmap = new Bitmap(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + myFile.ToString());
 
                                     for (var x = bitmap.Width; x < Minutesinday; x++)
                                     {
@@ -2726,32 +3084,32 @@ namespace AllSky_2020
                                         }
                                     }
 
-                                    keogramsImage = bitmap;
+                                    KeoGramsImage = bitmap;
 
-                                }*/
-
-
+                                }
 
 
-                                //int outputImageHeight = keogramsImage.Height > keograms.Height ? keogramsImage.Height : keograms.Height;
-                                int outputImageHeight = keogramsImage.Height;
-                                int outputImageWidth = keogramsImage.Width + keograms.Width;
+
+
+                                //int outputImageHeight = KeoGramsImage.Height > keograms.Height ? KeoGramsImage.Height : keograms.Height;
+                                int outputImageHeight = KeoGramsImage.Height;
+                                int outputImageWidth = KeoGramsImage.Width + keograms.Width;
 
                                 outputImage = new Bitmap(outputImageWidth, outputImageHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                                 Graphics graphics = Graphics.FromImage(outputImage);
 
-                                graphics.DrawImage(keogramsImage, new Rectangle(new Point(), keogramsImage.Size),
-                                    new Rectangle(new Point(), keogramsImage.Size), GraphicsUnit.Pixel);
-                                graphics.DrawImage(keograms, new Rectangle(new Point(keogramsImage.Width, 0), keograms.Size),
+                                graphics.DrawImage(KeoGramsImage, new Rectangle(new Point(), KeoGramsImage.Size),
+                                    new Rectangle(new Point(), KeoGramsImage.Size), GraphicsUnit.Pixel);
+                                graphics.DrawImage(keograms, new Rectangle(new Point(KeoGramsImage.Width, 0), keograms.Size),
                                     new Rectangle(new Point(), keograms.Size), GraphicsUnit.Pixel);
 
 
-                                //File.Delete(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + "keoGrams" + ".jpg");
-                                if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore && StopSave.Checked == false)
+                                //File.Delete(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + "keoGrams" + ".jpg");
+                                if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore && StopSave.Checked == false)
                                 {
-                                    timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
-                                    outputImage.Save(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + timeFolder + @"\" + DateTime.Now.ToString("yyyy_MM_dd__HH_mm") + "keoGrams" + ".jpg", jpgEncoder,
+                                    TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                    outputImage.Save(AppSetting.Data.SaveFileDialog + @"\keoGrams" + @"\" + TimeFolder + @"\" + DateTime.Now.ToString("yyyy_MM_dd__HH_mm") + "keoGrams" + ".jpg", jpgEncoder,
                                     myEncoderParameters);
                                 }
 
@@ -2759,13 +3117,13 @@ namespace AllSky_2020
 
                             }
 
-                            if (AppSetting.Data.SaveFileDialog != "" && timeNow_Chack != timeBefore
-                                && colorValue <= 150
+                            if (AppSetting.Data.SaveFileDialog != "" && TimeNowChack != TimeBefore
+                                && ColorValue <= 150
                                 && ConnectedCameras > 0 && autoHDR.CheckState == 0
                                 && hdr_On.CheckState == 0
                                 && StopSave.Checked == false)
                             {
-                                timeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
+                                TimeBefore = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
 
                                 ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
                                 System.Drawing.Imaging.Encoder myEncoder =
@@ -2775,16 +3133,16 @@ namespace AllSky_2020
                                 50L);
 
                                 myEncoderParameters.Param[0] = myEncoderParameter;
-                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder);
+                                Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
 
-                                bmpImage_Frame.Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + timeFolder + @"\" + timeNow + ".jpg", jpgEncoder,
+                                BmpImageFrame.Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder,
                                     myEncoderParameters);
 
 
 
                                 if (SaveLog.CheckState != 0)
                                 {
-                                    File.AppendAllText(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\log " + timeFolder + ".txt", timeNow + " ExpouseTime = " + ExpouseTimeText.Value.ToString() + " Exposuring = " + ExposuringText.Text.ToString() + " Color(0-255) = " + colorValue + "\n");
+                                    File.AppendAllText(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\log " + TimeFolder + ".txt", TimeNow + " ExpouseTime = " + ExpouseTimeText.Value.ToString() + " Exposuring = " + ExposuringText.Text.ToString() + " Color(0-255) = " + ColorValue + "\n");
                                 }
 
                             }
