@@ -118,7 +118,6 @@
             this.SavePath = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.panel5 = new System.Windows.Forms.Panel();
-            this.AutoISO = new System.Windows.Forms.CheckBox();
             this.SpeedMode = new System.Windows.Forms.CheckBox();
             this.ShowFocusPoint = new System.Windows.Forms.CheckBox();
             this.checkBoxAverage = new System.Windows.Forms.CheckBox();
@@ -1109,7 +1108,6 @@
             // 
             // panel5
             // 
-            this.panel5.Controls.Add(this.AutoISO);
             this.panel5.Controls.Add(this.SpeedMode);
             this.panel5.Controls.Add(this.ShowFocusPoint);
             this.panel5.Controls.Add(this.checkBoxAverage);
@@ -1125,20 +1123,10 @@
             this.panel5.Size = new System.Drawing.Size(395, 100);
             this.panel5.TabIndex = 14;
             // 
-            // AutoISO
-            // 
-            this.AutoISO.AutoSize = true;
-            this.AutoISO.Location = new System.Drawing.Point(186, 31);
-            this.AutoISO.Name = "AutoISO";
-            this.AutoISO.Size = new System.Drawing.Size(69, 17);
-            this.AutoISO.TabIndex = 14;
-            this.AutoISO.Text = "Auto ISO";
-            this.AutoISO.UseVisualStyleBackColor = true;
-            // 
             // SpeedMode
             // 
             this.SpeedMode.AutoSize = true;
-            this.SpeedMode.Location = new System.Drawing.Point(257, 31);
+            this.SpeedMode.Location = new System.Drawing.Point(194, 31);
             this.SpeedMode.Name = "SpeedMode";
             this.SpeedMode.Size = new System.Drawing.Size(84, 17);
             this.SpeedMode.TabIndex = 13;
@@ -1719,7 +1707,6 @@
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.Label label36;
-        private System.Windows.Forms.CheckBox AutoISO;
     }
 }
 

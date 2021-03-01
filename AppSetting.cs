@@ -31,10 +31,10 @@ namespace AllSky_2020
             public double TEMPERATURE { get; set; } = 0.0;
             public double ExposureTime { get; set; } = 100;
             public double ZoomScale { get; set; } = 1;
-            public int maxLight { get; set; } = 125;
-            public int minLight { get; set; } = 80;
-            public int hdrDetectionhigh { get; set; } = 12000;
-            public int hdrDetectionlow { get; set; } = 300000;
+            public int MaxLight { get; set; } = 125;
+            public int MinLight { get; set; } = 100;
+            public int HdrDetectionHigh { get; set; } = 30000;
+            public int HdrDetectionLow { get; set; } = 300000;
             public int hdrPixelvalueshigh { get; set; } = 255;
             public int hdrPixelvalueslow { get; set; } = 60;
             public double MIN_ISO { get; set; } = 0.0;        //100
