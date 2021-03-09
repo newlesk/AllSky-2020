@@ -2032,6 +2032,16 @@ namespace AllSky_2020
                                     ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                 }
+                                else
+                                {
+                                    if (AppSetting.Data.MIN_ISO <= 100 && ColorValue < MinLight)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 200;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                }
 
                             }
 
