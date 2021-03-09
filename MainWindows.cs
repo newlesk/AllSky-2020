@@ -2034,22 +2034,29 @@ namespace AllSky_2020
                                 }
                                 else
                                 {
-                                    if (AppSetting.Data.MIN_ISO <= 100 && ColorValue < MinLight)
+                                    if (AppSetting.Data.MIN_ISO <= 100 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
                                     {
                                         AppSetting.Data.MIN_ISO = 200;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
-                                    }else if (AppSetting.Data.MIN_ISO <= 200 && ColorValue < MinLight)
+                                    }else if (AppSetting.Data.MIN_ISO <= 200 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
                                     {
                                         AppSetting.Data.MIN_ISO = 300;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                     }
-                                    else if (AppSetting.Data.MIN_ISO <= 300 && ColorValue < MinLight)
+                                    else if (AppSetting.Data.MIN_ISO <= 300 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
                                     {
                                         AppSetting.Data.MIN_ISO = 400;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                    else if (AppSetting.Data.MIN_ISO <= 400 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 500;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
