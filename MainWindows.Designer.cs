@@ -160,6 +160,8 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
+            this.flipXCheck = new System.Windows.Forms.CheckBox();
+            this.flipYCheck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -282,7 +284,7 @@
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(840, 346);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Setting";
@@ -320,7 +322,7 @@
             // Histo
             // 
             this.Histo.Location = new System.Drawing.Point(3, 3);
-            this.Histo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Histo.Margin = new System.Windows.Forms.Padding(4);
             this.Histo.Name = "Histo";
             this.Histo.Size = new System.Drawing.Size(368, 320);
             this.Histo.TabIndex = 0;
@@ -618,8 +620,8 @@
             this.tabPage2.Controls.Add(this.HoughCircles);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPage2.Size = new System.Drawing.Size(840, 345);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(840, 346);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -962,8 +964,8 @@
             this.tabPage4.Controls.Add(this.pixelValuesText);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPage4.Size = new System.Drawing.Size(840, 345);
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(840, 346);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Values";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -1042,8 +1044,8 @@
             this.tabPage3.Controls.Add(this.SavePath);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPage3.Size = new System.Drawing.Size(840, 345);
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(840, 346);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Save";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1159,7 +1161,7 @@
             // 
             this.checkBoxAverage.AutoSize = true;
             this.checkBoxAverage.Location = new System.Drawing.Point(72, 72);
-            this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBoxAverage.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxAverage.Name = "checkBoxAverage";
             this.checkBoxAverage.Size = new System.Drawing.Size(66, 17);
             this.checkBoxAverage.TabIndex = 9;
@@ -1181,7 +1183,7 @@
             // 
             this.checkBoxCenter.AutoSize = true;
             this.checkBoxCenter.Location = new System.Drawing.Point(144, 72);
-            this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBoxCenter.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxCenter.Name = "checkBoxCenter";
             this.checkBoxCenter.Size = new System.Drawing.Size(57, 17);
             this.checkBoxCenter.TabIndex = 8;
@@ -1387,6 +1389,8 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.flipYCheck);
+            this.groupBox4.Controls.Add(this.flipXCheck);
             this.groupBox4.Controls.Add(this.BtnSetCameraSetting);
             this.groupBox4.Controls.Add(this.MIN_ISOText);
             this.groupBox4.Controls.Add(this.label13);
@@ -1407,7 +1411,7 @@
             // 
             // BtnSetCameraSetting
             // 
-            this.BtnSetCameraSetting.Location = new System.Drawing.Point(130, 156);
+            this.BtnSetCameraSetting.Location = new System.Drawing.Point(130, 198);
             this.BtnSetCameraSetting.Name = "BtnSetCameraSetting";
             this.BtnSetCameraSetting.Size = new System.Drawing.Size(100, 23);
             this.BtnSetCameraSetting.TabIndex = 2;
@@ -1532,6 +1536,26 @@
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
             // 
+            // flipXCheck
+            // 
+            this.flipXCheck.AutoSize = true;
+            this.flipXCheck.Location = new System.Drawing.Point(101, 157);
+            this.flipXCheck.Name = "flipXCheck";
+            this.flipXCheck.Size = new System.Drawing.Size(52, 17);
+            this.flipXCheck.TabIndex = 12;
+            this.flipXCheck.Text = "Flip X";
+            this.flipXCheck.UseVisualStyleBackColor = true;
+            // 
+            // flipYCheck
+            // 
+            this.flipYCheck.AutoSize = true;
+            this.flipYCheck.Location = new System.Drawing.Point(101, 176);
+            this.flipYCheck.Name = "flipYCheck";
+            this.flipYCheck.Size = new System.Drawing.Size(52, 17);
+            this.flipYCheck.TabIndex = 13;
+            this.flipYCheck.Text = "Flip Y";
+            this.flipYCheck.UseVisualStyleBackColor = true;
+            // 
             // MainWindows
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1540,7 +1564,7 @@
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.panel2);
             this.Name = "MainWindows";
-            this.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Padding = new System.Windows.Forms.Padding(5);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AllSky-2020";
             this.Load += new System.EventHandler(this.MainWindows_Load);
@@ -1720,6 +1744,8 @@
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.CheckBox AutoISO;
+        private System.Windows.Forms.CheckBox flipYCheck;
+        private System.Windows.Forms.CheckBox flipXCheck;
     }
 }
 

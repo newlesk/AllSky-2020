@@ -44,6 +44,16 @@ namespace AllSky_2020
             public double MIN_APERTURE { get; set; } = 0.0;   //3.8
             public double LATITUDE { get; set; } = 0.0;
             public double LONGTITUDE { get; set; } = 0.0;
+
+
+            public bool IS_HOUGHCIRCLE { get; set; } = false;
+            public int HOUGHCIRCLE_X { get; set; } = 0;
+            public int HOUGHCIRCLE_Y { get; set; } = 0;
+            public int HOUGHCIRCLE_R { get; set; } = 0;
+            public bool HDR_AUTO { get; set; } = false;
+
+            public bool FLIP_X { get; set; } = false;
+            public bool FLIP_Y { get; set; } = false;
         }
 
         public static Settings Data;

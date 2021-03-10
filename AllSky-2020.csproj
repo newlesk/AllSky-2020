@@ -60,6 +60,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AstroNETLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\AstroNETLib.dll</HintPath>
+    </Reference>
     <Reference Include="Emgu.CV.UI, Version=3.4.3.3016, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.3.4.3.3016\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
@@ -154,6 +158,7 @@
     <Compile Include="SunHanler.cs" />
     <EmbeddedResource Include="MainWindows.resx">
       <DependentUpon>MainWindows.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -186,6 +191,9 @@
     <Content Include="ASICamera2_x64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="AstroNETLib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="License-LGPL.txt" />
     <Content Include="TAllSyk.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -193,12 +201,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AstroFUNC\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\AstroCalculator\AstroCalculation\AstroNETLib.csproj">
-      <Project>{aafd81cd-fe76-4870-9d29-58fd27ff9ab3}</Project>
-      <Name>AstroNETLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
