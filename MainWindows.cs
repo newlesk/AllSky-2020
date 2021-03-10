@@ -2044,7 +2044,7 @@ namespace AllSky_2020
 
                     if (IsAutoExposureTime.CheckState != 0) //On-Off AutoExposureTime 
                     {
-                        if (AutoISO.CheckState != 0)
+                        if (AutoISO.CheckState != 0 && CameraStateText.Text != "ASI_EXP_WORKING")
                         {
                             if (AppSetting.Data.ExposureTime <= 1000)
                             {
