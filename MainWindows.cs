@@ -2221,14 +2221,17 @@ namespace AllSky_2020
                                 EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                                 myEncoderParameters.Param[0] = myEncoderParameter;
 
-                                if (HdrDetectionHigh > AppSetting.Data.HdrDetectionHigh && HdrDetectionLow > AppSetting.Data.HdrDetectionLow)
+                                if (HdrDetectionHigh > AppSetting.Data.HdrDetectionHigh && HdrDetectionLow > AppSetting.Data.HdrDetectionLow && AppSetting.Data.ExposureTime < 60000)
                                 {
                                     HdrOn = true;
                                 }
 
-                                if (HdrOn == true)
+                                if (HdrOn == true && AppSetting.Data.ExposureTime < 60000)
                                 {
-
+                                    if(AppSetting.Data.ExposureTime >= 60000)
+                                    {
+                                        HdrOn = false;
+                                    }
                                     Console.WriteLine("OnHDR with = " + AppSetting.Data.ExposureTime);
                                     bool DoOne = false;
 
@@ -2255,6 +2258,8 @@ namespace AllSky_2020
                                     {
                                         ControlJump = 1.8;
                                     }
+
+                                    
 
                                     if (ColorValue > MaxLightHdr && CameraStateText.Text != "ASI_EXP_WORKING"
                                         && Recover != false && AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
@@ -2473,7 +2478,7 @@ namespace AllSky_2020
 
 
                                     }
-                                    else if (AppSetting.Data.ExposureTime >= 1)
+                                    else if (AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < 60000)
                                     {
                                         if (AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
                                         {
