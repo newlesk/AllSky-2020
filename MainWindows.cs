@@ -198,13 +198,31 @@ namespace AllSky_2020
             pixelValuesLowHDR.Text = AppSetting.Data.hdrPixelvalueslow.ToString();
             AutoISO.Checked = true;
 
+            flipXCheck.Checked = AppSetting.Data.FLIP_X;
+            flipYCheck.Checked = AppSetting.Data.FLIP_Y;
 
+            if (AppSetting.Data.IS_HOUGHCIRCLE)
+            {
+                /*
+                HoughCirclesX;
+                circleTemp[1] = HoughCirclesY;
+                circleTemp[2] = HoughCirclesRadius;
+                */
+                HoughCirclesX = AppSetting.Data.HOUGHCIRCLE_X;
+                HoughCirclesY = AppSetting.Data.HOUGHCIRCLE_Y;
+                HoughCirclesRadius = AppSetting.Data.HOUGHCIRCLE_R;
+                
+                //CannyThreshold_Box.Text = HoughCirclesX.ToString();
+                //CircleAccumulatorThreshold_Box.Text = HoughCirclesY.ToString();
+            }
+           
             if (IsAutoExposureTime.CheckState == 0)
             {
                 IsAutoExposureTime.Checked = true;
                 FocusPoint.Text = "21 Focus Points";
                 SpeedMode.Checked = true;
             }
+
             for (int i = 0; i < (HoughCircleslineCount / 2); i++)
             {
 
@@ -244,7 +262,7 @@ namespace AllSky_2020
 
             Task Capdatatain = Task.Run(async () =>
             {
-                STARTPROCESS:
+            STARTPROCESS:
 
 
                 if (ConnectedCameras > 0)
@@ -321,8 +339,11 @@ namespace AllSky_2020
                         GetExpError = ASICameraDll2.ASIGetDataAfterExp(CameraId, ImageBuf, (int)AppSetting.Data.ImageSize);
                         if (GetExpError == ASI_ERROR_CODE.ASI_SUCCESS)
                         {
-
                             RootFrame = new Image<Bgr, byte>((int)AppSetting.Data.ImageWidth, (int)AppSetting.Data.ImageHeight, (int)AppSetting.Data.ImageWidth * 3, ImageBuf);
+
+                            if (AppSetting.Data.FLIP_X) RootFrame = RootFrame.Flip(FlipType.Horizontal);
+                            if (AppSetting.Data.FLIP_Y) RootFrame = RootFrame.Flip(FlipType.Vertical);
+
                             ProcessFrameGray = RootFrame.Convert<Gray, Byte>();
                             ProcessFrame = RootFrame.Copy();
                             HoughCirclesFrame = RootFrame.Convert<Gray, Byte>();
@@ -357,7 +378,7 @@ namespace AllSky_2020
                     }
                     else
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(2000);
 
                     }
 
@@ -433,6 +454,8 @@ namespace AllSky_2020
                 AppSetting.Data.MIN_SHUTTER = MIN_SHUTTER;
                 AppSetting.Data.MAX_SHUTTER = MAX_SHUTTER;
                 AppSetting.Data.MIN_APERTURE = MIN_APERTURE;
+                AppSetting.Data.FLIP_X = flipXCheck.Checked;
+                AppSetting.Data.FLIP_Y = flipYCheck.Checked;
                 AppSetting.Save();
             }
             ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
@@ -635,14 +658,12 @@ namespace AllSky_2020
 
         private void autoHDR_CheckedChanged(object sender, EventArgs e)
         {
+            AppSetting.Data.HDR_AUTO = autoHDR.Checked;
+            AppSetting.Save();
+
             ImageMergeStatus = 0;
             ModeHDR = 0;
-        }
-
-        private void autoHDR_CheckedChanged_1(object sender, EventArgs e)
-        {
-            ImageMergeStatus = 0;
-        }
+        }    
 
         private void Save_HoughCircles_Click(object sender, EventArgs e)
         {
@@ -683,13 +704,34 @@ namespace AllSky_2020
 
             #region draw circles
             CircleImage = img;
+
+            int countCircle = 0;
+            int[] circleTemp = new int[3];
+
             foreach (CircleF circle in circles)
             {
                 CircleImage.Draw(circle, new Bgr(Color.Red), 2);
                 HoughCirclesX = (int)circle.Center.X;
                 HoughCirclesY = (int)circle.Center.Y;
                 HoughCirclesRadius = (int)circle.Radius;
+                circleTemp[0] = HoughCirclesX;
+                circleTemp[1] = HoughCirclesY;
+                circleTemp[2] = HoughCirclesRadius;
+                countCircle++;
+            }
 
+            if(countCircle == 1)
+            {
+                AppSetting.Data.HOUGHCIRCLE_X = circleTemp[0];
+                AppSetting.Data.HOUGHCIRCLE_Y = circleTemp[1];
+                AppSetting.Data.HOUGHCIRCLE_R = circleTemp[2];
+                AppSetting.Data.IS_HOUGHCIRCLE = true;
+                AppSetting.Save();
+            }
+            else
+            {
+                AppSetting.Data.IS_HOUGHCIRCLE = false;
+                AppSetting.Save();
             }
 
             HoughCircles.Image = CircleImage;
@@ -781,10 +823,6 @@ namespace AllSky_2020
                 HoughCirclesX = (int)circle.Center.X;
                 HoughCirclesY = (int)circle.Center.Y;
                 HoughCirclesRadius = (int)circle.Radius;
-
-
-
-
             }
 
             HoughCircles.Image = CircleImage;
@@ -1372,8 +1410,11 @@ namespace AllSky_2020
                     {
                         if (CentroidXright_DOWN > CentroidYright_DOWN)
                         {
-                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            if (j < BmpImageFrame.Height)
+                            {
+                                Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                                ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            }
                         }
                     }
                 }
@@ -1383,8 +1424,11 @@ namespace AllSky_2020
                     {
                         if (CentroidXrightmore_DOWN > CentroidYrightmore_DOWN)
                         {
-                            Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
-                            ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            if (j < BmpImageFrame.Height)
+                            {
+                                Color pixel = BmpImageFrame.GetPixel(Convert.ToInt32(i), Convert.ToInt32(j));
+                                ColorValue += (pixel.R + pixel.B + pixel.G) / 3;
+                            }
                         }
                     }
                 }
@@ -1710,7 +1754,7 @@ namespace AllSky_2020
                         }
                     }
                 }
-                ColorValue = (ColorValue / 1500);
+                ColorValue = (ColorValue / 1500);                
             }
             else if (FocusPoint.Text == "9 Focus Points")
             {
@@ -1964,7 +2008,8 @@ namespace AllSky_2020
                         MainImageControl.Image = ProcessFrame;
                     }
 
-                    string TimesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
+                    //string TimesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
+                    string TimesStamp = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
                     int Thickness = 5;
                     int BorderHeight = Int32.Parse(AppSetting.Data.ImageHeight.ToString());
                     int BorderWidth = Int32.Parse(AppSetting.Data.ImageWidth.ToString());
@@ -1975,10 +2020,12 @@ namespace AllSky_2020
                     TimeFolder = DateTime.Now.ToString("yyyy-MM-dd");
                     TimeNowChack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
                     BorderHeight = BorderHeight - 300;
-                    var BorderTime = new Rectangle(0, BorderHeight, 800, 100);
+                    //var BorderTime = new Rectangle(0, BorderHeight, 800, 100);
+                    var BorderTime = new Rectangle(0, BorderHeight, 700, 100);
                     ImageFrame.Draw(BorderTime, new Bgr(Color.Black), -1);
                     ImageFrame.Draw(BorderTime, new Bgr(Color.White), 2);
-                    CvInvoke.PutText(ImageFrame, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                    //CvInvoke.PutText(ImageFrame, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                    CvInvoke.PutText(ImageFrame, TimesStamp, new Point(20, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     BorderWidth = BorderWidth - 600;
                     var BorderExposureTime = new Rectangle(BorderWidth, BorderHeight, 300, 100);
                     ImageFrame.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
@@ -1996,11 +2043,13 @@ namespace AllSky_2020
                         CvInvoke.PutText(ImageFrame, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     }
 
+                    CvInvoke.PutText(ImageFrame, "Gain " + AppSetting.Data.MIN_ISO, new Point(BorderWidth + 50, BorderHeight - 20), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+
                     Bitmap BmpImageFrame = ImageFrame.ToBitmap();
 
                     if (IsAutoExposureTime.CheckState != 0) //On-Off AutoExposureTime 
                     {
-                        if (AutoISO.CheckState != 0)
+                        if (AutoISO.CheckState != 0 && CameraStateText.Text != "ASI_EXP_WORKING")
                         {
                             if (AppSetting.Data.ExposureTime <= 1000)
                             {
@@ -2031,6 +2080,57 @@ namespace AllSky_2020
                                     MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                     ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
+                                }
+                                else
+                                {
+                                    if (AppSetting.Data.MIN_ISO <= 100 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 200;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }else if (AppSetting.Data.MIN_ISO <= 200 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 300;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                    else if (AppSetting.Data.MIN_ISO <= 300 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 400;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                    else if (AppSetting.Data.MIN_ISO <= 400 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 500;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                    else if (AppSetting.Data.MIN_ISO <= 500 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 600;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                    else if (AppSetting.Data.MIN_ISO <= 600 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 700;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
+                                    else if (AppSetting.Data.MIN_ISO <= 700 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    {
+                                        AppSetting.Data.MIN_ISO = 800;
+                                        MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
+                                        ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
+
+                                    }
                                 }
 
                             }
@@ -2121,20 +2221,23 @@ namespace AllSky_2020
                                 EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 50L);
                                 myEncoderParameters.Param[0] = myEncoderParameter;
 
-                                if (HdrDetectionHigh > AppSetting.Data.HdrDetectionHigh && HdrDetectionLow > AppSetting.Data.HdrDetectionLow)
+                                if (HdrDetectionHigh > AppSetting.Data.HdrDetectionHigh && HdrDetectionLow > AppSetting.Data.HdrDetectionLow && AppSetting.Data.ExposureTime < 60000)
                                 {
                                     HdrOn = true;
                                 }
 
-                                if (HdrOn == true)
+                                if (HdrOn == true && AppSetting.Data.ExposureTime < 60000)
                                 {
-
-                                    Console.WriteLine("OnHDR");
+                                    if(AppSetting.Data.ExposureTime >= 60000)
+                                    {
+                                        HdrOn = false;
+                                    }
+                                    Console.WriteLine("OnHDR with = " + AppSetting.Data.ExposureTime);
                                     bool DoOne = false;
 
                                     if (AppSetting.Data.ExposureTime > 1)
                                     {
-                                        if (ColorValue > MinLight - 2 && ColorValue <= MaxLight + 2 )
+                                        if (ColorValue > MinLight - 2 && ColorValue <= MaxLight + 2)
                                         {
                                             ControlJump = 2.1;
                                             Console.WriteLine("ControlJump = 2;");
@@ -2155,6 +2258,8 @@ namespace AllSky_2020
                                     {
                                         ControlJump = 1.8;
                                     }
+
+                                    
 
                                     if (ColorValue > MaxLightHdr && CameraStateText.Text != "ASI_EXP_WORKING"
                                         && Recover != false && AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
@@ -2373,7 +2478,7 @@ namespace AllSky_2020
 
 
                                     }
-                                    else if (AppSetting.Data.ExposureTime >= 1)
+                                    else if (AppSetting.Data.ExposureTime >= 1 && AppSetting.Data.ExposureTime < 60000)
                                     {
                                         if (AppSetting.Data.ExposureTime < (AppSetting.Data.MAX_SHUTTER / 4))
                                         {
@@ -2434,7 +2539,7 @@ namespace AllSky_2020
 
                                                 }
                                             }
-                                            
+
 
                                         }
                                         else
@@ -2542,7 +2647,7 @@ namespace AllSky_2020
                                                 }
                                             }
                                         }
-                                        else if(AppSetting.Data.ExposureTime < 1 )
+                                        else if (AppSetting.Data.ExposureTime < 1)
                                         {
                                             for (int i = 0; i < HdrMedium.Height; i++)
                                             {
@@ -2610,8 +2715,9 @@ namespace AllSky_2020
                                         ImageHdrMedium.Draw(BorderTime, new Bgr(Color.White), 2);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.White), 2);
-                                        CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
-
+                                        //CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        CvInvoke.PutText(ImageHdrMedium, TimesStamp, new Point(20, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        
                                         if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
@@ -2624,6 +2730,9 @@ namespace AllSky_2020
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
+                                        
+                                        CvInvoke.PutText(ImageHdrMedium, "Gain " + AppSetting.Data.MIN_ISO, new Point(BorderWidth + 50, BorderHeight - 20), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+
                                         CvInvoke.PutText(ImageHdrMedium, "AUTO HDR", new Point(BorderWidth - 300, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
                                         //Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\NonHdr\" + TimeFolder);
@@ -2882,7 +2991,9 @@ namespace AllSky_2020
                                         ImageHdrMedium.Draw(BorderTime, new Bgr(Color.White), 2);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.White), 2);
-                                        CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        //CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        CvInvoke.PutText(ImageHdrMedium, TimesStamp, new Point(20, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+
                                         if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
@@ -2895,6 +3006,8 @@ namespace AllSky_2020
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
+
+                                        CvInvoke.PutText(ImageHdrMedium, "Gain " + AppSetting.Data.MIN_ISO, new Point(BorderWidth + 50, BorderHeight - 20), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
 
                                         CvInvoke.PutText(ImageHdrMedium, "HDR ON", new Point(BorderWidth - 200, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
@@ -3138,6 +3251,16 @@ namespace AllSky_2020
                                 BmpImageFrame.Save(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder + @"\" + TimeNow + ".jpg", jpgEncoder,
                                     myEncoderParameters);
 
+                                if (AppSetting.Data.HDR_AUTO && autoHDR.Checked == false)
+                                {
+                                    Histogramcheck.Checked = true;
+                                    FocusPoint.Text = "Histogram";
+                                    autoHDR.Checked = true;
+                                    IsAutoExposureTime.Checked = true;
+                                    SpeedMode.Checked = true;
+                                    HoughCirclesStatus = true;
+                                    checkBoxAverage.Checked = true;
+                                }
 
 
                                 if (SaveLog.CheckState != 0)

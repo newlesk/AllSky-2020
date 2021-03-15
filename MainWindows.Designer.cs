@@ -160,6 +160,8 @@
             this.XYPosText = new System.Windows.Forms.Label();
             this.MessageStatusText = new System.Windows.Forms.Label();
             this.UITimer = new System.Windows.Forms.Timer(this.components);
+            this.flipXCheck = new System.Windows.Forms.CheckBox();
+            this.flipYCheck = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -209,7 +211,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.TabControl);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox3);
             this.splitContainer1.Size = new System.Drawing.Size(1340, 815);
-            this.splitContainer1.SplitterDistance = 440;
+            this.splitContainer1.SplitterDistance = 439;
             this.splitContainer1.TabIndex = 1;
             // 
             // splitContainer3
@@ -225,8 +227,8 @@
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.ROIImage);
-            this.splitContainer3.Size = new System.Drawing.Size(1340, 440);
-            this.splitContainer3.SplitterDistance = 689;
+            this.splitContainer3.Size = new System.Drawing.Size(1340, 439);
+            this.splitContainer3.SplitterDistance = 688;
             this.splitContainer3.TabIndex = 4;
             // 
             // MainImageControl
@@ -236,7 +238,7 @@
             this.MainImageControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainImageControl.Location = new System.Drawing.Point(0, 0);
             this.MainImageControl.Name = "MainImageControl";
-            this.MainImageControl.Size = new System.Drawing.Size(689, 440);
+            this.MainImageControl.Size = new System.Drawing.Size(688, 439);
             this.MainImageControl.TabIndex = 3;
             this.MainImageControl.TabStop = false;
             this.MainImageControl.Click += new System.EventHandler(this.MainImageControl_Click);
@@ -250,7 +252,7 @@
             this.ROIImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ROIImage.Location = new System.Drawing.Point(0, 0);
             this.ROIImage.Name = "ROIImage";
-            this.ROIImage.Size = new System.Drawing.Size(647, 440);
+            this.ROIImage.Size = new System.Drawing.Size(648, 439);
             this.ROIImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.ROIImage.TabIndex = 4;
             this.ROIImage.TabStop = false;
@@ -261,7 +263,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel3.Location = new System.Drawing.Point(843, 0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(5, 371);
+            this.panel3.Size = new System.Drawing.Size(5, 372);
             this.panel3.TabIndex = 2;
             // 
             // TabControl
@@ -274,7 +276,7 @@
             this.TabControl.Location = new System.Drawing.Point(0, 0);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(848, 371);
+            this.TabControl.Size = new System.Drawing.Size(848, 372);
             this.TabControl.TabIndex = 0;
             // 
             // tabPage1
@@ -283,7 +285,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(840, 345);
+            this.tabPage1.Size = new System.Drawing.Size(840, 346);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Setting";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -294,7 +296,7 @@
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(834, 339);
+            this.groupBox1.Size = new System.Drawing.Size(834, 340);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Process Area";
@@ -313,8 +315,8 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.panel6);
             this.splitContainer2.Panel2.Controls.Add(this.panel4);
-            this.splitContainer2.Size = new System.Drawing.Size(828, 320);
-            this.splitContainer2.SplitterDistance = 373;
+            this.splitContainer2.Size = new System.Drawing.Size(828, 321);
+            this.splitContainer2.SplitterDistance = 372;
             this.splitContainer2.TabIndex = 0;
             // 
             // Histo
@@ -619,7 +621,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(840, 345);
+            this.tabPage2.Size = new System.Drawing.Size(840, 346);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Process Image";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -963,7 +965,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(840, 345);
+            this.tabPage4.Size = new System.Drawing.Size(840, 346);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Values";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -1043,7 +1045,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(840, 345);
+            this.tabPage3.Size = new System.Drawing.Size(840, 346);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Save";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1102,7 +1104,7 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox3.Location = new System.Drawing.Point(848, 0);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(492, 371);
+            this.groupBox3.Size = new System.Drawing.Size(492, 372);
             this.groupBox3.TabIndex = 1;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Camera State";
@@ -1387,6 +1389,8 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.flipYCheck);
+            this.groupBox4.Controls.Add(this.flipXCheck);
             this.groupBox4.Controls.Add(this.BtnSetCameraSetting);
             this.groupBox4.Controls.Add(this.MIN_ISOText);
             this.groupBox4.Controls.Add(this.label13);
@@ -1407,7 +1411,7 @@
             // 
             // BtnSetCameraSetting
             // 
-            this.BtnSetCameraSetting.Location = new System.Drawing.Point(130, 156);
+            this.BtnSetCameraSetting.Location = new System.Drawing.Point(130, 198);
             this.BtnSetCameraSetting.Name = "BtnSetCameraSetting";
             this.BtnSetCameraSetting.Size = new System.Drawing.Size(100, 23);
             this.BtnSetCameraSetting.TabIndex = 2;
@@ -1531,6 +1535,26 @@
             this.UITimer.Enabled = true;
             this.UITimer.Interval = 50;
             this.UITimer.Tick += new System.EventHandler(this.UITimer_Tick);
+            // 
+            // flipXCheck
+            // 
+            this.flipXCheck.AutoSize = true;
+            this.flipXCheck.Location = new System.Drawing.Point(101, 157);
+            this.flipXCheck.Name = "flipXCheck";
+            this.flipXCheck.Size = new System.Drawing.Size(52, 17);
+            this.flipXCheck.TabIndex = 12;
+            this.flipXCheck.Text = "Flip X";
+            this.flipXCheck.UseVisualStyleBackColor = true;
+            // 
+            // flipYCheck
+            // 
+            this.flipYCheck.AutoSize = true;
+            this.flipYCheck.Location = new System.Drawing.Point(101, 176);
+            this.flipYCheck.Name = "flipYCheck";
+            this.flipYCheck.Size = new System.Drawing.Size(52, 17);
+            this.flipYCheck.TabIndex = 13;
+            this.flipYCheck.Text = "Flip Y";
+            this.flipYCheck.UseVisualStyleBackColor = true;
             // 
             // MainWindows
             // 
@@ -1720,6 +1744,8 @@
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.CheckBox AutoISO;
+        private System.Windows.Forms.CheckBox flipYCheck;
+        private System.Windows.Forms.CheckBox flipXCheck;
     }
 }
 
