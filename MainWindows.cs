@@ -2051,20 +2051,23 @@ namespace AllSky_2020
                     {
                         if (AutoISO.CheckState != 0 && CameraStateText.Text != "ASI_EXP_WORKING")
                         {
-                            if (AppSetting.Data.ExposureTime <= 1000)
+                            if (AppSetting.Data.ExposureTime <= 1000 && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                             {
                                 if (AppSetting.Data.MIN_ISO > 0)
                                 {
+                                    Recover = false;
                                     AppSetting.Data.MIN_ISO = 0;
                                     MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                     ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                 }
                             }
-                            else if (AppSetting.Data.ExposureTime >= 10000 && AppSetting.Data.ExposureTime < 100000)
+                            else if (AppSetting.Data.ExposureTime >= 10000 && AppSetting.Data.ExposureTime < 100000 && CameraStateText.Text != "ASI_EXP_WORKING"
+                                && Recover != false)
                             {
-                                if (AppSetting.Data.MIN_ISO < 50)
+                                if (AppSetting.Data.MIN_ISO < 50 && Recover != false && CameraStateText.Text != "ASI_EXP_WORKING")
                                 {
+                                    Recover = false;
                                     AppSetting.Data.MIN_ISO = 50;
                                     MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                     ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
@@ -2072,10 +2075,11 @@ namespace AllSky_2020
                                 }
 
                             }
-                            else if (AppSetting.Data.ExposureTime >= 100000)
+                            else if (AppSetting.Data.ExposureTime >= 100000 && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                             {
-                                if (AppSetting.Data.MIN_ISO < 100)
+                                if (AppSetting.Data.MIN_ISO < 100 && CameraStateText.Text != "ASI_EXP_WORKING")
                                 {
+                                    Recover = false;
                                     AppSetting.Data.MIN_ISO = 100;
                                     MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                     ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
@@ -2083,49 +2087,63 @@ namespace AllSky_2020
                                 }
                                 else
                                 {
-                                    if (AppSetting.Data.MIN_ISO <= 100 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    if (AppSetting.Data.MIN_ISO <= 100 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 200;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
-                                    }else if (AppSetting.Data.MIN_ISO <= 200 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    }else if (AppSetting.Data.MIN_ISO <= 200 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 300;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                     }
-                                    else if (AppSetting.Data.MIN_ISO <= 300 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    else if (AppSetting.Data.MIN_ISO <= 300 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 400;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                     }
-                                    else if (AppSetting.Data.MIN_ISO <= 400 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    else if (AppSetting.Data.MIN_ISO <= 400 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 500;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                     }
-                                    else if (AppSetting.Data.MIN_ISO <= 500 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    else if (AppSetting.Data.MIN_ISO <= 500 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 600;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                     }
-                                    else if (AppSetting.Data.MIN_ISO <= 600 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    else if (AppSetting.Data.MIN_ISO <= 600 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 700;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
 
                                     }
-                                    else if (AppSetting.Data.MIN_ISO <= 700 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO)
+                                    else if (AppSetting.Data.MIN_ISO <= 700 && ColorValue < MinLight && AppSetting.Data.MIN_ISO <= AppSetting.Data.MAX_ISO
+                                        && CameraStateText.Text != "ASI_EXP_WORKING" && Recover != false)
                                     {
+                                        Recover = false;
                                         AppSetting.Data.MIN_ISO = 800;
                                         MIN_ISOText.Text = AppSetting.Data.MIN_ISO.ToString();
                                         ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
