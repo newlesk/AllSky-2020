@@ -2008,7 +2008,8 @@ namespace AllSky_2020
                         MainImageControl.Image = ProcessFrame;
                     }
 
-                    string TimesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
+                    //string TimesStamp = DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy hh:mm:ss tt");
+                    string TimesStamp = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
                     int Thickness = 5;
                     int BorderHeight = Int32.Parse(AppSetting.Data.ImageHeight.ToString());
                     int BorderWidth = Int32.Parse(AppSetting.Data.ImageWidth.ToString());
@@ -2019,10 +2020,12 @@ namespace AllSky_2020
                     TimeFolder = DateTime.Now.ToString("yyyy-MM-dd");
                     TimeNowChack = DateTime.Now.ToString("yyyy_MM_dd__HH_mm");
                     BorderHeight = BorderHeight - 300;
-                    var BorderTime = new Rectangle(0, BorderHeight, 800, 100);
+                    //var BorderTime = new Rectangle(0, BorderHeight, 800, 100);
+                    var BorderTime = new Rectangle(0, BorderHeight, 700, 100);
                     ImageFrame.Draw(BorderTime, new Bgr(Color.Black), -1);
                     ImageFrame.Draw(BorderTime, new Bgr(Color.White), 2);
-                    CvInvoke.PutText(ImageFrame, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                    //CvInvoke.PutText(ImageFrame, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                    CvInvoke.PutText(ImageFrame, TimesStamp, new Point(20, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     BorderWidth = BorderWidth - 600;
                     var BorderExposureTime = new Rectangle(BorderWidth, BorderHeight, 300, 100);
                     ImageFrame.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
@@ -2039,6 +2042,8 @@ namespace AllSky_2020
                     {
                         CvInvoke.PutText(ImageFrame, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                     }
+
+                    CvInvoke.PutText(ImageFrame, "Gain " + AppSetting.Data.MIN_ISO, new Point(BorderWidth + 50, BorderHeight - 20), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
 
                     Bitmap BmpImageFrame = ImageFrame.ToBitmap();
 
@@ -2705,8 +2710,9 @@ namespace AllSky_2020
                                         ImageHdrMedium.Draw(BorderTime, new Bgr(Color.White), 2);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.White), 2);
-                                        CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
-
+                                        //CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        CvInvoke.PutText(ImageHdrMedium, TimesStamp, new Point(20, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        
                                         if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
@@ -2719,6 +2725,9 @@ namespace AllSky_2020
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
+                                        
+                                        CvInvoke.PutText(ImageHdrMedium, "Gain " + AppSetting.Data.MIN_ISO, new Point(BorderWidth + 50, BorderHeight - 20), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+
                                         CvInvoke.PutText(ImageHdrMedium, "AUTO HDR", new Point(BorderWidth - 300, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
                                         //Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\NonHdr\" + TimeFolder);
@@ -2977,7 +2986,9 @@ namespace AllSky_2020
                                         ImageHdrMedium.Draw(BorderTime, new Bgr(Color.White), 2);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
                                         ImageHdrMedium.Draw(BorderExposureTime, new Bgr(Color.White), 2);
-                                        CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        //CvInvoke.PutText(ImageHdrMedium, "UTC " + TimesStamp, new Point(0, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+                                        CvInvoke.PutText(ImageHdrMedium, TimesStamp, new Point(20, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
+
                                         if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
@@ -2990,6 +3001,8 @@ namespace AllSky_2020
                                         {
                                             CvInvoke.PutText(ImageHdrMedium, Math.Round(AppSetting.Data.ExposureTime, 2) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         }
+
+                                        CvInvoke.PutText(ImageHdrMedium, "Gain " + AppSetting.Data.MIN_ISO, new Point(BorderWidth + 50, BorderHeight - 20), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
 
                                         CvInvoke.PutText(ImageHdrMedium, "HDR ON", new Point(BorderWidth - 200, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
                                         Directory.CreateDirectory(AppSetting.Data.SaveFileDialog + @"\AllSky" + @"\" + TimeFolder);
