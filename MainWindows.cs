@@ -460,6 +460,8 @@ namespace AllSky_2020
             }
             ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_GAIN, (int)AppSetting.Data.MIN_ISO);
             ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_AUTO_MAX_GAIN, (int)AppSetting.Data.MAX_ISO);
+            ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_WB_B, 90);
+            ASICameraDll2.ASISetControlValue(CameraId, ASI_CONTROL_TYPE.ASI_WB_R, 40);
         }
 
         private void BtnDefineOrigin_Click(object sender, EventArgs e)
@@ -1983,8 +1985,9 @@ namespace AllSky_2020
                     if (AppSetting.Data.IS_DISPLAY_ORGIN)
                         CvInvoke.Rectangle(ProcessFrame, new Rectangle((int)AppSetting.Data.OriginX, (int)AppSetting.Data.OriginY, (int)AppSetting.Data.OriginWidth, (int)AppSetting.Data.OriginHeight), new Bgr(Color.LightGreen).MCvScalar, 2);
 
+
                     AltAz SunAltAz = SunHanler.GetSunPosition();
-                    Point SunXY = AzmAltToXY.CalculateXYPoint(SunAltAz.Alt.Degs, SunAltAz.Az.Degs, 20);
+                    //Point SunXY = AzmAltToXY.CalculateXYPoint(SunAltAz.Alt.Degs, SunAltAz.Az.Degs, 20);
                     //CvInvoke.Circle(ProcessFrame, SunXY, 20, new Bgr(Color.LightGreen).MCvScalar, 2);
 
                     int CameraWidth;
@@ -2030,6 +2033,7 @@ namespace AllSky_2020
                     var BorderExposureTime = new Rectangle(BorderWidth, BorderHeight, 300, 100);
                     ImageFrame.Draw(BorderExposureTime, new Bgr(Color.Black), -1);
                     ImageFrame.Draw(BorderExposureTime, new Bgr(Color.White), 2);
+
                     if (ExposureTimeShow < 1000 && ExposureTimeShow > 1)
                     {
                         CvInvoke.PutText(ImageFrame, Math.Round(AppSetting.Data.ExposureTime, 0) + " ms", new Point(BorderWidth + 50, BorderHeight + 50), FontFace.HersheySimplex, 1.5, new Bgr(Color.White).MCvScalar, Thickness);
@@ -2243,6 +2247,8 @@ namespace AllSky_2020
                                 {
                                     HdrOn = true;
                                 }
+
+                                if(SunAltAz.Alt.Degs <= 0) HdrOn = false;
 
                                 if (HdrOn == true && AppSetting.Data.ExposureTime < 60000)
                                 {
